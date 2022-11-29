@@ -23,4 +23,32 @@ public class SOUser {
     public String toString() {
         return "User: " + display_name;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getReputation() {
+        return reputation;
+    }
+
+    public String getDisplay_name() {
+        return display_name;
+    }
+
+    public String getWebsite_url() {
+        return website_url;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getProfile_image_url() {
+        return profile_image_url;
+    }
+
+    public int getAccount_id() {
+        return account_id;
+    }
 }

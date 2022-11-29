@@ -1,29 +1,55 @@
 package com.wriesnig;
 
-import com.wriesnig.stackoverflowapi.SOAPI;
+import com.wriesnig.githubapi.GHUser;
+import com.wriesnig.githubapi.GitHubApi;
+import com.wriesnig.stackoverflowapi.StackOverFlowApi;
 import com.wriesnig.stackoverflowapi.SOUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class CharacterizerApplication {
     private ArrayList<Integer> ids;
+    private ArrayList<SOUser> so_users;
+    private StackOverFlowApi stackoverflow_api;
+    private GitHubApi github_api;
+    private HashMap<SOUser, ArrayList<GHUser>> potentially_matching_accounts;
+
 
     public CharacterizerApplication(){
         ids = new ArrayList<>(Arrays.asList(22656, 2333));
+        so_users = new ArrayList<>();
+        stackoverflow_api = new StackOverFlowApi();
+        github_api = new GitHubApi();
     }
 
     public void run(){
-        //was muss gemacht werden?
-        //wenn nicht schon so_ids dann diese
-        //SO api fetch für image url etc
-        //github fetch und match
-        getSOUserData(ids);
+        initSOUserData();
+        fetchPossibleGHUsers();
+        findMatchingPairs();
+    }
+    public void findMatchingPairs(){
+
     }
 
-    private void getSOUserData(ArrayList<Integer> ids){
-        SOAPI SOAPI = new SOAPI();
-        ArrayList<SOUser> so_users = SOAPI.getSOUsers(ids);
-        System.out.println(so_users);
+    public void fetchPossibleGHUsers(){
+        for(SOUser so_user: so_users){
+            ArrayList<GHUser> potential_matches = new ArrayList<>();
+            GHUser gh_user;
+            gh_user = github_api.getUserByLogin(so_user.getDisplay_name());
+            if(gh_user != null) potential_matches.add(gh_user);
+            ArrayList<String> full_names = github_api.getUsersByFullName(so_user.getDisplay_name());
+            for(String login: full_names){
+                gh_user = github_api.getUserByLogin(login);
+                potential_matches.add(gh_user);
+            }
+
+            potentially_matching_accounts.put(so_user, potential_matches);
+        }
+    }
+
+    public void initSOUserData(){
+        so_users = stackoverflow_api.getUsers(ids);
     }
 }
