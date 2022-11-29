@@ -1,16 +1,16 @@
-package wriesnig;
+package com.wriesnig;
 
-import org.json.JSONObject;
+import com.wriesnig.stackoverflowapi.SOAPI;
+import com.wriesnig.stackoverflowapi.SOUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 public class CharacterizerApplication {
     private ArrayList<Integer> ids;
 
     public CharacterizerApplication(){
-        ids = new ArrayList<>(Arrays.asList(22656));
+        ids = new ArrayList<>(Arrays.asList(22656, 2333));
     }
 
     public void run(){
@@ -22,8 +22,8 @@ public class CharacterizerApplication {
     }
 
     private void getSOUserData(ArrayList<Integer> ids){
-        StackOverflowAPI stackOverflowAPI = new StackOverflowAPI();
-        JSONObject user_data = stackOverflowAPI.getUserInfo(ids);
-
+        SOAPI SOAPI = new SOAPI();
+        ArrayList<SOUser> so_users = SOAPI.getSOUsers(ids);
+        System.out.println(so_users);
     }
 }
