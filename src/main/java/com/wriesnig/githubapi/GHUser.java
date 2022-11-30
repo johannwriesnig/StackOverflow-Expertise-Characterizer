@@ -14,4 +14,29 @@ public class GHUser {
         this.location = location;
         this.website_url = website_url;
     }
+
+    @Override
+    public String toString() {
+        return "GHUser: " + login;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public String getProfile_image_url() {
+        return profile_image_url;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getWebsite_url() {
+        return website_url;
+    }
 }

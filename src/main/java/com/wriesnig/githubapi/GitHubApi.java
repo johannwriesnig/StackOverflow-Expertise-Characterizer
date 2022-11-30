@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+
+/**
+ * Class is the Interface to the Github-RestApi. It offers different GET-Methods to retrieve specific data.
+ */
 public class GitHubApi {
     private final String api_url = "https://api.github.com/";
     private WebClient client;
@@ -24,6 +28,11 @@ public class GitHubApi {
                 .build();
     }
 
+    /**
+     * Get GithubUser by his login(unique).
+     * @param login
+     * @return
+     */
     public GHUser getUserByLogin(String login) {
         if(login.contains(" "))return null;
         WebClient.ResponseSpec response = client.get().uri("/users/" + login).retrieve();
@@ -32,6 +41,11 @@ public class GitHubApi {
         return GHUserDataParser.parseUserByLoginResponse(user_as_json);
     }
 
+    /**
+     * Get GithubUsers based on full_name which is not unique.
+     * @param full_name
+     * @return
+     */
     public ArrayList<String> getUsersByFullName(String full_name){
         full_name = full_name.replace(" ", "+");
         WebClient.ResponseSpec response = client.get().uri("/search/users?q=fullname:" + full_name).retrieve();

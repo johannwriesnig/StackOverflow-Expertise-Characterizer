@@ -5,9 +5,17 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+/**
+ * Parser for Stackoverflow Rest-Api responses
+ */
 public class SOUserDataParser {
     private SOUserDataParser(){}
 
+    /**
+     * Returns StackoverflowUsers based on response
+     * @param response
+     * @return
+     */
     public static ArrayList<SOUser> parseUsersResponse(JSONObject response){
         JSONArray users_as_json = response.getJSONArray("items");
 

@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Interface to the StackOverflowApi that is needed since some data are missing in the dumps
+ */
 public class StackOverFlowApi {
     private final String api_url = "https://api.stackexchange.com/2.3";
     private final WebClient client;
@@ -22,6 +25,11 @@ public class StackOverFlowApi {
                 .build();
     }
 
+    /**
+     * Get Users based on their Ids
+     * @param ids
+     * @return
+     */
     public ArrayList<SOUser> getUsers(ArrayList<Integer> ids) {
         String ids_list = ids.stream().map(Object::toString)
                 .collect(Collectors.joining(";"));
