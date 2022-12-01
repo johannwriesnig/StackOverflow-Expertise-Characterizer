@@ -5,16 +5,16 @@ public class SOUser {
     private int reputation;
     private String display_name;
     private String website_url;
-    private String location;
+    private String link;
     private String profile_image_url;
     private int account_id;
 
-    public SOUser(int id, int reputation, String display_name, String website_url, String location, String profile_image_url, int account_id) {
+    public SOUser(int id, int reputation, String display_name, String website_url, String link, String profile_image_url, int account_id) {
         this.id = id;
         this.reputation = reputation;
         this.display_name = display_name;
         this.website_url = website_url;
-        this.location = location;
+        this.link = link;
         this.profile_image_url = profile_image_url;
         this.account_id = account_id;
     }
@@ -40,8 +40,8 @@ public class SOUser {
         return website_url;
     }
 
-    public String getLocation() {
-        return location;
+    public String getLink() {
+        return link;
     }
 
     public String getProfile_image_url() {

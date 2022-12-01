@@ -8,50 +8,39 @@ import java.awt.image.BufferedImage;
 /**
  * Scores the matching between Stackoverflow- and GithubUser
  */
-public class MatchScorer {
-    private MatchScorer(){}
+public class MatchingScorer {
+    private static final double matching_names_score = 0.4;
+    private static final double matching_images_score = 0.4;
+    private static final double matching_linked_websites_score = 0.2;
+    private static final double no_match_score = 0;
+    private MatchingScorer(){}
 
     public static double getMatchingScore(SOUser so_user, GHUser gh_user){
         double score=0;
-        score+= getLocationMatchingScore(so_user.getLocation(), gh_user.getLocation());
-        score+= getWebsiteMatchingScore(so_user.getWebsite_url(), gh_user.getWebsite_url());
         score+= getNameMatchingScore(so_user.getDisplay_name(), gh_user);
         score+= getImageMatchingScore(so_user.getProfile_image_url(), gh_user.getProfile_image_url());
-        return score;
-    }
-
-    private static double getLocationMatchingScore(String so_user_location, String gh_user_location){
-        double score=0;
-        if(so_user_location.toLowerCase().contains(gh_user_location.toLowerCase()) || gh_user_location.toLowerCase().contains(so_user_location.toLowerCase()))
-            score +=0.1;
-
-        return score;
-    }
-
-    private static double getWebsiteMatchingScore(String so_user_website_url, String gh_user_website_url){
-        double score=0;
+        score+= getLinkedWebsiteMatchingScore(so_user, gh_user);
         return score;
     }
 
     private static double getNameMatchingScore(String so_user_name, GHUser gh_user){
-        double score=0;
-        if(so_user_name.equals(gh_user.getLogin()) || so_user_name.equals(gh_user.getName()))
-            score+=0.25;
-        return score;
+        return isNamesMatching(so_user_name, gh_user)?matching_names_score: no_match_score;
+    }
+
+    private static boolean isNamesMatching(String so_user_name, GHUser gh_user){
+        return so_user_name.equals(gh_user.getLogin()) || so_user_name.equals(gh_user.getName());
     }
 
     private static double getImageMatchingScore(String so_user_image_url, String gh_user_image_url){
-        double score=0;
-        BufferedImage so_user_image = ImageFetcher.getImageFromUrl(so_user_image_url);
-        BufferedImage gh_user_image = ImageFetcher.getImageFromUrl(gh_user_image_url);
+        BufferedImage so_user_image = ProfileImageFetcher.getImageFromUrl(so_user_image_url);
+        BufferedImage gh_user_image = ProfileImageFetcher.getImageFromUrl(gh_user_image_url);
 
-        double similarity_dif = compareImages(so_user_image, gh_user_image);
-        if(similarity_dif<8) score+=0.25;
+        double images_difference = getImagesDissimilarity(so_user_image, gh_user_image);
 
-        return score;
+        return images_difference<8?matching_images_score:no_match_score;
     }
 
-    private static double compareImages(BufferedImage img1, BufferedImage img2){
+    private static double getImagesDissimilarity(BufferedImage img1, BufferedImage img2){
         if(img1 == null || img2 == null)return -1;
         int width1 = img1.getWidth();
         int width2 = img2.getWidth();
@@ -103,5 +92,12 @@ public class MatchScorer {
         return percentage;
     }
 
+    private static double getLinkedWebsiteMatchingScore(SOUser so_user, GHUser gh_user){
+        return isWebsitesMatching(so_user, gh_user)?matching_linked_websites_score:no_match_score;
+    }
+
+    private static boolean isWebsitesMatching(SOUser so_user, GHUser gh_user){
+        return so_user.getLink().equals(gh_user.getWebsite_url()) || so_user.getWebsite_url().equals(gh_user.getHtml_url());
+    }
 
 }

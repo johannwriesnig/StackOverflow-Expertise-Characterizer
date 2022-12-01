@@ -4,14 +4,14 @@ public class GHUser {
     private String login;
     private String profile_image_url;
     private String name;
-    private String location;
+    private String html_url;
     private String website_url;
 
-    public GHUser(String login, String profile_image_url, String name, String location, String website_url) {
+    public GHUser(String login, String profile_image_url, String name, String html_url, String website_url) {
         this.login = login;
         this.profile_image_url = profile_image_url;
         this.name = name;
-        this.location = location;
+        this.html_url = html_url;
         this.website_url = website_url;
     }
 
@@ -32,8 +32,8 @@ public class GHUser {
         return name;
     }
 
-    public String getLocation() {
-        return location;
+    public String getHtml_url() {
+        return html_url;
     }
 
     public String getWebsite_url() {

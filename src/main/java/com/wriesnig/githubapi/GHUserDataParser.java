@@ -23,9 +23,9 @@ public class GHUserDataParser {
         String profile_image_url = user.getString("avatar_url");
         String name = user.getString("name");
         String website_url = user.getString("blog");
-        String location = user.isNull("location")?"null":user.getString("location");
+        String html_url = user.getString("html_url");
 
-        return new GHUser(login, profile_image_url, name, location, website_url);
+        return new GHUser(login, profile_image_url, name, html_url, website_url);
 
     }
 
