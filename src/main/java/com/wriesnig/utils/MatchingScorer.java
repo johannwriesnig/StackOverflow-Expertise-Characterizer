@@ -1,4 +1,4 @@
-package com.wriesnig;
+package com.wriesnig.utils;
 
 import com.wriesnig.githubapi.GHUser;
 import com.wriesnig.stackoverflowapi.SOUser;

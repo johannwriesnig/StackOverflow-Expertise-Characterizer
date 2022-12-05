@@ -1,4 +1,4 @@
-package com.wriesnig;
+package com.wriesnig.utils;
 
 import com.wriesnig.githubapi.GHUser;
 import com.wriesnig.githubapi.GitHubApi;
@@ -36,7 +36,6 @@ public class AccountsFetcher {
      * Fetches possible GHUsers. Firstly GHUser with same login is stored, secondly User with same full_name
      */
     private static HashMap<SOUser, ArrayList<GHUser>> fetchSOUsersWithPotentialGHUsers(ArrayList<SOUser> so_users) {
-        GitHubApi github_api = new GitHubApi();
         HashMap<SOUser, ArrayList<GHUser>> potentially_matching_accounts = new HashMap<>();
 
         for (SOUser so_user : so_users) {
@@ -68,7 +67,6 @@ public class AccountsFetcher {
         }
 
         if(isGHUserLink(so_user.getWebsite_url())){
-            String[] url_parts = so_user.getWebsite_url().split("/");
             String login = getLoginFromGHUserLink(so_user.getWebsite_url());
             gh_user = github_api.getUserByLogin(login);
             potential_matches.add(gh_user);
