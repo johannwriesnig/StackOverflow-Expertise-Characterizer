@@ -16,11 +16,11 @@ public class ExpertiseCalculator {
     private static void computeSOExpertise(ArrayList<User> users) {
         System.out.println("Fetching Posts from User...");
         User user = users.get(0);
-        ResultSet result_set = SODatabase.getPostsFromUser(user.getSo_id());
+        ResultSet resultSet = SODatabase.getPostsFromUser(user.getSo_id());
         try {
 
-            while (result_set.next()) {
-                String id = result_set.getString("Body");
+            while (resultSet.next()) {
+                String id = resultSet.getString("Body");
                 System.out.println(id);
             }
         } catch (SQLException e) {

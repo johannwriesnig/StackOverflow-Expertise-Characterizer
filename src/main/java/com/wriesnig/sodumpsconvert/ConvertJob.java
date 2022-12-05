@@ -16,20 +16,20 @@ import java.util.ArrayList;
 public class ConvertJob{
     private final FileWriter writer;
 
-    private final String file_name;
+    private final String fileName;
     private final SAXParser parser;
-    private final DataInfo data_info;
+    private final DataInfo dataInfo;
 
     private double start;
     private int counter = 0;
     private int mill_counter = 1;
 
-    public ConvertJob(DataInfo data_info, String file_name, SAXParser parser) throws IOException {
-        this.data_info = data_info;
-        this.file_name = file_name;
+    public ConvertJob(DataInfo dataInfo, String fileName, SAXParser parser) throws IOException {
+        this.dataInfo = dataInfo;
+        this.fileName = fileName;
         this.parser = parser;
 
-        File csv = new File("output/" + data_info.getDataName() + ".csv");
+        File csv = new File("output/" + dataInfo.getDataName() + ".csv");
         writer = new FileWriter(csv);
     }
 
@@ -47,13 +47,13 @@ public class ConvertJob{
 
     public void startParsing() {
         try {
-            for(int i=0; i<data_info.getData_attributes().size(); i++){
-                writer.write((data_info.getData_attributes().get(i).getKey()));
-                if(i!=data_info.getData_attributes().size()-1)writer.write(",");
+            for(int i = 0; i< dataInfo.getDataAttributes().size(); i++){
+                writer.write((dataInfo.getDataAttributes().get(i).getKey()));
+                if(i!= dataInfo.getDataAttributes().size()-1)writer.write(",");
             }
             writer.write("\n");
             XMLHandler xml_handler = new XMLHandler(this::processRow);
-            parser.parse(new File(file_name), xml_handler);
+            parser.parse(new File(fileName), xml_handler);
 
         } catch (SAXException | IOException e) {
             System.out.println("Running parser failed...");
@@ -67,30 +67,30 @@ public class ConvertJob{
     }
 
     public void writeToCSV(Attributes attributes){
-        ArrayList<Pair<String, AttributeType>> table_attributes = data_info.getData_attributes();
-        for (int i = 0; i < table_attributes.size(); i++) {
-            Pair<String, AttributeType> current_attribute = table_attributes.get(i);
+        ArrayList<Pair<String, AttributeType>> dataAttributes = dataInfo.getDataAttributes();
+        for (int i = 0; i < dataAttributes.size(); i++) {
+            Pair<String, AttributeType> current_attribute = dataAttributes.get(i);
             try {
-                String to_write = "";
-                String attribute_value = attributes.getValue(current_attribute.getKey());
+                String toWrite = "";
+                String attributeValue = attributes.getValue(current_attribute.getKey());
                 switch (current_attribute.getValue()) {
                     case INTEGER:
-                        to_write = attribute_value == null ? "0" : attribute_value;
+                        toWrite = attributeValue == null ? "0" : attributeValue;
                         break;
                     case STRING:
-                        to_write = attribute_value == null ? "" : attribute_value;
+                        toWrite = attributeValue == null ? "" : attributeValue;
                         break;
                 }
 
-                if(to_write.contains("\r")) to_write = to_write.replace("\r", " ");
-                if(to_write.contains("\n")) to_write = to_write.replace("\n", " ");
-                if (to_write.contains(",") || to_write.contains("\"") || to_write.contains("'")) {
-                    to_write = to_write.replace("\"", "\"\"");
-                    to_write = "\"" + to_write + "\"";
+                if(toWrite.contains("\r")) toWrite = toWrite.replace("\r", " ");
+                if(toWrite.contains("\n")) toWrite = toWrite.replace("\n", " ");
+                if (toWrite.contains(",") || toWrite.contains("\"") || toWrite.contains("'")) {
+                    toWrite = toWrite.replace("\"", "\"\"");
+                    toWrite = "\"" + toWrite + "\"";
                 }
 
-                writer.write(to_write);
-                if(i!=table_attributes.size()-1){
+                writer.write(toWrite);
+                if(i!=dataAttributes.size()-1){
                     writer.write(",");
                 }
             } catch (IOException e) {
@@ -112,7 +112,7 @@ public class ConvertJob{
 
         double stop = System.nanoTime() - start;
         stop /= 1000000000.0;
-        System.out.println("Needed " + String.format("%.2f", stop) + "sec to insert " + (mill_counter++) + "mill entries into " + data_info.getDataName() + ".");
+        System.out.println("Needed " + String.format("%.2f", stop) + "sec to insert " + (mill_counter++) + "mill entries into " + dataInfo.getDataName() + ".");
         counter = 0;
     }
 }

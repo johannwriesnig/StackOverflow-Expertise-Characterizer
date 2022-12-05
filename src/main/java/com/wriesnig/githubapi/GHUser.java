@@ -2,17 +2,17 @@ package com.wriesnig.githubapi;
 
 public class GHUser {
     private String login;
-    private String profile_image_url;
+    private String profileImageUrl;
     private String name;
-    private String html_url;
-    private String website_url;
+    private String htmlUrl;
+    private String websiteUrl;
 
-    public GHUser(String login, String profile_image_url, String name, String html_url, String website_url) {
+    public GHUser(String login, String profileImageUrl, String name, String htmlUrl, String websiteUrl) {
         this.login = login;
-        this.profile_image_url = profile_image_url;
+        this.profileImageUrl = profileImageUrl;
         this.name = name;
-        this.html_url = html_url;
-        this.website_url = website_url;
+        this.htmlUrl = htmlUrl;
+        this.websiteUrl = websiteUrl;
     }
 
     @Override
@@ -24,19 +24,19 @@ public class GHUser {
         return login;
     }
 
-    public String getProfile_image_url() {
-        return profile_image_url;
+    public String getProfileImageUrl() {
+        return profileImageUrl;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getHtml_url() {
-        return html_url;
+    public String getHtmlUrl() {
+        return htmlUrl;
     }
 
-    public String getWebsite_url() {
-        return website_url;
+    public String getWebsiteUrl() {
+        return websiteUrl;
     }
 }

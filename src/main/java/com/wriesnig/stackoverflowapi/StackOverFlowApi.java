@@ -14,13 +14,13 @@ import java.util.stream.Collectors;
  * Interface to the StackOverflowApi that is needed since some data are missing in the dumps
  */
 public class StackOverFlowApi {
-    private final String api_url = "https://api.stackexchange.com/2.3";
+    private final String apiUrl = "https://api.stackexchange.com/2.3";
     private final WebClient client;
 
 
     public StackOverFlowApi() {
         client = WebClient.builder()
-                .baseUrl(api_url)
+                .baseUrl(apiUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
@@ -31,12 +31,12 @@ public class StackOverFlowApi {
      * @return
      */
     public ArrayList<SOUser> getUsers(ArrayList<Integer> ids) {
-        String ids_list = ids.stream().map(Object::toString)
+        String idsList = ids.stream().map(Object::toString)
                 .collect(Collectors.joining(";"));
 
-        WebClient.ResponseSpec response = client.get().uri("/users/" + ids_list + "?site=stackoverflow").retrieve();
-        JSONObject users_as_json = new JSONObject(Objects.requireNonNull(response.bodyToMono(String.class).block()));
-        return SOUserDataParser.parseUsersResponse(users_as_json);
+        WebClient.ResponseSpec response = client.get().uri("/users/" + idsList + "?site=stackoverflow").retrieve();
+        JSONObject usersAsJson = new JSONObject(Objects.requireNonNull(response.bodyToMono(String.class).block()));
+        return SOUserDataParser.parseUsersResponse(usersAsJson);
     }
 
 }

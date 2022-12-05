@@ -23,11 +23,11 @@ public class CharacterizerApplication {
     }
 
     public void run() {
-        ArrayList<Pair<SOUser, GHUser>> linked_accounts = AccountsFetcher.fetchMatchingAccounts(ids);
-        printCurrentMatches(linked_accounts);
+        ArrayList<Pair<SOUser, GHUser>> linkedAccounts = AccountsFetcher.fetchMatchingAccounts(ids);
+        printCurrentMatches(linkedAccounts);
 
         ArrayList<User> users = new ArrayList<>();
-        for(Pair<SOUser, GHUser> matching_accounts: linked_accounts){
+        for(Pair<SOUser, GHUser> matching_accounts: linkedAccounts){
             users.add(new User(matching_accounts.getKey(), matching_accounts.getValue()));
         }
 
@@ -35,9 +35,9 @@ public class CharacterizerApplication {
         printExpertisePerUser(users);
     }
 
-    public void printCurrentMatches(ArrayList<Pair<SOUser, GHUser>> linked_accounts){
-        for(Pair<SOUser, GHUser> pair: linked_accounts){
-            System.out.println("Matched pair -> SO: "+ pair.getKey().getDisplay_name() + " GH: " + pair.getValue().getLogin());
+    public void printCurrentMatches(ArrayList<Pair<SOUser, GHUser>> linkedAccounts){
+        for(Pair<SOUser, GHUser> pair: linkedAccounts){
+            System.out.println("Matched pair -> SO: "+ pair.getKey().getDisplayName() + " GH: " + pair.getValue().getLogin());
         }
     }
 

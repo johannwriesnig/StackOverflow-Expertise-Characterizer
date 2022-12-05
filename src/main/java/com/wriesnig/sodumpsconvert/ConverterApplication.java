@@ -1,8 +1,9 @@
 package com.wriesnig.sodumpsconvert;
 
-import datainfo.PostsInfo;
-import datainfo.UsersInfo;
-import datainfo.VotesInfo;
+
+import com.wriesnig.sodumpsconvert.datainfo.PostsInfo;
+import com.wriesnig.sodumpsconvert.datainfo.UsersInfo;
+import com.wriesnig.sodumpsconvert.datainfo.VotesInfo;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,14 +25,13 @@ public class ConverterApplication {
         try {
             new File("output").mkdirs();
 
-            ConvertJob users_convert_job = new ConvertJob(new UsersInfo(), "C:\\Users\\43664\\Desktop\\dumps\\Users.xml", factory.newSAXParser());
-            ConvertJob posts_convert_job = new ConvertJob(new PostsInfo(), "C:\\Users\\43664\\Desktop\\dumps\\Posts.xml", factory.newSAXParser());
-            ConvertJob votes_convert_job = new ConvertJob(new VotesInfo(), "C:\\Users\\43664\\Desktop\\dumps\\Votes.xml", factory.newSAXParser());
+            ConvertJob usersConvertJob = new ConvertJob(new UsersInfo(), "", factory.newSAXParser());
+            ConvertJob postsConvertJob = new ConvertJob(new PostsInfo(), "", factory.newSAXParser());
+            ConvertJob votesConvertJob = new ConvertJob(new VotesInfo(), "", factory.newSAXParser());
 
-            users_convert_job.convert();
-            votes_convert_job.convert();
-            posts_convert_job.convert();
-
+            usersConvertJob.convert();
+            votesConvertJob.convert();
+            postsConvertJob.convert();
         } catch (SAXException | ParserConfigurationException e) {
             System.out.println("Issues with ConverterApplication...");
             e.printStackTrace();

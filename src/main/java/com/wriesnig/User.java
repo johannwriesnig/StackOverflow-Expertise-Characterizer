@@ -10,7 +10,7 @@ public class User {
     private Expertise expertise;
 
     public User(SOUser so_user, GHUser gh_user){
-        this.so_display_name = so_user.getDisplay_name();
+        this.so_display_name = so_user.getDisplayName();
         this.so_id = so_user.getId();
         this.gh_login = gh_user.getLogin();
     }
