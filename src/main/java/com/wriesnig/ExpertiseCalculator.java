@@ -3,6 +3,9 @@ package com.wriesnig;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class ExpertiseCalculator {
     private ExpertiseCalculator() {
@@ -16,16 +19,15 @@ public class ExpertiseCalculator {
     private static void computeSOExpertise(ArrayList<User> users) {
         System.out.println("Fetching Posts from User...");
         User user = users.get(0);
-        ResultSet resultSet = SODatabase.getPostsFromUser(user.getSo_id());
+        Thread thread = new Thread(new SOExpertiseJob(user, SODatabase.getConnectionPool().getDBConnection()));
+        thread.start();
         try {
-
-            while (resultSet.next()) {
-                String id = resultSet.getString("Body");
-                System.out.println(id);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            thread.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
+
+
 
     }
 
