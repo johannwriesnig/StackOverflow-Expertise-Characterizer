@@ -1,4 +1,4 @@
-package com.wriesnig;
+package com.wriesnig.stackoverflow.db;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;

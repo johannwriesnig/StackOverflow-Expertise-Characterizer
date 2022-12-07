@@ -1,7 +1,8 @@
-package com.wriesnig;
+package com.wriesnig.expertise;
 
+import com.wriesnig.expertise.Expertise;
 import com.wriesnig.githubapi.GHUser;
-import com.wriesnig.stackoverflowapi.SOUser;
+import com.wriesnig.stackoverflow.api.SOUser;
 
 public class User {
     private int so_id;

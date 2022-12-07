@@ -1,4 +1,4 @@
-package com.wriesnig;
+package com.wriesnig.stackoverflow.db;
 
 public enum VoteTypes {
     IS_ACCEPTED(1), UP_VOTE(2), DOWN_VOTE(3);

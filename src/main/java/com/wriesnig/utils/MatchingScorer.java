@@ -1,7 +1,7 @@
 package com.wriesnig.utils;
 
 import com.wriesnig.githubapi.GHUser;
-import com.wriesnig.stackoverflowapi.SOUser;
+import com.wriesnig.stackoverflow.api.SOUser;
 
 import java.awt.image.BufferedImage;
 

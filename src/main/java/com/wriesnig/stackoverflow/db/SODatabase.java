@@ -1,7 +1,6 @@
-package com.wriesnig;
+package com.wriesnig.stackoverflow.db;
 
 import java.sql.*;
-import java.sql.Connection;
 
 public class SODatabase {
     private static ConnectionPool connectionPool;

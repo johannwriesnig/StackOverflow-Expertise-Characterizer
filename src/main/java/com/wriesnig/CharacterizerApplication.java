@@ -1,8 +1,10 @@
 package com.wriesnig;
 
 
+import com.wriesnig.expertise.ExpertiseCalculator;
+import com.wriesnig.expertise.User;
 import com.wriesnig.githubapi.GHUser;
-import com.wriesnig.stackoverflowapi.SOUser;
+import com.wriesnig.stackoverflow.api.SOUser;
 
 import com.wriesnig.utils.AccountsFetcher;
 import javafx.util.Pair;

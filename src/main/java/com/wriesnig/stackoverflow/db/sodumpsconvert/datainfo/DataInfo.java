@@ -1,4 +1,4 @@
-package com.wriesnig.sodumpsconvert.datainfo;
+package com.wriesnig.stackoverflow.db.sodumpsconvert.datainfo;
 
 import javafx.util.Pair;
 

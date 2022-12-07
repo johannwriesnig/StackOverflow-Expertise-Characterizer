@@ -1,4 +1,4 @@
-package com.wriesnig.stackoverflowapi;
+package com.wriesnig.stackoverflow.api;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -1,9 +1,9 @@
-package com.wriesnig.sodumpsconvert;
+package com.wriesnig.stackoverflow.db.sodumpsconvert;
 
 
-import com.wriesnig.sodumpsconvert.datainfo.PostsInfo;
-import com.wriesnig.sodumpsconvert.datainfo.UsersInfo;
-import com.wriesnig.sodumpsconvert.datainfo.VotesInfo;
+import com.wriesnig.stackoverflow.db.sodumpsconvert.datainfo.PostsInfo;
+import com.wriesnig.stackoverflow.db.sodumpsconvert.datainfo.UsersInfo;
+import com.wriesnig.stackoverflow.db.sodumpsconvert.datainfo.VotesInfo;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;

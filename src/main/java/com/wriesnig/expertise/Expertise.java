@@ -1,4 +1,4 @@
-package com.wriesnig;
+package com.wriesnig.expertise;
 
 public class Expertise {
 

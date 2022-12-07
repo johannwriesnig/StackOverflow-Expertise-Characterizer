@@ -1,5 +1,7 @@
 package com.wriesnig;
 
+import com.wriesnig.stackoverflow.db.SODatabase;
+
 import java.sql.SQLException;
 
 public class Main {

@@ -1,14 +1,11 @@
-package com.wriesnig;
+package com.wriesnig.expertise;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.wriesnig.stackoverflow.db.SODatabase;
+
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class ExpertiseCalculator {
     private ExpertiseCalculator() {

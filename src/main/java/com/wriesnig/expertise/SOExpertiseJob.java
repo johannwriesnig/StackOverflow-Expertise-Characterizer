@@ -1,4 +1,8 @@
-package com.wriesnig;
+package com.wriesnig.expertise;
+
+import com.wriesnig.stackoverflow.db.DBConnection;
+import com.wriesnig.stackoverflow.db.SODatabase;
+import com.wriesnig.stackoverflow.db.VoteTypes;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

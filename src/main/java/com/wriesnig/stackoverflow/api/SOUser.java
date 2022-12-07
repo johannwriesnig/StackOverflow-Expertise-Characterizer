@@ -1,4 +1,4 @@
-package com.wriesnig.stackoverflowapi;
+package com.wriesnig.stackoverflow.api;
 
 public class SOUser {
     private int id;
