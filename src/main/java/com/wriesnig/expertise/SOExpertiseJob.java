@@ -20,7 +20,7 @@ public class SOExpertiseJob implements Runnable{
     @Override
     public void run() {
         DBConnection dbConnection = SODatabase.getConnectionPool().getDBConnection();
-        ResultSet postResults = SODatabase.getPostsFromUser(dbConnection, user.getSo_id());
+        ResultSet postResults = SODatabase.getPostsFromUser(dbConnection, user.getSoId());
         try {
 
             HashMap<String, ArrayList<Double>> scoresPerTag = new HashMap<>();
@@ -58,7 +58,7 @@ public class SOExpertiseJob implements Runnable{
 
             scoresPerTag.forEach((key,value)-> {
                 double score = value.stream().mapToDouble(Double::doubleValue).sum() / value.size();
-                System.out.println(user.getSo_display_name() + " has " + String.format("%.4f",score) + " for " + key);
+                System.out.println(user.getSoDisplayName() + " has " + String.format("%.4f",score) + " for " + key);
             });
         } catch (SQLException e) {
             e.printStackTrace();

@@ -1,5 +1,6 @@
 package com.wriesnig.expertise;
 
+import com.wriesnig.githubapi.GitHubApi;
 import com.wriesnig.stackoverflow.db.SODatabase;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public class ExpertiseCalculator {
     }
 
     private static void computeSOExpertise(ArrayList<User> users) {
-        System.out.println("Fetching Posts from User...");
+        System.out.println("Compute So-Expertise...");
         double start = System.nanoTime();
 
         ExecutorService executorService = Executors.newFixedThreadPool(SODatabase.getConnectionSize());
@@ -39,6 +40,24 @@ public class ExpertiseCalculator {
     }
 
     private static void computeGHExpertise(ArrayList<User> users) {
+        System.out.println("Compute Gh-Expertise...");
+        double start = System.nanoTime();
+        GitHubApi gitHubApi = new GitHubApi();
 
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
+        for(User user: users){
+            executorService.execute(new GHExpertiseJob(user, gitHubApi));
+        }
+
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(1, TimeUnit.HOURS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        double stop = System.nanoTime() - start;
+        stop /= 1000000000.0;
+        System.out.println("Computing took " + stop + " secs");
     }
 }

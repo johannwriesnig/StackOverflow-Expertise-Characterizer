@@ -1,43 +1,42 @@
 package com.wriesnig.expertise;
 
-import com.wriesnig.expertise.Expertise;
 import com.wriesnig.githubapi.GHUser;
 import com.wriesnig.stackoverflow.api.SOUser;
 
 public class User {
-    private int so_id;
-    private String so_display_name;
-    private String gh_login;
+    private int soId;
+    private String soDisplayName;
+    private String ghLogin;
     private Expertise expertise;
 
     public User(SOUser so_user, GHUser gh_user){
-        this.so_display_name = so_user.getDisplayName();
-        this.so_id = so_user.getId();
-        this.gh_login = gh_user.getLogin();
+        this.soDisplayName = so_user.getDisplayName();
+        this.soId = so_user.getId();
+        this.ghLogin = gh_user.getLogin();
     }
 
-    public int getSo_id() {
-        return so_id;
+    public int getSoId() {
+        return soId;
     }
 
-    public void setSo_id(int so_id) {
-        this.so_id = so_id;
+    public void setSoId(int soId) {
+        this.soId = soId;
     }
 
-    public String getSo_display_name() {
-        return so_display_name;
+    public String getSoDisplayName() {
+        return soDisplayName;
     }
 
-    public void setSo_display_name(String so_display_name) {
-        this.so_display_name = so_display_name;
+    public void setSoDisplayName(String soDisplayName) {
+        this.soDisplayName = soDisplayName;
     }
 
-    public String getGh_login() {
-        return gh_login;
+    public String getGhLogin() {
+        return ghLogin;
     }
 
-    public void setGh_login(String gh_login) {
-        this.gh_login = gh_login;
+    public void setGhLogin(String ghLogin) {
+        this.ghLogin = ghLogin;
     }
 
     public Expertise getExpertise() {

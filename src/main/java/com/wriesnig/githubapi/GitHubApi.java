@@ -1,5 +1,6 @@
 package com.wriesnig.githubapi;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -50,5 +51,12 @@ public class GitHubApi {
         JSONObject usersAsJson = new JSONObject(Objects.requireNonNull(response.bodyToMono(String.class).block()));
 
         return GHUserDataParser.parseUsersByFullName(usersAsJson);
+    }
+
+    public ArrayList<String> getReposByLogin(String login){
+        WebClient.ResponseSpec response = client.get().uri("users/"+login+"/repos").retrieve();
+        JSONArray repos = new JSONArray(Objects.requireNonNull(response.bodyToMono(String.class).block()));
+
+        return GHUserDataParser.parseReposByLogin(repos);
     }
 }
