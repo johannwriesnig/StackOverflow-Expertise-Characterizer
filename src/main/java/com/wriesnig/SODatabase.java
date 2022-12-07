@@ -59,4 +59,9 @@ public class SODatabase {
     public static ConnectionPool getConnectionPool() {
         return connectionPool;
     }
+
+    public static int getConnectionSize(){
+        return connectionSize;
+    }
+
 }

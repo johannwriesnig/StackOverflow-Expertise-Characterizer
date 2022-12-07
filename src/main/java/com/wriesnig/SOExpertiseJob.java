@@ -8,14 +8,14 @@ import java.util.HashMap;
 
 public class SOExpertiseJob implements Runnable{
     private User user;
-    private DBConnection dbConnection;
 
-    public SOExpertiseJob(User user, DBConnection dbConnection){
+    public SOExpertiseJob(User user){
         this.user = user;
-        this.dbConnection = dbConnection;
+
     }
     @Override
     public void run() {
+        DBConnection dbConnection = SODatabase.getConnectionPool().getDBConnection();
         ResultSet postResults = SODatabase.getPostsFromUser(dbConnection, user.getSo_id());
         try {
 
@@ -59,6 +59,7 @@ public class SOExpertiseJob implements Runnable{
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        SODatabase.getConnectionPool().releaseDBConnection(dbConnection);
     }
 
     private boolean postTagsContainTagsToCharacterize(String inputStr) {
