@@ -1,5 +1,6 @@
 package com.wriesnig;
 
+import com.wriesnig.expertise.ExpertiseDatabase;
 import com.wriesnig.stackoverflow.db.SODatabase;
 
 import java.io.FileInputStream;
@@ -15,19 +16,33 @@ public class Main {
         //Wie UI aussieht wird noch entschieden
         //Deshalb erstmal mit ausgewählten Usern, hier sind es die Top SO-User
         //Still todo: error handling, code cleanen, api rates, vllt auf spring verzichten
+        initDatabases();
 
+        CharacterizerApplication application = new CharacterizerApplication();
+        application.run();
+    }
+
+    public static void initDatabases() throws IOException, SQLException {
         Properties properties = new Properties();
         InputStream inputStream = new FileInputStream("config.properties");
         properties.load(inputStream);
         inputStream.close();
 
-        String soDbUrl = properties.getProperty("dumpsDB.url");
-        String soDbUser = properties.getProperty("dumpsDB.user");
-        String soDbPassword = properties.getProperty("dumpsDB.password");
-        SODatabase.initDB(soDbUser, soDbPassword, soDbUrl);
+        initDumpsDatabase(properties);
+        initExpertiseDatabase(properties);
 
-        CharacterizerApplication application = new CharacterizerApplication();
-        application.run();
+    }
 
+    public static void initDumpsDatabase(Properties properties) throws SQLException {
+        String url = properties.getProperty("dumpsDB.url");
+        String user = properties.getProperty("dumpsDB.user");
+        String password = properties.getProperty("dumpsDB.password");
+        SODatabase.initDB(user, password, url);
+    }
+    public static void initExpertiseDatabase(Properties properties) throws SQLException {
+        String url = properties.getProperty("expertiseDB.url");
+        String user = properties.getProperty("expertiseDB.user");
+        String password = properties.getProperty("expertiseDB.password");
+        ExpertiseDatabase.initDB(url, user, password);
     }
 }

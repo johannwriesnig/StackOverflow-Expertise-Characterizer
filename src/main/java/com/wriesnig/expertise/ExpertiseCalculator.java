@@ -15,6 +15,7 @@ public class ExpertiseCalculator {
     public static void computeExpertise(ArrayList<User> users) {
         computeSOExpertise(users);
         computeGHExpertise(users);
+        storeUsersExpertise(users);
     }
 
     private static void computeSOExpertise(ArrayList<User> users) {
@@ -59,5 +60,9 @@ public class ExpertiseCalculator {
         double stop = System.nanoTime() - start;
         stop /= 1000000000.0;
         System.out.println("Computing took " + stop + " secs");
+    }
+
+    private static void storeUsersExpertise(ArrayList<User> users){
+        //store data into expertise database
     }
 }
