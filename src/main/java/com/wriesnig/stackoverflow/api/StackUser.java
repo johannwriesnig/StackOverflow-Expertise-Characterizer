@@ -1,6 +1,6 @@
 package com.wriesnig.stackoverflow.api;
 
-public class SOUser {
+public class StackUser {
     private int id;
     private int reputation;
     private String displayName;
@@ -9,7 +9,7 @@ public class SOUser {
     private String profileImageUrl;
     private int accountId;
 
-    public SOUser(int id, int reputation, String displayName, String websiteUrl, String link, String profileImageUrl, int accountId) {
+    public StackUser(int id, int reputation, String displayName, String websiteUrl, String link, String profileImageUrl, int accountId) {
         this.id = id;
         this.reputation = reputation;
         this.displayName = displayName;

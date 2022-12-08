@@ -3,8 +3,8 @@ package com.wriesnig;
 
 import com.wriesnig.expertise.ExpertiseCalculator;
 import com.wriesnig.expertise.User;
-import com.wriesnig.githubapi.GHUser;
-import com.wriesnig.stackoverflow.api.SOUser;
+import com.wriesnig.githubapi.GitUser;
+import com.wriesnig.stackoverflow.api.StackUser;
 
 import com.wriesnig.utils.AccountsFetcher;
 import javafx.util.Pair;
@@ -26,11 +26,11 @@ public class CharacterizerApplication {
     }
 
     public void run() {
-        ArrayList<Pair<SOUser, GHUser>> linkedAccounts = AccountsFetcher.fetchMatchingAccounts(ids);
+        ArrayList<Pair<StackUser, GitUser>> linkedAccounts = AccountsFetcher.fetchMatchingAccounts(ids);
         printCurrentMatches(linkedAccounts);
 
         ArrayList<User> users = new ArrayList<>();
-        for(Pair<SOUser, GHUser> matching_accounts: linkedAccounts){
+        for(Pair<StackUser, GitUser> matching_accounts: linkedAccounts){
             users.add(new User(matching_accounts.getKey(), matching_accounts.getValue()));
         }
 
@@ -38,8 +38,8 @@ public class CharacterizerApplication {
         printExpertisePerUser(users);
     }
 
-    public void printCurrentMatches(ArrayList<Pair<SOUser, GHUser>> linkedAccounts){
-        for(Pair<SOUser, GHUser> pair: linkedAccounts){
+    public void printCurrentMatches(ArrayList<Pair<StackUser, GitUser>> linkedAccounts){
+        for(Pair<StackUser, GitUser> pair: linkedAccounts){
             System.out.println("Matched pair -> SO: "+ pair.getKey().getDisplayName() + " GH: " + pair.getValue().getLogin());
         }
     }

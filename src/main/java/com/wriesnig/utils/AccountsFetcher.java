@@ -1,9 +1,9 @@
 package com.wriesnig.utils;
 
-import com.wriesnig.githubapi.GHUser;
-import com.wriesnig.githubapi.GitHubApi;
-import com.wriesnig.stackoverflow.api.SOUser;
-import com.wriesnig.stackoverflow.api.StackOverFlowApi;
+import com.wriesnig.githubapi.GitUser;
+import com.wriesnig.githubapi.GitApi;
+import com.wriesnig.stackoverflow.api.StackUser;
+import com.wriesnig.stackoverflow.api.StackApi;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
@@ -20,27 +20,27 @@ public class AccountsFetcher {
      * @param soIds
      * @return
      */
-    public static ArrayList<Pair<SOUser, GHUser>> fetchMatchingAccounts(ArrayList<Integer> soIds){
-        ArrayList<SOUser> soUsers = fetchSOUsers(soIds);
-        HashMap<SOUser, ArrayList<GHUser>> potentially_matching_accounts = fetchSOUsersWithPotentialGHUsers(soUsers);
+    public static ArrayList<Pair<StackUser, GitUser>> fetchMatchingAccounts(ArrayList<Integer> soIds){
+        ArrayList<StackUser> stackUsers = fetchSOUsers(soIds);
+        HashMap<StackUser, ArrayList<GitUser>> potentially_matching_accounts = fetchSOUsersWithPotentialGHUsers(stackUsers);
 
         return determineMatchingAccounts(potentially_matching_accounts);
     }
 
-    private static ArrayList<SOUser> fetchSOUsers(ArrayList<Integer> soIds){
-        StackOverFlowApi stackoverflowApi = new StackOverFlowApi();
+    private static ArrayList<StackUser> fetchSOUsers(ArrayList<Integer> soIds){
+        StackApi stackoverflowApi = new StackApi();
         return stackoverflowApi.getUsers(soIds);
     }
 
     /**
      * Fetches possible GHUsers. Firstly GHUser with same login is stored, secondly User with same full_name
      */
-    private static HashMap<SOUser, ArrayList<GHUser>> fetchSOUsersWithPotentialGHUsers(ArrayList<SOUser> soUsers) {
-        HashMap<SOUser, ArrayList<GHUser>> potentiallyMatchingAccounts = new HashMap<>();
+    private static HashMap<StackUser, ArrayList<GitUser>> fetchSOUsersWithPotentialGHUsers(ArrayList<StackUser> stackUsers) {
+        HashMap<StackUser, ArrayList<GitUser>> potentiallyMatchingAccounts = new HashMap<>();
 
-        for (SOUser soUser : soUsers) {
-            ArrayList<GHUser> potential_matches = fetchPotentialGHUsers(soUser);
-            potentiallyMatchingAccounts.put(soUser, potential_matches);
+        for (StackUser stackUser : stackUsers) {
+            ArrayList<GitUser> potential_matches = fetchPotentialGHUsers(stackUser);
+            potentiallyMatchingAccounts.put(stackUser, potential_matches);
         }
 
         return potentiallyMatchingAccounts;
@@ -48,28 +48,28 @@ public class AccountsFetcher {
 
     /**
      * fetches potential GH Accounts based on Login, Full Name and linked Website
-     * @param soUser
+     * @param stackUser
      * @return
      */
-    private static ArrayList<GHUser> fetchPotentialGHUsers(SOUser soUser){
-        GitHubApi githubApi = new GitHubApi();
-        ArrayList<GHUser> potentialMatches = new ArrayList<>();
-        GHUser ghUser;
+    private static ArrayList<GitUser> fetchPotentialGHUsers(StackUser stackUser){
+        GitApi githubApi = new GitApi();
+        ArrayList<GitUser> potentialMatches = new ArrayList<>();
+        GitUser gitUser;
 
-        ghUser = githubApi.getUserByLogin(soUser.getDisplayName());
-        if (ghUser != null) potentialMatches.add(ghUser);
+        gitUser = githubApi.getUserByLogin(stackUser.getDisplayName());
+        if (gitUser != null) potentialMatches.add(gitUser);
 
-        ArrayList<String> fullNames = githubApi.getUsersByFullName(soUser.getDisplayName());
+        ArrayList<String> fullNames = githubApi.getUsersByFullName(stackUser.getDisplayName());
         for (String login : fullNames) {
-            ghUser = githubApi.getUserByLogin(login);
-            if (!ghUser.getName().equals(soUser.getDisplayName())) continue;
-            potentialMatches.add(ghUser);
+            gitUser = githubApi.getUserByLogin(login);
+            if (!gitUser.getName().equals(stackUser.getDisplayName())) continue;
+            potentialMatches.add(gitUser);
         }
 
-        if(isGHUserLink(soUser.getWebsiteUrl())){
-            String login = getLoginFromGHUserLink(soUser.getWebsiteUrl());
-            ghUser = githubApi.getUserByLogin(login);
-            potentialMatches.add(ghUser);
+        if(isGHUserLink(stackUser.getWebsiteUrl())){
+            String login = getLoginFromGHUserLink(stackUser.getWebsiteUrl());
+            gitUser = githubApi.getUserByLogin(login);
+            potentialMatches.add(gitUser);
         }
 
         return potentialMatches;
@@ -94,11 +94,11 @@ public class AccountsFetcher {
      * @param potentiallyMatchingAccounts
      * @return
      */
-    private static ArrayList<Pair<SOUser, GHUser>> determineMatchingAccounts(HashMap<SOUser, ArrayList<GHUser>> potentiallyMatchingAccounts){
-        ArrayList<Pair<SOUser, GHUser>> linkedAccounts = new ArrayList<>();
-        for (SOUser so_user : potentiallyMatchingAccounts.keySet()) {
-            Pair<GHUser, Double> highest_match = new Pair<>(null, -1.0);
-            for (GHUser gh_user : potentiallyMatchingAccounts.get(so_user)) {
+    private static ArrayList<Pair<StackUser, GitUser>> determineMatchingAccounts(HashMap<StackUser, ArrayList<GitUser>> potentiallyMatchingAccounts){
+        ArrayList<Pair<StackUser, GitUser>> linkedAccounts = new ArrayList<>();
+        for (StackUser so_user : potentiallyMatchingAccounts.keySet()) {
+            Pair<GitUser, Double> highest_match = new Pair<>(null, -1.0);
+            for (GitUser gh_user : potentiallyMatchingAccounts.get(so_user)) {
                 double score = MatchingScorer.getMatchingScore(so_user, gh_user);
                 if(score>highest_match.getValue()) highest_match = new Pair<>(gh_user, score);
                 System.out.println("SO-User: " + so_user.getDisplayName() + "/GH-User: " + gh_user.getName() + " Score: " +

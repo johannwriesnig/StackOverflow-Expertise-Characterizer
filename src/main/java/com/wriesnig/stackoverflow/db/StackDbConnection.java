@@ -4,13 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class DBConnection {
+public class StackDbConnection {
     private Connection connection;
     private PreparedStatement postsByUserId;
     private PreparedStatement votesByPostId;
     private PreparedStatement tagsByParentsId;
 
-    public DBConnection(Connection connection) throws SQLException {
+    public StackDbConnection(Connection connection) throws SQLException {
         this.connection = connection;
         postsByUserId = connection.prepareStatement("SELECT * FROM Posts" +
                 " WHERE OwnerUserId=?;");

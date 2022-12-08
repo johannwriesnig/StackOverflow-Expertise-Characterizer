@@ -1,13 +1,13 @@
 package com.wriesnig.githubapi;
 
-public class GHUser {
+public class GitUser {
     private String login;
     private String profileImageUrl;
     private String name;
     private String htmlUrl;
     private String websiteUrl;
 
-    public GHUser(String login, String profileImageUrl, String name, String htmlUrl, String websiteUrl) {
+    public GitUser(String login, String profileImageUrl, String name, String htmlUrl, String websiteUrl) {
         this.login = login;
         this.profileImageUrl = profileImageUrl;
         this.name = name;

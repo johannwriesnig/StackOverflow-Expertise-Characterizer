@@ -1,7 +1,7 @@
 package com.wriesnig.expertise;
 
-import com.wriesnig.stackoverflow.db.DBConnection;
-import com.wriesnig.stackoverflow.db.SODatabase;
+import com.wriesnig.stackoverflow.db.StackDbConnection;
+import com.wriesnig.stackoverflow.db.StackDatabase;
 import com.wriesnig.stackoverflow.db.VoteTypes;
 
 import java.sql.ResultSet;
@@ -10,17 +10,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class SOExpertiseJob implements Runnable{
+public class StackExpertiseJob implements Runnable{
     private User user;
 
-    public SOExpertiseJob(User user){
+    public StackExpertiseJob(User user){
         this.user = user;
 
     }
     @Override
     public void run() {
-        DBConnection dbConnection = SODatabase.getConnectionPool().getDBConnection();
-        ResultSet postResults = SODatabase.getPostsFromUser(dbConnection, user.getSoId());
+        StackDbConnection stackDbConnection = StackDatabase.getConnectionPool().getDBConnection();
+        ResultSet postResults = StackDatabase.getPostsFromUser(stackDbConnection, user.getSoId());
         try {
 
             HashMap<String, ArrayList<Double>> scoresPerTag = new HashMap<>();
@@ -30,11 +30,11 @@ public class SOExpertiseJob implements Runnable{
 
             while (postResults.next()) {
                 int parentId = postResults.getInt("parentId");
-                String tagsOfCurrentPost = parentId==0?postResults.getString("tags"):SODatabase.getTagsFromParentPost(dbConnection, parentId);
+                String tagsOfCurrentPost = parentId==0?postResults.getString("tags"): StackDatabase.getTagsFromParentPost(stackDbConnection, parentId);
                 if (tagsOfCurrentPost == null || !postTagsContainTagsToCharacterize(tagsOfCurrentPost)) continue;
                 String postBody = postResults.getString("Body");
                 int postId = postResults.getInt("id");
-                ResultSet votesOfCurrentPost = SODatabase.getVotesOfPost(dbConnection, postId);
+                ResultSet votesOfCurrentPost = StackDatabase.getVotesOfPost(stackDbConnection, postId);
                 int upVotes = 0;
                 int downVotes = 0;
                 int isAccepted = 0;
@@ -63,7 +63,7 @@ public class SOExpertiseJob implements Runnable{
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        SODatabase.getConnectionPool().releaseDBConnection(dbConnection);
+        StackDatabase.getConnectionPool().releaseDBConnection(stackDbConnection);
     }
 
     private boolean postTagsContainTagsToCharacterize(String inputStr) {

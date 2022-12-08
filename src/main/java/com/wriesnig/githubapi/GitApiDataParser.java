@@ -8,15 +8,15 @@ import java.util.ArrayList;
 /**
  * Class parses the JSON-Responses from the Api.
  */
-public class GHUserDataParser {
-    private GHUserDataParser(){}
+public class GitApiDataParser {
+    private GitApiDataParser(){}
 
     /**
      * Creates an GHUser based on the Rest Api response.
      * @param user
      * @return
      */
-    public static GHUser parseUserByLoginResponse(JSONObject user){
+    public static GitUser parseUserByLoginResponse(JSONObject user){
         if(user.has("message") && user.get("message").equals("Not Found")) return null;
 
         String login = user.getString("login");
@@ -25,7 +25,7 @@ public class GHUserDataParser {
         String websiteUrl = user.getString("blog");
         String htmlUrl = user.getString("html_url");
 
-        return new GHUser(login, profileImageUrl, name, htmlUrl, websiteUrl);
+        return new GitUser(login, profileImageUrl, name, htmlUrl, websiteUrl);
 
     }
 

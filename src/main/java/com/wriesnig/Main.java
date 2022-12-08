@@ -1,10 +1,9 @@
 package com.wriesnig;
 
 import com.wriesnig.expertise.ExpertiseDatabase;
-import com.wriesnig.stackoverflow.db.SODatabase;
+import com.wriesnig.stackoverflow.db.StackDatabase;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -37,7 +36,7 @@ public class Main {
         String url = properties.getProperty("dumpsDB.url");
         String user = properties.getProperty("dumpsDB.user");
         String password = properties.getProperty("dumpsDB.password");
-        SODatabase.initDB(user, password, url);
+        StackDatabase.initDB(user, password, url);
     }
     public static void initExpertiseDatabase(Properties properties) throws SQLException {
         String url = properties.getProperty("expertiseDB.url");

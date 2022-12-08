@@ -7,26 +7,26 @@ import java.util.List;
 
 public class ConnectionPool {
     private int size;
-    private List<DBConnection> connectionPool;
-    private List<DBConnection> usedConnections = new ArrayList<>();
+    private List<StackDbConnection> connectionPool;
+    private List<StackDbConnection> usedConnections = new ArrayList<>();
 
     public ConnectionPool(int size, String url, String password, String user) throws SQLException {
         connectionPool = new ArrayList<>();
         for(int i=1; i<=size; i++){
-            connectionPool.add(new DBConnection(DriverManager.getConnection(url, user, password)));
+            connectionPool.add(new StackDbConnection(DriverManager.getConnection(url, user, password)));
         }
         this.size = size;
     }
 
-    public DBConnection getDBConnection(){
-        DBConnection dbConnection = connectionPool.remove(connectionPool.size()-1);
-        usedConnections.add(dbConnection);
-        return dbConnection;
+    public StackDbConnection getDBConnection(){
+        StackDbConnection stackDbConnection = connectionPool.remove(connectionPool.size()-1);
+        usedConnections.add(stackDbConnection);
+        return stackDbConnection;
     }
 
-    public boolean releaseDBConnection(DBConnection dbConnection) {
-        connectionPool.add(dbConnection);
-        return usedConnections.remove(dbConnection);
+    public boolean releaseDBConnection(StackDbConnection stackDbConnection) {
+        connectionPool.add(stackDbConnection);
+        return usedConnections.remove(stackDbConnection);
     }
 
 }

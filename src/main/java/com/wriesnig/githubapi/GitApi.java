@@ -14,13 +14,13 @@ import java.util.Objects;
 /**
  * Class is the Interface to the Github-RestApi. It offers different GET-Methods to retrieve specific data.
  */
-public class GitHubApi {
+public class GitApi {
     private final String apiUrl = "https://api.github.com/";
     private WebClient client;
     private WebClient.ResponseSpec response_spec;
 
 
-    public GitHubApi() {
+    public GitApi() {
         client = WebClient.builder()
                 .baseUrl(apiUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -32,12 +32,12 @@ public class GitHubApi {
      * @param login
      * @return
      */
-    public GHUser getUserByLogin(String login) {
+    public GitUser getUserByLogin(String login) {
         if(login.contains(" "))return null;
         WebClient.ResponseSpec response = client.get().uri("/users/" + login).retrieve();
         JSONObject userAsJson = new JSONObject(Objects.requireNonNull(response.bodyToMono(String.class).block()));
 
-        return GHUserDataParser.parseUserByLoginResponse(userAsJson);
+        return GitApiDataParser.parseUserByLoginResponse(userAsJson);
     }
 
     /**
@@ -50,13 +50,13 @@ public class GitHubApi {
         WebClient.ResponseSpec response = client.get().uri("/search/users?q=fullname:" + fullName).retrieve();
         JSONObject usersAsJson = new JSONObject(Objects.requireNonNull(response.bodyToMono(String.class).block()));
 
-        return GHUserDataParser.parseUsersByFullName(usersAsJson);
+        return GitApiDataParser.parseUsersByFullName(usersAsJson);
     }
 
     public ArrayList<String> getReposByLogin(String login){
         WebClient.ResponseSpec response = client.get().uri("users/"+login+"/repos").retrieve();
         JSONArray repos = new JSONArray(Objects.requireNonNull(response.bodyToMono(String.class).block()));
 
-        return GHUserDataParser.parseReposByLogin(repos);
+        return GitApiDataParser.parseReposByLogin(repos);
     }
 }

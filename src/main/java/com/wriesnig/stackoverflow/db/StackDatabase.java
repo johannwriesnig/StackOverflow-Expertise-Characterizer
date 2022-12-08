@@ -2,7 +2,7 @@ package com.wriesnig.stackoverflow.db;
 
 import java.sql.*;
 
-public class SODatabase {
+public class StackDatabase {
     private static ConnectionPool connectionPool;
     private static final int connectionSize = 3;
     private static String user;
@@ -10,8 +10,8 @@ public class SODatabase {
     private static String url;
 
 
-    public static ResultSet getVotesOfPost(DBConnection dbConnection, int postId){
-        PreparedStatement statement = dbConnection.getVotesByPostId();
+    public static ResultSet getVotesOfPost(StackDbConnection stackDbConnection, int postId){
+        PreparedStatement statement = stackDbConnection.getVotesByPostId();
         ResultSet resultSet;
         try {
             statement.setInt(1, postId);
@@ -27,8 +27,8 @@ public class SODatabase {
         connectionPool = new ConnectionPool(connectionSize, url, password, user);
     }
 
-    public static String getTagsFromParentPost(DBConnection dbConnection, int parentId){
-        PreparedStatement statement = dbConnection.getTagsByParentsId();
+    public static String getTagsFromParentPost(StackDbConnection stackDbConnection, int parentId){
+        PreparedStatement statement = stackDbConnection.getTagsByParentsId();
         String tags="";
         try {
             statement.setInt(1, parentId);
@@ -42,8 +42,8 @@ public class SODatabase {
         return tags;
     }
 
-    public static ResultSet getPostsFromUser(DBConnection dbConnection, int userId){
-        PreparedStatement statement = dbConnection.getPostsByUserId();
+    public static ResultSet getPostsFromUser(StackDbConnection stackDbConnection, int userId){
+        PreparedStatement statement = stackDbConnection.getPostsByUserId();
         ResultSet resultSet;
         try {
             statement.setInt(1, userId);

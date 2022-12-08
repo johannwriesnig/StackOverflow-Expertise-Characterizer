@@ -1,7 +1,7 @@
 package com.wriesnig.expertise;
 
-import com.wriesnig.githubapi.GHUser;
-import com.wriesnig.stackoverflow.api.SOUser;
+import com.wriesnig.githubapi.GitUser;
+import com.wriesnig.stackoverflow.api.StackUser;
 
 public class User {
     private int soId;
@@ -9,7 +9,7 @@ public class User {
     private String ghLogin;
     private Expertise expertise;
 
-    public User(SOUser so_user, GHUser gh_user){
+    public User(StackUser so_user, GitUser gh_user){
         this.soDisplayName = so_user.getDisplayName();
         this.soId = so_user.getId();
         this.ghLogin = gh_user.getLogin();

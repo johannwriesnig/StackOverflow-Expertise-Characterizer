@@ -1,7 +1,7 @@
 package com.wriesnig.expertise;
 
-import com.wriesnig.githubapi.GitHubApi;
-import com.wriesnig.stackoverflow.db.SODatabase;
+import com.wriesnig.githubapi.GitApi;
+import com.wriesnig.stackoverflow.db.StackDatabase;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -22,9 +22,9 @@ public class ExpertiseCalculator {
         System.out.println("Compute So-Expertise...");
         double start = System.nanoTime();
 
-        ExecutorService executorService = Executors.newFixedThreadPool(SODatabase.getConnectionSize());
+        ExecutorService executorService = Executors.newFixedThreadPool(StackDatabase.getConnectionSize());
         for(User user: users){
-            executorService.execute(new SOExpertiseJob(user));
+            executorService.execute(new StackExpertiseJob(user));
         }
 
         executorService.shutdown();
@@ -43,11 +43,11 @@ public class ExpertiseCalculator {
     private static void computeGHExpertise(ArrayList<User> users) {
         System.out.println("Compute Gh-Expertise...");
         double start = System.nanoTime();
-        GitHubApi gitHubApi = new GitHubApi();
+        GitApi gitApi = new GitApi();
 
         ExecutorService executorService = Executors.newFixedThreadPool(5);
         for(User user: users){
-            executorService.execute(new GHExpertiseJob(user, gitHubApi));
+            executorService.execute(new GitExpertiseJob(user, gitApi));
         }
 
         executorService.shutdown();

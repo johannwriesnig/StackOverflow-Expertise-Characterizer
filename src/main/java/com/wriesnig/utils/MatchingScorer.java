@@ -1,7 +1,7 @@
 package com.wriesnig.utils;
 
-import com.wriesnig.githubapi.GHUser;
-import com.wriesnig.stackoverflow.api.SOUser;
+import com.wriesnig.githubapi.GitUser;
+import com.wriesnig.stackoverflow.api.StackUser;
 
 import java.awt.image.BufferedImage;
 
@@ -15,20 +15,20 @@ public class MatchingScorer {
     private static final double NO_MATCH_SCORE = 0;
     private MatchingScorer(){}
 
-    public static double getMatchingScore(SOUser soUser, GHUser ghUser){
+    public static double getMatchingScore(StackUser stackUser, GitUser gitUser){
         double score=0;
-        score+= getNameMatchingScore(soUser.getDisplayName(), ghUser);
-        score+= getImageMatchingScore(soUser.getProfileImageUrl(), ghUser.getProfileImageUrl());
-        score+= getLinkedWebsiteMatchingScore(soUser, ghUser);
+        score+= getNameMatchingScore(stackUser.getDisplayName(), gitUser);
+        score+= getImageMatchingScore(stackUser.getProfileImageUrl(), gitUser.getProfileImageUrl());
+        score+= getLinkedWebsiteMatchingScore(stackUser, gitUser);
         return score;
     }
 
-    private static double getNameMatchingScore(String soUserName, GHUser ghUser){
-        return isNamesMatching(soUserName, ghUser)? MATCHING_NAMES_SCORE : NO_MATCH_SCORE;
+    private static double getNameMatchingScore(String soUserName, GitUser gitUser){
+        return isNamesMatching(soUserName, gitUser)? MATCHING_NAMES_SCORE : NO_MATCH_SCORE;
     }
 
-    private static boolean isNamesMatching(String soUserName, GHUser ghUser){
-        return soUserName.equals(ghUser.getLogin()) || soUserName.equals(ghUser.getName());
+    private static boolean isNamesMatching(String soUserName, GitUser gitUser){
+        return soUserName.equals(gitUser.getLogin()) || soUserName.equals(gitUser.getName());
     }
 
     private static double getImageMatchingScore(String so_user_image_url, String gh_user_image_url){
@@ -92,12 +92,12 @@ public class MatchingScorer {
         return percentage;
     }
 
-    private static double getLinkedWebsiteMatchingScore(SOUser soUser, GHUser ghUser){
-        return isWebsitesMatching(soUser, ghUser)? MATCHING_LINKED_WEBSITES_SCORE : NO_MATCH_SCORE;
+    private static double getLinkedWebsiteMatchingScore(StackUser stackUser, GitUser gitUser){
+        return isWebsitesMatching(stackUser, gitUser)? MATCHING_LINKED_WEBSITES_SCORE : NO_MATCH_SCORE;
     }
 
-    private static boolean isWebsitesMatching(SOUser soUser, GHUser ghUser){
-        return soUser.getLink().equals(ghUser.getWebsiteUrl()) || soUser.getWebsiteUrl().equals(ghUser.getHtmlUrl());
+    private static boolean isWebsitesMatching(StackUser stackUser, GitUser gitUser){
+        return stackUser.getLink().equals(gitUser.getWebsiteUrl()) || stackUser.getWebsiteUrl().equals(gitUser.getHtmlUrl());
     }
 
 }
