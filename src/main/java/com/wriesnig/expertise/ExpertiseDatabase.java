@@ -10,9 +10,13 @@ public class ExpertiseDatabase {
     private static PreparedStatement getUsers;
     private static Connection connection;
 
-    public static void initDB(String url, String user, String password) throws SQLException {
-        connection = DriverManager.getConnection(url, user, password);
-        insertUser = connection.prepareStatement("INSERT INTO Users VALUES");
-        getUsers = connection.prepareStatement("SELECT * FROM Users");
+    public static void initDB(String url, String user, String password) {
+        try {
+            connection = DriverManager.getConnection(url, user, password);
+            insertUser = connection.prepareStatement("INSERT INTO Users VALUES");
+            getUsers = connection.prepareStatement("SELECT * FROM Users");
+        } catch (SQLException e) {
+            throw new RuntimeException("Connection issues with ExpertiseDatabase in initDB(...)",e);
+        }
     }
 }

@@ -23,7 +23,7 @@ public class StackDatabase {
         return resultSet;
     }
 
-    public static void initDB(String user, String password, String url) throws SQLException {
+    public static void initDB(String user, String password, String url){
         connectionPool = new ConnectionPool(connectionSize, url, password, user);
     }
 

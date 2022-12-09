@@ -17,7 +17,6 @@ public class ProfileImageFetcher {
             imageUrl = imageUrl + "&s=256";
         }
 
-        //System.out.println("New Url: " + image_url);
         BufferedImage image=null;
         try {
             URL url = new URL(imageUrl);

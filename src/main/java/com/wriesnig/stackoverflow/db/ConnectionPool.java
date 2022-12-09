@@ -6,16 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConnectionPool {
-    private int size;
     private List<StackDbConnection> connectionPool;
-    private List<StackDbConnection> usedConnections = new ArrayList<>();
+    private List<StackDbConnection> usedConnections;
 
-    public ConnectionPool(int size, String url, String password, String user) throws SQLException {
+    public ConnectionPool(int size, String url, String password, String user){
+        usedConnections = new ArrayList<>();
         connectionPool = new ArrayList<>();
         for(int i=1; i<=size; i++){
-            connectionPool.add(new StackDbConnection(DriverManager.getConnection(url, user, password)));
+            connectionPool.add(new StackDbConnection(url, user, password));
         }
-        this.size = size;
     }
 
     public StackDbConnection getDBConnection(){
