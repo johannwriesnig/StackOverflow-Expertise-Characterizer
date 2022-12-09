@@ -4,6 +4,7 @@ import com.wriesnig.githubapi.GitApi;
 import com.wriesnig.stackoverflow.db.StackDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -63,6 +64,12 @@ public class ExpertiseCalculator {
     }
 
     private static void storeUsersExpertise(ArrayList<User> users){
+        for(User user: users){
+            HashMap<String, Double> expertise = user.getExpertise().getFinalExpertise();
+            expertise.forEach((key,value) -> {
+                System.out.println(user.getStackDisplayName() + " has " + String.format("%.4f",value) + " for " + key);
+            });
+        }
         //store data into expertise database
     }
 }

@@ -4,39 +4,40 @@ import com.wriesnig.githubapi.GitUser;
 import com.wriesnig.stackoverflow.api.StackUser;
 
 public class User {
-    private int soId;
-    private String soDisplayName;
-    private String ghLogin;
+    private int stackId;
+    private String stackDisplayName;
+    private String gitLogin;
     private Expertise expertise;
 
     public User(StackUser so_user, GitUser gh_user){
-        this.soDisplayName = so_user.getDisplayName();
-        this.soId = so_user.getId();
-        this.ghLogin = gh_user.getLogin();
+        this.stackDisplayName = so_user.getDisplayName();
+        this.stackId = so_user.getId();
+        this.gitLogin = gh_user.getLogin();
+        this.expertise = new Expertise();
     }
 
-    public int getSoId() {
-        return soId;
+    public int getStackId() {
+        return stackId;
     }
 
-    public void setSoId(int soId) {
-        this.soId = soId;
+    public void setStackId(int stackId) {
+        this.stackId = stackId;
     }
 
-    public String getSoDisplayName() {
-        return soDisplayName;
+    public String getStackDisplayName() {
+        return stackDisplayName;
     }
 
-    public void setSoDisplayName(String soDisplayName) {
-        this.soDisplayName = soDisplayName;
+    public void setStackDisplayName(String stackDisplayName) {
+        this.stackDisplayName = stackDisplayName;
     }
 
-    public String getGhLogin() {
-        return ghLogin;
+    public String getGitLogin() {
+        return gitLogin;
     }
 
-    public void setGhLogin(String ghLogin) {
-        this.ghLogin = ghLogin;
+    public void setGitLogin(String gitLogin) {
+        this.gitLogin = gitLogin;
     }
 
     public Expertise getExpertise() {

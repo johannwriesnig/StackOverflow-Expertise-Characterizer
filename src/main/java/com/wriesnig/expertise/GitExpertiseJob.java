@@ -14,7 +14,7 @@ public class GitExpertiseJob implements Runnable{
     }
     @Override
     public void run() {
-        ArrayList<String> repos = gitApi.getReposByLogin(user.getGhLogin());
-        System.out.println(user.getSoDisplayName() + " has following repose: " + repos);
+        ArrayList<String> repos = gitApi.getReposByLogin(user.getGitLogin());
+        System.out.println(user.getStackDisplayName() + " has following repose: " + repos);
     }
 }

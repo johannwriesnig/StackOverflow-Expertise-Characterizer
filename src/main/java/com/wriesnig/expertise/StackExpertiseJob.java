@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class StackExpertiseJob implements Runnable{
-    private User user;
+    private final User user;
 
     public StackExpertiseJob(User user){
         this.user = user;
@@ -20,7 +20,7 @@ public class StackExpertiseJob implements Runnable{
     @Override
     public void run() {
         StackDbConnection stackDbConnection = StackDatabase.getConnectionPool().getDBConnection();
-        ResultSet postResults = StackDatabase.getPostsFromUser(stackDbConnection, user.getSoId());
+        ResultSet postResults = StackDatabase.getPostsFromUser(stackDbConnection, user.getStackId());
         try {
 
             HashMap<String, ArrayList<Double>> scoresPerTag = new HashMap<>();
@@ -58,7 +58,7 @@ public class StackExpertiseJob implements Runnable{
 
             scoresPerTag.forEach((key,value)-> {
                 double score = value.stream().mapToDouble(Double::doubleValue).sum() / value.size();
-                System.out.println(user.getSoDisplayName() + " has " + String.format("%.4f",score) + " for " + key);
+                user.getExpertise().getStackExpertise().put(key, score);
             });
         } catch (SQLException e) {
             e.printStackTrace();
