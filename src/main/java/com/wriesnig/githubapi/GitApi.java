@@ -1,5 +1,6 @@
 package com.wriesnig.githubapi;
 
+import com.wriesnig.utils.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
@@ -16,15 +17,20 @@ import java.util.Objects;
  */
 public class GitApi {
     private final String apiUrl = "https://api.github.com/";
-    private WebClient client;
-    private WebClient.ResponseSpec response_spec;
+    private final WebClient client;
+    private static String token;
 
 
     public GitApi() {
         client = WebClient.builder()
                 .baseUrl(apiUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader("Authorization", "Bearer " + token)
                 .build();
+    }
+
+    public static void setToken(String token){
+        GitApi.token = token;
     }
 
     /**
@@ -59,4 +65,5 @@ public class GitApi {
 
         return GitApiDataParser.parseReposByLogin(repos);
     }
+
 }

@@ -1,6 +1,8 @@
 package com.wriesnig;
 
+import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import com.wriesnig.expertise.ExpertiseDatabase;
+import com.wriesnig.githubapi.GitApi;
 import com.wriesnig.stackoverflow.db.StackDatabase;
 import com.wriesnig.utils.Logger;
 
@@ -17,16 +19,22 @@ public class Main {
         //Wie UI aussieht wird noch entschieden
         //Deshalb erstmal mit ausgewählten Usern, hier sind es die Top SO-User
         //Still todo: api rates, vllt auf spring verzichten
-        Logger.info("Database initialization...");
-        initDatabases();
+        Logger.info("Application initialization...");
+        Properties properties = getPropertiesFromConfigFile();
+        initDatabases(properties);
+        setGitApiToken(properties);
 
         CharacterizerApplication application = new CharacterizerApplication();
         application.run();
     }
 
-    public static void initDatabases(){
-        Properties properties = getPropertiesFromConfigFile();
+    public static void setGitApiToken(Properties properties){
+        String gitToken = properties.getProperty("git.token");
+        GitApi.setToken(gitToken);
 
+    }
+
+    public static void initDatabases(Properties properties){
         initDumpsDatabase(properties);
         initExpertiseDatabase(properties);
     }
