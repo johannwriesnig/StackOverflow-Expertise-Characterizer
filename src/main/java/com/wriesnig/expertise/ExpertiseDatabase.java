@@ -1,5 +1,7 @@
 package com.wriesnig.expertise;
 
+import com.wriesnig.utils.Logger;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -16,7 +18,8 @@ public class ExpertiseDatabase {
             insertUser = connection.prepareStatement("INSERT INTO Users VALUES");
             getUsers = connection.prepareStatement("SELECT * FROM Users");
         } catch (SQLException e) {
-            throw new RuntimeException("Connection issues with ExpertiseDatabase in initDB(...)",e);
+            Logger.error("Connection issues with ExpertiseDatabase in initDB(...)",e);
+            throw new RuntimeException();
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.wriesnig.stackoverflow.db;
 
+import com.wriesnig.utils.Logger;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -21,7 +23,8 @@ public class StackDbConnection {
             tagsByParentsId = connection.prepareStatement("SELECT * FROM Posts" +
                     " WHERE Id=?");
         } catch (SQLException e) {
-            throw new RuntimeException("Connection issues to StackDatabase in StackDbConnection constructor", e);
+            Logger.error("Connection issues to StackDatabase in StackDbConnection constructor", e);
+            throw new RuntimeException();
         }
     }
 

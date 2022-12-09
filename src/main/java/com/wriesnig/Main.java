@@ -2,6 +2,7 @@ package com.wriesnig;
 
 import com.wriesnig.expertise.ExpertiseDatabase;
 import com.wriesnig.stackoverflow.db.StackDatabase;
+import com.wriesnig.utils.Logger;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,6 +17,7 @@ public class Main {
         //Wie UI aussieht wird noch entschieden
         //Deshalb erstmal mit ausgewählten Usern, hier sind es die Top SO-User
         //Still todo: api rates, vllt auf spring verzichten
+        Logger.info("Database initialization...");
         initDatabases();
 
         CharacterizerApplication application = new CharacterizerApplication();
@@ -27,7 +29,6 @@ public class Main {
 
         initDumpsDatabase(properties);
         initExpertiseDatabase(properties);
-
     }
 
     public static void initDumpsDatabase(Properties properties){
@@ -35,12 +36,14 @@ public class Main {
         String user = properties.getProperty("dumpsDB.user");
         String password = properties.getProperty("dumpsDB.password");
         StackDatabase.initDB(user, password, url);
+        Logger.info("Created connection to stack-database");
     }
     public static void initExpertiseDatabase(Properties properties){
         String url = properties.getProperty("expertiseDB.url");
         String user = properties.getProperty("expertiseDB.user");
         String password = properties.getProperty("expertiseDB.password");
         ExpertiseDatabase.initDB(url, user, password);
+        Logger.info("Created connection to expertise-database");
     }
 
     public static Properties getPropertiesFromConfigFile(){
@@ -50,10 +53,12 @@ public class Main {
             properties.load(inputStream);
             inputStream.close();
         } catch(FileNotFoundException e){
-            throw new RuntimeException("Issues with .properties file",e);
+            Logger.error("Issues with .properties file",e);
+            throw new RuntimeException();
         }
         catch (IOException e) {
-            throw new RuntimeException("Issues with IO operations concerning .properties file",e);
+            Logger.error("Issues with IO operations concerning .properties file",e);
+            throw new RuntimeException();
         }
 
         return properties;

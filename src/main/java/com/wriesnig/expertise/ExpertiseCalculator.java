@@ -2,6 +2,7 @@ package com.wriesnig.expertise;
 
 import com.wriesnig.githubapi.GitApi;
 import com.wriesnig.stackoverflow.db.StackDatabase;
+import com.wriesnig.utils.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,13 +15,14 @@ public class ExpertiseCalculator {
     }
 
     public static void computeExpertise(ArrayList<User> users) {
+        Logger.info("Starting expertise computation...");
         computeSOExpertise(users);
         computeGHExpertise(users);
         storeUsersExpertise(users);
     }
 
     private static void computeSOExpertise(ArrayList<User> users) {
-        System.out.println("Compute So-Expertise...");
+        Logger.info("Starting stack-expertise computation");
         double start = System.nanoTime();
 
         ExecutorService executorService = Executors.newFixedThreadPool(StackDatabase.getConnectionSize());
@@ -37,12 +39,11 @@ public class ExpertiseCalculator {
 
         double stop = System.nanoTime() - start;
         stop /= 1000000000.0;
-        System.out.println("Computing took " + stop + " secs");
-
+        Logger.info("Computing took " + stop + " secs");
     }
 
     private static void computeGHExpertise(ArrayList<User> users) {
-        System.out.println("Compute Gh-Expertise...");
+        Logger.info("Starting git-expertise computation");
         double start = System.nanoTime();
         GitApi gitApi = new GitApi();
 
@@ -60,14 +61,14 @@ public class ExpertiseCalculator {
 
         double stop = System.nanoTime() - start;
         stop /= 1000000000.0;
-        System.out.println("Computing took " + stop + " secs");
+        Logger.info("Computing took " + stop + " secs");
     }
 
     private static void storeUsersExpertise(ArrayList<User> users){
         for(User user: users){
             HashMap<String, Double> expertise = user.getExpertise().getFinalExpertise();
             expertise.forEach((key,value) -> {
-                System.out.println(user.getStackDisplayName() + " has " + String.format("%.4f",value) + " for " + key);
+
             });
         }
         //store data into expertise database

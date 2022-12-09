@@ -18,13 +18,14 @@ public class ProfileImageFetcher {
         }
 
         BufferedImage image=null;
+
         try {
             URL url = new URL(imageUrl);
             image = ImageIO.read(url);
         } catch (MalformedURLException e){
-            System.out.println("Malformed Url...\n" + e);
+            Logger.error("Malformed url when fetching profile images -> " + imageUrl);
         } catch(IOException e){
-            System.out.println("File operation failed...\n" + e);
+            Logger.error("Issues reading image from " + imageUrl);
         }
 
         return image;

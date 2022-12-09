@@ -96,15 +96,16 @@ public class AccountsFetcher {
      */
     private static ArrayList<Pair<StackUser, GitUser>> determineMatchingAccounts(HashMap<StackUser, ArrayList<GitUser>> potentiallyMatchingAccounts){
         ArrayList<Pair<StackUser, GitUser>> linkedAccounts = new ArrayList<>();
-        for (StackUser soUser : potentiallyMatchingAccounts.keySet()) {
+        for (StackUser stackUser : potentiallyMatchingAccounts.keySet()) {
             Pair<GitUser, Double> highest_match = new Pair<>(null, -1.0);
-            for (GitUser gitUser : potentiallyMatchingAccounts.get(soUser)) {
-                double score = MatchingScorer.getMatchingScore(soUser, gitUser);
+            for (GitUser gitUser : potentiallyMatchingAccounts.get(stackUser)) {
+                double score = MatchingScorer.getMatchingScore(stackUser, gitUser);
                 if(score>highest_match.getValue()) highest_match = new Pair<>(gitUser, score);
-                System.out.println("SO-User: " + soUser.getDisplayName() + "/GH-User: " + gitUser.getName() + " Score: " +
-                        score);
             }
-            if(highest_match.getValue()>0.5) linkedAccounts.add(new Pair<>(soUser, highest_match.getKey()));
+            if(highest_match.getValue()>0.5) {
+                linkedAccounts.add(new Pair<>(stackUser, highest_match.getKey()));
+                Logger.info("Matched accounts " + stackUser.getDisplayName() + "/" + highest_match.getKey().getLogin() + " with score of " + highest_match.getValue());
+            }
         }
         return linkedAccounts;
     }

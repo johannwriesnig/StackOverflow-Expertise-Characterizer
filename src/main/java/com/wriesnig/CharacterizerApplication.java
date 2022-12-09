@@ -21,13 +21,12 @@ public class CharacterizerApplication {
 
     public CharacterizerApplication() {
         //Ids are top five so users: Jon Skeet, Gordon Linoff, Von C, BalusC, Darin Dimitrov
-        ids = new ArrayList<>(Arrays.asList(6309));
         ids = new ArrayList<>(Arrays.asList(22656, 1144035, 6309, 157882, 29407));
+        ids = new ArrayList<>(Arrays.asList(6309));
     }
 
     public void run() {
         ArrayList<Pair<StackUser, GitUser>> linkedAccounts = AccountsFetcher.fetchMatchingAccounts(ids);
-        printCurrentMatches(linkedAccounts);
 
         ArrayList<User> users = new ArrayList<>();
         for(Pair<StackUser, GitUser> matching_accounts: linkedAccounts){
@@ -38,11 +37,6 @@ public class CharacterizerApplication {
         printExpertisePerUser(users);
     }
 
-    public void printCurrentMatches(ArrayList<Pair<StackUser, GitUser>> linkedAccounts){
-        for(Pair<StackUser, GitUser> pair: linkedAccounts){
-            System.out.println("Matched pair -> SO: "+ pair.getKey().getDisplayName() + " GH: " + pair.getValue().getLogin());
-        }
-    }
 
     public void printExpertisePerUser(ArrayList<User> users){
 
