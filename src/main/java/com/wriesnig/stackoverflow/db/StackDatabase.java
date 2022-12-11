@@ -27,20 +27,6 @@ public class StackDatabase {
         connectionPool = new ConnectionPool(connectionSize, url, password, user);
     }
 
-    public static String getTagsFromParentPost(StackDbConnection stackDbConnection, int parentId){
-        PreparedStatement statement = stackDbConnection.getTagsByParentsId();
-        String tags="";
-        try {
-            statement.setInt(1, parentId);
-            ResultSet returnVal = statement.executeQuery();
-            if(returnVal.next())tags=returnVal.getString("tags");
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        return tags;
-    }
 
     public static ResultSet getPostsFromUser(StackDbConnection stackDbConnection, int userId){
         PreparedStatement statement = stackDbConnection.getPostsByUserId();

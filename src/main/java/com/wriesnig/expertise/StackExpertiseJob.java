@@ -29,28 +29,28 @@ public class StackExpertiseJob implements Runnable{
             }
 
             while (postResults.next()) {
-                int parentId = postResults.getInt("parentId");
-                String tagsOfCurrentPost = parentId==0?postResults.getString("tags"): StackDatabase.getTagsFromParentPost(stackDbConnection, parentId);
+                String tagsOfCurrentPost = postResults.getString("tags");
                 if (tagsOfCurrentPost == null || !postTagsContainTagsToCharacterize(tagsOfCurrentPost)) continue;
-                String postBody = postResults.getString("Body");
+                int postBody = postResults.getInt("bodyLength");
                 int postId = postResults.getInt("id");
                 ResultSet votesOfCurrentPost = StackDatabase.getVotesOfPost(stackDbConnection, postId);
-                int upVotes = 0;
-                int downVotes = 0;
-                int isAccepted = 0;
 
-                while (votesOfCurrentPost.next()) {
-                    int voteType = votesOfCurrentPost.getInt("VoteTypeId");
-                    if (voteType == VoteTypes.IS_ACCEPTED.getValue()) isAccepted = 1;
-                    if (voteType == VoteTypes.UP_VOTE.getValue()) upVotes++;
-                    if (voteType == VoteTypes.DOWN_VOTE.getValue()) downVotes++;
+                int upVotes=0;
+                int downVotes=0;
+                int isAccepted=0;
+
+                if(votesOfCurrentPost.next()){
+                    upVotes = votesOfCurrentPost.getInt("upVotes");
+                    downVotes =votesOfCurrentPost.getInt("downVotes");;
+                    isAccepted = votesOfCurrentPost.getInt("isAccepted");;
                 }
+
                 double upKof = 0.0041;
                 double downKof = -0.019;
                 double isKof = 0.2388;
                 double lenKof = 0.0023;
 
-                double score = upKof*upVotes + downKof*downVotes + isAccepted*isKof + lenKof*postBody.length();
+                double score = upKof*upVotes + downKof*downVotes + isAccepted*isKof + lenKof*postBody;
                 for(String tag: Tags.tagsToCharacterize){
                     if(tagsOfCurrentPost.contains("<"+tag+">"))scoresPerTag.get(tag).add(score);
                 }

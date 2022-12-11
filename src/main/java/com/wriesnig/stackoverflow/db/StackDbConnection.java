@@ -8,20 +8,29 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class StackDbConnection {
-    private Connection connection;
-    private PreparedStatement postsByUserId;
-    private PreparedStatement votesByPostId;
-    private PreparedStatement tagsByParentsId;
+    private final Connection connection;
+    private final PreparedStatement postsByUserId;
+    private final PreparedStatement votesByPostId;
+
 
     public StackDbConnection(String url, String user, String password) {
         try {
             this.connection = DriverManager.getConnection(url, user, password);
-            postsByUserId = connection.prepareStatement("SELECT * FROM Posts" +
-                    " WHERE OwnerUserId=?;");
-            votesByPostId = connection.prepareStatement("SELECT * FROM Votes" +
-                    " WHERE PostId=?;");
-            tagsByParentsId = connection.prepareStatement("SELECT * FROM Posts" +
-                    " WHERE Id=?");
+            postsByUserId = connection.prepareStatement("SELECT " +
+                    "Post.ID, length(Post.Body) as bodyLength, ParentPost.Tags " +
+                    "FROM Posts Post, Posts ParentPost " +
+                    "WHERE Post.OwnerUserId=? AND Post.ParentId = ParentPost.Id;");
+
+            votesByPostId = connection.prepareStatement("SELECT " +
+                    "(SELECT count(*) from Votes v1 " +
+                    "where v1.PostId=p.id and v1.VoteTypeId=2) as upVotes, " +
+                    "(SELECT count(*) from Votes v2 " +
+                    "where v2.PostId=p.id and v2.VoteTypeId=3) as downVotes, " +
+                    "(SELECT count(*) from Votes v3\n" +
+                    "where v3.PostId=p.id and v3.VoteTypeId=1) as isAccepted " +
+                    "from posts p  " +
+                    "where id=?");
+
         } catch (SQLException e) {
             Logger.error("Connection issues to StackDatabase in StackDbConnection constructor", e);
             throw new RuntimeException();
@@ -36,9 +45,7 @@ public class StackDbConnection {
         return votesByPostId;
     }
 
-    public PreparedStatement getTagsByParentsId() {
-        return tagsByParentsId;
-    }
+
 
     public void closeConnection() throws SQLException {
         connection.close();
