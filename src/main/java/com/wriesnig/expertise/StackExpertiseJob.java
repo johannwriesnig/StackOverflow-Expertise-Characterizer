@@ -3,6 +3,7 @@ package com.wriesnig.expertise;
 import com.wriesnig.stackoverflow.db.StackDbConnection;
 import com.wriesnig.stackoverflow.db.StackDatabase;
 import com.wriesnig.stackoverflow.db.VoteTypes;
+import com.wriesnig.utils.Logger;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,7 +32,7 @@ public class StackExpertiseJob implements Runnable{
             while (postResults.next()) {
                 String tagsOfCurrentPost = postResults.getString("tags");
                 if (tagsOfCurrentPost == null || !postTagsContainTagsToCharacterize(tagsOfCurrentPost)) continue;
-                int postBody = postResults.getInt("bodyLength");
+                int postBodyLength = postResults.getInt("bodyLength");
                 int postId = postResults.getInt("id");
                 ResultSet votesOfCurrentPost = StackDatabase.getVotesOfPost(stackDbConnection, postId);
 
@@ -45,14 +46,11 @@ public class StackExpertiseJob implements Runnable{
                     isAccepted = votesOfCurrentPost.getInt("isAccepted");;
                 }
 
-                double upKof = 0.0041;
-                double downKof = -0.019;
-                double isKof = 0.2388;
-                double lenKof = 0.0023;
 
-                double score = upKof*upVotes + downKof*downVotes + isAccepted*isKof + lenKof*postBody;
+                double expertise = Classifier.classify(upVotes, downVotes, isAccepted, postBodyLength);
+                //if(tagsOfCurrentPost.contains("c#"))Logger.info("Post c# "+ postId +" -> " + upVotes + "/"+ downVotes + "/" + isAccepted + "/" + postBodyLength + " ... Expertise: " + expertise);
                 for(String tag: Tags.tagsToCharacterize){
-                    if(tagsOfCurrentPost.contains("<"+tag+">"))scoresPerTag.get(tag).add(score);
+                    if(tagsOfCurrentPost.contains("<"+tag+">"))scoresPerTag.get(tag).add(expertise);
                 }
             }
 
@@ -64,6 +62,7 @@ public class StackExpertiseJob implements Runnable{
             e.printStackTrace();
         }
         StackDatabase.getConnectionPool().releaseDBConnection(stackDbConnection);
+        Logger.info("Computed following expertise for " + user.getStackDisplayName() + " : " + user.getExpertise().getStackExpertise().toString());
     }
 
     private boolean postTagsContainTagsToCharacterize(String inputStr) {
