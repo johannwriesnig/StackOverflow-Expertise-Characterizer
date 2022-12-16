@@ -8,10 +8,17 @@ build:
   script: 
     - mvn compile
 
-test:
-  stage: test
+
+unit-test:
   tags:
     - maven
     - java
+  stage: test
   script:
-    - mvn clean test
+    - mvn test
+
+cache:
+  paths:
+    - .m2/repository/
+    - target/
+  
