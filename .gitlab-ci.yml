@@ -2,10 +2,23 @@ image: maven:3-openjdk-8
 
 build: 
   stage: build
+  tags:
+    - maven
+    - java
   script: 
     - mvn compile
 
-test:
+
+unit-test:
+  tags:
+    - maven
+    - java
   stage: test
   script:
-    - mvn clean test
+    - mvn test
+
+cache:
+  paths:
+    - .m2/repository/
+    - target/
+  
