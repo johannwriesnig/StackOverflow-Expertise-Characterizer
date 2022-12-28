@@ -1,4 +1,5 @@
-image: maven:3-openjdk-8
+#NOTFALLS: image: maven:3-amazoncorretto-19
+image: maven:3-openjdk-18
 
 build: 
   stage: build
