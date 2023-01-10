@@ -27,6 +27,10 @@ public class StackDatabase {
         connectionPool = new ConnectionPool(connectionSize, url, password, user);
     }
 
+    public static void closeConnections(){
+        connectionPool.closeConnections();
+    }
+
 
     public static ResultSet getPostsFromUser(StackDbConnection stackDbConnection, int userId){
         PreparedStatement statement = stackDbConnection.getPostsByUserId();

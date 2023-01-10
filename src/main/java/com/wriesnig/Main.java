@@ -18,7 +18,6 @@ public class Main {
     public static void main(String[] args){
         //Wie UI aussieht wird noch entschieden
         //Deshalb erstmal mit ausgewählten Usern, hier sind es die Top SO-User
-        //Still todo: api rates, vllt auf spring verzichten
         Logger.info("Application initialization...");
         Properties properties = getPropertiesFromConfigFile();
         initDatabases(properties);
@@ -26,12 +25,18 @@ public class Main {
 
         CharacterizerApplication application = new CharacterizerApplication();
         application.run();
+        closeDbConnections();
     }
 
     public static void setGitApiToken(Properties properties){
         String gitToken = properties.getProperty("git.token");
         GitApi.setToken(gitToken);
 
+    }
+
+    public static void closeDbConnections(){
+        StackDatabase.closeConnections();
+        ExpertiseDatabase.closeConnection();
     }
 
     public static void initDatabases(Properties properties){

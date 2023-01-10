@@ -7,9 +7,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
-
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 
 /**
@@ -29,17 +33,18 @@ public class GitApi {
                 .build();
     }
 
-    public static void setToken(String token){
+    public static void setToken(String token) {
         GitApi.token = token;
     }
 
     /**
      * Get GithubUser by his login(unique).
+     *
      * @param login
      * @return
      */
     public GitUser getUserByLogin(String login) {
-        if(login.contains(" "))return null;
+        if (login.contains(" ")) return null;
         WebClient.ResponseSpec response = client.get().uri("/users/" + login).retrieve();
         JSONObject userAsJson = new JSONObject(Objects.requireNonNull(response.bodyToMono(String.class).block()));
 
@@ -48,10 +53,11 @@ public class GitApi {
 
     /**
      * Get GithubUsers based on full_name which is not unique.
+     *
      * @param fullName
      * @return
      */
-    public ArrayList<String> getUsersByFullName(String fullName){
+    public ArrayList<String> getUsersByFullName(String fullName) {
         fullName = fullName.replace(" ", "+");
         WebClient.ResponseSpec response = client.get().uri("/search/users?q=fullname:" + fullName).retrieve();
         JSONObject usersAsJson = new JSONObject(Objects.requireNonNull(response.bodyToMono(String.class).block()));
@@ -59,11 +65,48 @@ public class GitApi {
         return GitApiDataParser.parseUsersByFullName(usersAsJson);
     }
 
-    public ArrayList<String> getReposByLogin(String login){
-        WebClient.ResponseSpec response = client.get().uri("users/"+login+"/repos").retrieve();
+    public ArrayList<String> getReposByLogin(String login) {
+        WebClient.ResponseSpec response = client.get().uri("users/" + login + "/repos").retrieve();
         JSONArray repos = new JSONArray(Objects.requireNonNull(response.bodyToMono(String.class).block()));
 
         return GitApiDataParser.parseReposByLogin(repos);
+    }
+
+    //refactorn
+    public void downloadRepos(String login, ArrayList<String> repos, String path) {
+        try {
+            for (String repo : repos) {
+                URL url = new URL(apiUrl + "repos/" + login + "/" + repo + "/zipball");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                InputStream in = connection.getInputStream();
+                ZipInputStream zipIn = new ZipInputStream(in);
+
+                ZipEntry entry = zipIn.getNextEntry();
+
+                while (entry != null) {
+                    String filePath = path + entry.getName();
+                    if (!entry.isDirectory()) {
+
+                        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+                        byte[] bytesIn = new byte[4096];
+                        int read = 0;
+                        while ((read = zipIn.read(bytesIn)) != -1) {
+                            bos.write(bytesIn, 0, read);
+                        }
+                        bos.close();
+                    } else {
+                        File dir = new File(filePath);
+                        dir.mkdirs();
+                    }
+                    zipIn.closeEntry();
+                    entry = zipIn.getNextEntry();
+
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 }

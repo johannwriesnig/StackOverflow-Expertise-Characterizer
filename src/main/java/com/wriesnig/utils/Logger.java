@@ -9,6 +9,7 @@ import java.time.temporal.ChronoField;
 public class Logger {
     private static final File logFile = new File("log.txt");
     private static final FileWriter writer;
+    private static boolean shouldPrint = true;
 
     static {
         try {
@@ -20,8 +21,13 @@ public class Logger {
 
     private Logger(){}
 
+    public static void deactivatePrinting(){
+        shouldPrint=false;
+    }
+
     public static void error(String message, Throwable stackTrace){
         try {
+            print(message);
             writer.write(getTimeStamp() + " [ERROR]: " + message + "\n");
             writer.write("\t" + stackTrace);
             writer.flush();
@@ -32,6 +38,7 @@ public class Logger {
 
     public static void error(String message){
         try {
+            print(message);
             writer.write(getTimeStamp() + " [ERROR]: " + message + "\n");
             writer.flush();
         } catch (IOException e) {
@@ -41,11 +48,16 @@ public class Logger {
 
     public static void info(String message){
         try {
+            print(message);
             writer.write(getTimeStamp() + " [INFO]: " + message + "\n");
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException("Issues writing to log file",e);
         }
+    }
+
+    private static void print(String message){
+        if(shouldPrint) System.out.println(message);
     }
 
     private static String getTimeStamp(){

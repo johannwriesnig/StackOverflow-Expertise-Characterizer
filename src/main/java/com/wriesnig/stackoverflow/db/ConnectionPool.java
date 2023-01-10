@@ -17,15 +17,21 @@ public class ConnectionPool {
         }
     }
 
-    public StackDbConnection getDBConnection(){
+    public synchronized StackDbConnection getDBConnection(){
         StackDbConnection stackDbConnection = connectionPool.remove(connectionPool.size()-1);
         usedConnections.add(stackDbConnection);
         return stackDbConnection;
     }
 
-    public boolean releaseDBConnection(StackDbConnection stackDbConnection) {
+    public synchronized boolean releaseDBConnection(StackDbConnection stackDbConnection) {
         connectionPool.add(stackDbConnection);
         return usedConnections.remove(stackDbConnection);
+    }
+
+    public void closeConnections(){
+        for(StackDbConnection connection: connectionPool) {
+            connection.closeConnection();
+        }
     }
 
 }

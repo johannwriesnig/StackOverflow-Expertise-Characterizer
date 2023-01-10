@@ -45,9 +45,11 @@ public class StackDbConnection {
         return votesByPostId;
     }
 
-
-
-    public void closeConnection() throws SQLException {
-        connection.close();
+    public void closeConnection(){
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            Logger.error("Issues with closing StackDbConnection...", e);
+        }
     }
 }

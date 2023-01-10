@@ -22,4 +22,12 @@ public class ExpertiseDatabase {
             throw new RuntimeException();
         }
     }
+
+    public static void closeConnection(){
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            Logger.error("Issues with closing ExpertiseDbConnection...", e);
+        }
+    }
 }
