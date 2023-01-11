@@ -1,36 +1,51 @@
 package com.wriesnig.expertise;
 
 import com.wriesnig.githubapi.GitApi;
+import org.springframework.boot.autoconfigure.info.ProjectInfoProperties;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class GitExpertiseJob implements Runnable{
     private User user;
-    private GitApi gitApi;
 
-    public GitExpertiseJob(User user, GitApi gitApi){
+    public GitExpertiseJob(User user){
         this.user = user;
-        this.gitApi = gitApi;
     }
     @Override
     public void run() {
-        String usersReposPath = "repos/"+user.getGitLogin()+"/";
-        File currentUser = new File(usersReposPath);
-        currentUser.mkdirs();
+        String userReposPath = "repos/"+user.getGitLogin()+"/";
+        File userReposDir = new File(userReposPath);
+        userReposDir.mkdirs();
+
+        GitApi gitApi = new GitApi();
         ArrayList<String> repos = gitApi.getReposByLogin(user.getGitLogin());
-        gitApi.downloadRepos(user.getGitLogin(), repos, usersReposPath);
 
-        File[] reposDirs = currentUser.listFiles();
+        BlockingQueue<String> downloadedRepos = new LinkedBlockingQueue<>();
+        Thread reposDownloadJob = new Thread(()->{
+            gitApi.downloadRepos(user.getGitLogin(),repos, userReposPath, downloadedRepos);
+        });
+        reposDownloadJob.start();
 
-        for(File repo : reposDirs){
-            System.out.println(repo.getName());
-        }
-        //System.out.println(user.getStackDisplayName() + " has following repose: " + repos);
-        //deleteDirectory(userRepos);
+       try{
+           while(true){
+               String currentRepoFileName = userReposPath + downloadedRepos.take();
+               System.out.println("Repo taken from Queue: " + currentRepoFileName);
+               if(currentRepoFileName.equals(userReposPath + "finished")) break;
+
+               File currentRepo = new File(currentRepoFileName);
+               //ComputationOfExpertise...
+               deleteDirectory(currentRepo);
+           }
+       } catch(InterruptedException e){
+           throw new RuntimeException();
+       }
+        boolean isDeleted = deleteDirectory(userReposDir);
     }
 
-    void deleteDirectory(File file){
+    boolean deleteDirectory(File file){
         if (file.isDirectory()) {
             File[] entries = file.listFiles();
             if (entries != null) {
@@ -39,6 +54,6 @@ public class GitExpertiseJob implements Runnable{
                 }
             }
         }
-        file.delete();
+         return file.delete();
     }
 }

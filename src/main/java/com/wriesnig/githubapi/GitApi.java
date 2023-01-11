@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -73,7 +74,7 @@ public class GitApi {
     }
 
     //refactorn
-    public void downloadRepos(String login, ArrayList<String> repos, String path) {
+    public void downloadRepos(String login, ArrayList<String> repos, String path, BlockingQueue<String> downloadedRepos) {
         try {
             for (String repo : repos) {
                 URL url = new URL(apiUrl + "repos/" + login + "/" + repo + "/zipball");
@@ -83,6 +84,7 @@ public class GitApi {
                 ZipInputStream zipIn = new ZipInputStream(in);
 
                 ZipEntry entry = zipIn.getNextEntry();
+                String root = entry==null?"":entry.getName();
 
                 while (entry != null) {
                     String filePath = path + entry.getName();
@@ -101,9 +103,10 @@ public class GitApi {
                     }
                     zipIn.closeEntry();
                     entry = zipIn.getNextEntry();
-
                 }
+                if(!root.equals(""))downloadedRepos.put(root);
             }
+            downloadedRepos.put("finished");
         } catch (Exception e){
             e.printStackTrace();
         }

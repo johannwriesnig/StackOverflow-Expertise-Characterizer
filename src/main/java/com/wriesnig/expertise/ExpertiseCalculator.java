@@ -32,10 +32,10 @@ public class ExpertiseCalculator {
     }
 
     private static void computeGHExpertise(ArrayList<User> users) {
-        File repos = new File("repos");
-        repos.mkdirs();
+        File reposDir = new File("repos");
+        reposDir.mkdirs();
         startThreadedComputation(users, GitExpertiseJob.class, 5);
-        //repos.delete();
+        reposDir.delete();
     }
 
     private static void startThreadedComputation(ArrayList<User> users, Class<?> clazz, int threadPoolSize){
@@ -45,7 +45,7 @@ public class ExpertiseCalculator {
         ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
         for(User user: users){
             if(clazz == StackExpertiseJob.class)executorService.execute(new StackExpertiseJob(user));
-            else executorService.execute(new GitExpertiseJob(user, new GitApi()));
+            else executorService.execute(new GitExpertiseJob(user));
         }
 
         executorService.shutdown();
