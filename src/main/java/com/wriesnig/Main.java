@@ -4,12 +4,10 @@ import com.wriesnig.expertise.ExpertiseDatabase;
 import com.wriesnig.githubapi.GitApi;
 import com.wriesnig.stackoverflow.db.StackDatabase;
 import com.wriesnig.utils.Logger;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.Properties;
 
 public class Main {

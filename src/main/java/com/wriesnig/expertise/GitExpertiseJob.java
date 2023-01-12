@@ -1,8 +1,6 @@
 package com.wriesnig.expertise;
 
 import com.wriesnig.githubapi.GitApi;
-
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
@@ -35,7 +33,7 @@ public class GitExpertiseJob implements Runnable{
                if(currentRepoFileName.equals(userReposPath + "finished")) break;
 
                File currentRepo = new File(currentRepoFileName);
-               //ComputationOfExpertise...
+               computeExpertise(currentRepo);
                deleteDirectory(currentRepo);
            }
        } catch(InterruptedException e){
@@ -44,7 +42,13 @@ public class GitExpertiseJob implements Runnable{
         boolean isDeleted = deleteDirectory(userReposDir);
     }
 
-    boolean deleteDirectory(File file){
+    public void computeExpertise(File repo){
+        //check if repo contains certain libs/frameworks/languages
+        //if no return
+        //compute metrics
+    }
+
+    public boolean deleteDirectory(File file){
         if (file.isDirectory()) {
             File[] entries = file.listFiles();
             if (entries != null) {

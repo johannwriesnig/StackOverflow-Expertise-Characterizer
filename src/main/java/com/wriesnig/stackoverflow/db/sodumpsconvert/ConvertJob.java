@@ -1,12 +1,10 @@
 package com.wriesnig.stackoverflow.db.sodumpsconvert;
 
-
 import com.wriesnig.stackoverflow.db.sodumpsconvert.datainfo.AttributeType;
 import com.wriesnig.stackoverflow.db.sodumpsconvert.datainfo.DataInfo;
 import javafx.util.Pair;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
 import javax.xml.parsers.SAXParser;
 import java.io.File;
 import java.io.FileWriter;

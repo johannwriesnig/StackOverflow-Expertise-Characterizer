@@ -2,7 +2,6 @@ package com.wriesnig.stackoverflow.db.sodumpsconvert;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
-
 import java.util.function.Consumer;
 
 public class XMLHandler extends DefaultHandler {

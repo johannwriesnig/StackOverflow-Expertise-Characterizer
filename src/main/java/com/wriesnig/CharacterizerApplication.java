@@ -1,14 +1,11 @@
 package com.wriesnig;
 
-
 import com.wriesnig.expertise.ExpertiseCalculator;
 import com.wriesnig.expertise.User;
 import com.wriesnig.githubapi.GitUser;
 import com.wriesnig.stackoverflow.api.StackUser;
-
 import com.wriesnig.utils.AccountsFetcher;
 import javafx.util.Pair;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 

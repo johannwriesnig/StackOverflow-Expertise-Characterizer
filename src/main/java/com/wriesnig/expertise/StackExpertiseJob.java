@@ -2,9 +2,7 @@ package com.wriesnig.expertise;
 
 import com.wriesnig.stackoverflow.db.StackDbConnection;
 import com.wriesnig.stackoverflow.db.StackDatabase;
-import com.wriesnig.stackoverflow.db.VoteTypes;
 import com.wriesnig.utils.Logger;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;

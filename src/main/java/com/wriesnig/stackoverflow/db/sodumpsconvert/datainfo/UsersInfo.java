@@ -1,7 +1,6 @@
 package com.wriesnig.stackoverflow.db.sodumpsconvert.datainfo;
 
 import javafx.util.Pair;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 

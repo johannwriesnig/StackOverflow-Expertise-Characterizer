@@ -1,17 +1,12 @@
 package com.wriesnig.githubapi;
 
-import com.wriesnig.utils.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;

@@ -1,7 +1,6 @@
 package com.wriesnig.stackoverflow.db;
 
 import com.wriesnig.utils.Logger;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;

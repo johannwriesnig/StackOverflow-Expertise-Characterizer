@@ -1,8 +1,5 @@
 package com.wriesnig.expertise;
 
-import javafx.util.Pair;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Expertise {

@@ -2,7 +2,6 @@ package com.wriesnig.utils;
 
 import com.wriesnig.githubapi.GitUser;
 import com.wriesnig.stackoverflow.api.StackUser;
-
 import java.awt.image.BufferedImage;
 
 /**
