@@ -1,6 +1,5 @@
 package com.wriesnig;
 
-import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import com.wriesnig.expertise.ExpertiseDatabase;
 import com.wriesnig.githubapi.GitApi;
 import com.wriesnig.stackoverflow.db.StackDatabase;

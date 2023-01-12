@@ -28,8 +28,7 @@ public class AccountsFetcher {
     }
 
     private static ArrayList<StackUser> fetchStackUsers(ArrayList<Integer> stackIds){
-        StackApi stackoverflowApi = new StackApi();
-        return stackoverflowApi.getUsers(stackIds);
+        return StackApi.getUsers(stackIds);
     }
 
     /**
@@ -52,23 +51,22 @@ public class AccountsFetcher {
      * @return
      */
     private static ArrayList<GitUser> fetchPotentialGitUsers(StackUser stackUser){
-        GitApi githubApi = new GitApi();
         ArrayList<GitUser> potentialMatches = new ArrayList<>();
         GitUser gitUser;
 
-        gitUser = githubApi.getUserByLogin(stackUser.getDisplayName());
+        gitUser = GitApi.getUserByLogin(stackUser.getDisplayName());
         if (gitUser != null) potentialMatches.add(gitUser);
 
-        ArrayList<String> fullNames = githubApi.getUsersByFullName(stackUser.getDisplayName());
+        ArrayList<String> fullNames = GitApi.getUsersByFullName(stackUser.getDisplayName());
         for (String login : fullNames) {
-            gitUser = githubApi.getUserByLogin(login);
+            gitUser = GitApi.getUserByLogin(login);
             if (!gitUser.getName().equals(stackUser.getDisplayName())) continue;
             potentialMatches.add(gitUser);
         }
 
         if(isGitUserLink(stackUser.getWebsiteUrl())){
             String login = getLoginFromGitUserLink(stackUser.getWebsiteUrl());
-            gitUser = githubApi.getUserByLogin(login);
+            gitUser = GitApi.getUserByLogin(login);
             potentialMatches.add(gitUser);
         }
 

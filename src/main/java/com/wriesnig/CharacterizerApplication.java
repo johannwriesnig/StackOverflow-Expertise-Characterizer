@@ -21,9 +21,9 @@ public class CharacterizerApplication {
 
     public CharacterizerApplication() {
         //Ids are top five so users: Jon Skeet, Gordon Linoff, Von C, BalusC, Darin Dimitrov
-        ids = new ArrayList<>(Arrays.asList(22656, 1144035, 6309, 157882, 29407));
         ids = new ArrayList<>(Arrays.asList(22656, 1144035, 6309, 157882));
         ids = new ArrayList<>(Arrays.asList(22656));
+        ids = new ArrayList<>(Arrays.asList(22656, 1144035, 6309, 157882, 29407));
     }
 
     public void run() {

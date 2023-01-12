@@ -1,42 +1,68 @@
 package com.wriesnig.stackoverflow.api;
 
 
+import com.wriesnig.githubapi.GitApi;
 import org.json.JSONObject;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.WebClient;
 
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Interface to the StackOverflowApi that is needed since some data are missing in the dumps
  */
 public class StackApi {
-    private final String apiUrl = "https://api.stackexchange.com/2.3";
-    private final WebClient client;
+    private static final String apiUrl = "https://api.stackexchange.com/2.3/";
 
+    private StackApi() {
 
-    public StackApi() {
-        client = WebClient.builder()
-                .baseUrl(apiUrl)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
     }
-
     /**
      * Get Users based on their Ids
+     *
      * @param ids
      * @return
      */
-    public ArrayList<StackUser> getUsers(ArrayList<Integer> ids) {
+    public static ArrayList<StackUser> getUsers(ArrayList<Integer> ids) {
         String idsList = ids.stream().map(Object::toString)
                 .collect(Collectors.joining(";"));
 
-        WebClient.ResponseSpec response = client.get().uri("/users/" + idsList + "?site=stackoverflow").retrieve();
-        JSONObject usersAsJson = new JSONObject(Objects.requireNonNull(response.bodyToMono(String.class).block()));
+        String path = "users/" + idsList + "?site=stackoverflow";
+        InputStream apiStream = getStreamFromAPICall(path);
+        String stream = getStringFromStream(apiStream);
+        JSONObject usersAsJson = new JSONObject(stream);
+
         return StackApiDataParser.parseUsersResponse(usersAsJson);
+    }
+
+    private static InputStream getStreamFromAPICall(String path) {
+        try {
+            URL url = new URL(apiUrl + path);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            return connection.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return InputStream.nullInputStream();
+    }
+
+    public static String getStringFromStream(InputStream inputStream) {
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            Reader reader = new InputStreamReader(new GZIPInputStream(inputStream));
+            int ch;
+            while ((ch = reader.read()) != -1) {
+                stringBuilder.append((char) ch);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return stringBuilder.toString();
     }
 
 }

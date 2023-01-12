@@ -1,7 +1,7 @@
 package com.wriesnig.expertise;
 
 import com.wriesnig.githubapi.GitApi;
-import org.springframework.boot.autoconfigure.info.ProjectInfoProperties;
+
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,12 +20,11 @@ public class GitExpertiseJob implements Runnable{
         File userReposDir = new File(userReposPath);
         userReposDir.mkdirs();
 
-        GitApi gitApi = new GitApi();
-        ArrayList<String> repos = gitApi.getReposByLogin(user.getGitLogin());
+        ArrayList<String> repos = GitApi.getReposByLogin(user.getGitLogin());
 
         BlockingQueue<String> downloadedRepos = new LinkedBlockingQueue<>();
         Thread reposDownloadJob = new Thread(()->{
-            gitApi.downloadRepos(user.getGitLogin(),repos, userReposPath, downloadedRepos);
+            GitApi.downloadRepos(user.getGitLogin(),repos, userReposPath, downloadedRepos);
         });
         reposDownloadJob.start();
 

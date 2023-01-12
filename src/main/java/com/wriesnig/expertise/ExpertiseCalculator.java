@@ -20,9 +20,8 @@ public class ExpertiseCalculator {
 
     public static void computeExpertise(ArrayList<User> users) {
         Logger.info("Starting expertise computation...");
-        //computeSOExpertise(users);
-        //users.clear();
-        users.add(new User(new StackUser(1,1,"","","","",1),new GitUser("johannwriesnig", "", "", "", "")));
+        computeSOExpertise(users);
+        //users.add(new User(new StackUser(1,1,"","","","",1),new GitUser("johannwriesnig", "", "", "", "")));
         computeGHExpertise(users);
         storeUsersExpertise(users);
     }
