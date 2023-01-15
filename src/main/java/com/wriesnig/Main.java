@@ -1,13 +1,13 @@
 package com.wriesnig;
 
+import com.hankcs.hanlp.summary.TextRankKeyword;
 import com.wriesnig.expertise.ExpertiseDatabase;
 import com.wriesnig.githubapi.GitApi;
 import com.wriesnig.stackoverflow.db.StackDatabase;
 import com.wriesnig.utils.Logger;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+
+import java.io.*;
+import java.nio.file.Files;
 import java.util.Properties;
 
 public class Main {
@@ -23,6 +23,19 @@ public class Main {
         CharacterizerApplication application = new CharacterizerApplication();
         application.run();
         closeDbConnections();
+    }
+
+    public static void test(){
+        File readMe = new File("test.xml");
+        if(readMe.exists()){
+            String document = "";
+            try {
+                document = Files.readString(readMe.toPath());
+            } catch (IOException e) {
+                System.out.println("Reading failed");
+            }
+            System.out.println(TextRankKeyword.getKeywordList(document, 1000));
+        }
     }
 
     public static void setGitApiToken(Properties properties){

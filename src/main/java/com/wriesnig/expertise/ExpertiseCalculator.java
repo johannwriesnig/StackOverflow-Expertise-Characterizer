@@ -1,11 +1,7 @@
 package com.wriesnig.expertise;
 
-import com.wriesnig.githubapi.GitApi;
-import com.wriesnig.githubapi.GitUser;
-import com.wriesnig.stackoverflow.api.StackUser;
 import com.wriesnig.stackoverflow.db.StackDatabase;
 import com.wriesnig.utils.Logger;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,9 +14,7 @@ public class ExpertiseCalculator {
     }
 
     public static void computeExpertise(ArrayList<User> users) {
-        Logger.info("Starting expertise computation...");
-        computeSOExpertise(users);
-        //users.add(new User(new StackUser(1,1,"","","","",1),new GitUser("johannwriesnig", "", "", "", "")));
+        //computeSOExpertise(users);
         computeGHExpertise(users);
         storeUsersExpertise(users);
     }

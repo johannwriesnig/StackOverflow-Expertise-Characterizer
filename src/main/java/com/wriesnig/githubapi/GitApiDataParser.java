@@ -46,13 +46,14 @@ public class GitApiDataParser {
         return usersLogin;
     }
 
-    public static ArrayList<String> parseReposByLogin(JSONArray response){
-        ArrayList<String> repos = new ArrayList<>();
+    public static ArrayList<Repo> parseReposByLogin(JSONArray response){
+        ArrayList<Repo> repos = new ArrayList<>();
 
         for(int i=0; i<response.length();i++){
             JSONObject currentRepo = response.getJSONObject(i);
-            String repoName = currentRepo.getString("name");
-            repos.add(repoName);
+            String repoName = currentRepo.getString("full_name");
+            String repoMainLanguage = currentRepo.isNull("language")?"":currentRepo.getString("language").toLowerCase();
+            repos.add(new Repo(repoName, repoMainLanguage));
         }
 
         return repos;

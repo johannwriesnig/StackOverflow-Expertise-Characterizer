@@ -58,8 +58,8 @@ public class GitApi {
         return GitApiDataParser.parseUsersByFullName(usersAsJson);
     }
 
-    public static ArrayList<String> getReposByLogin(String login) {
-        String path = "users/" + login + "/repos";
+    public static ArrayList<Repo> getReposByLogin(String login) {
+        String path = "users/" + login + "/repos?type=all";
         InputStream apiStream = getStreamFromAPICall(path);
         JSONArray repos = new JSONArray(getStringFromStream(apiStream));
 
@@ -93,10 +93,10 @@ public class GitApi {
         return stringBuilder.toString();
     }
     //refactorn
-    public static void downloadRepos(String login, ArrayList<String> repos, String path, BlockingQueue<String> downloadedRepos) {
+    public static void downloadRepos(ArrayList<Repo> repos, String path, BlockingQueue<Repo> downloadedRepos) {
         try {
-            for (String repo : repos) {
-                String apiPath = "repos/" + login + "/" + repo + "/zipball";
+            for (Repo repo : repos) {
+                String apiPath = "repos/" + repo.getName() + "/zipball";
                 InputStream in = getStreamFromAPICall(apiPath);
                 ZipInputStream zipIn = new ZipInputStream(in);
 
@@ -121,9 +121,12 @@ public class GitApi {
                     zipIn.closeEntry();
                     entry = zipIn.getNextEntry();
                 }
-                if(!root.equals(""))downloadedRepos.put(root);
+                if(!root.equals("")){
+                    repo.setFileName(root);
+                    downloadedRepos.put(repo);
+                }
             }
-            downloadedRepos.put("finished");
+            downloadedRepos.put(new Repo("", ""));
         } catch (Exception e){
             e.printStackTrace();
         }
