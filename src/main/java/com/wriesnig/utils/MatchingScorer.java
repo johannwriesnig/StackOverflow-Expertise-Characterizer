@@ -45,6 +45,7 @@ public class MatchingScorer {
         int width2 = img2.getWidth();
         int height1 = img1.getHeight();
         int height2 = img2.getHeight();
+        if(width1!=width2 || height1 != height2) return -1;
 
         long difference = 0;
 

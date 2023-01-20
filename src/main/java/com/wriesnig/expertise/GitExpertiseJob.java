@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Stream;
@@ -29,6 +30,7 @@ public class GitExpertiseJob implements Runnable{
         userReposDir.mkdirs();
 
         ArrayList<Repo> repos = GitApi.getReposByLogin(user.getGitLogin());
+        cleanseRepos(repos); //not sure if needed
 
         BlockingQueue<Repo> downloadedRepos = new LinkedBlockingQueue<>();
         Thread reposDownloadJob = new Thread(()->{
@@ -39,10 +41,8 @@ public class GitExpertiseJob implements Runnable{
        try{
            while(true){
                Repo currentRepo = downloadedRepos.take();
-               currentRepo.setFileName(userReposPath + currentRepo.getFileName());
-               String currentRepoFileName = userReposPath + downloadedRepos.take();
-               if(currentRepoFileName.equals(userReposPath + "")) break;
-
+               currentRepo.setFileName(userReposPath + "/"+ currentRepo.getFileName());
+               if(currentRepo.getName().equals("")) break;
                computeExpertise(currentRepo);
                deleteDirectory(new File(currentRepo.getFileName()));
            }
@@ -52,12 +52,21 @@ public class GitExpertiseJob implements Runnable{
         boolean isDeleted = deleteDirectory(userReposDir);
     }
 
+    public void cleanseRepos(ArrayList<Repo> repos){
+        Iterator<Repo> iterator = repos.iterator();
+        while(iterator.hasNext()){
+            Repo repo = iterator.next();
+            if(!Arrays.asList(Tags.tagsToCharacterize).contains(repo.getMainLanguage()))iterator.remove();
+        }
+    }
+
     public void computeExpertise(Repo repo){
         if(repo.getMainLanguage().equals(""))return;
         computeTags(repo);
         if(repo.getPresentTags().isEmpty()) return;
         System.out.println("Following repo: " + repo.getName() + " includes following tags: " + repo.getPresentTags());
         //compute metrics
+
     }
 
     public void computeTags(Repo repo){

@@ -14,6 +14,7 @@ public class ProfileImageFetcher {
         else {
             imageUrl = imageUrl.replaceAll("&*s=\\d*", "");
             imageUrl = imageUrl + "&s=256";
+
         }
 
         BufferedImage image=null;

@@ -3,19 +3,21 @@ package com.wriesnig.expertise;
 import com.wriesnig.stackoverflow.db.StackDbConnection;
 import com.wriesnig.stackoverflow.db.StackDatabase;
 import com.wriesnig.utils.Logger;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class StackExpertiseJob implements Runnable{
+public class StackExpertiseJob implements Runnable {
     private final User user;
 
-    public StackExpertiseJob(User user){
+    public StackExpertiseJob(User user) {
         this.user = user;
 
     }
+
     @Override
     public void run() {
         StackDbConnection stackDbConnection = StackDatabase.getConnectionPool().getDBConnection();
@@ -23,42 +25,64 @@ public class StackExpertiseJob implements Runnable{
         try {
 
             HashMap<String, ArrayList<Double>> scoresPerTag = new HashMap<>();
-            for(String tag: Tags.tagsToCharacterize){
+            Object[] postToClassify = new Object[6];
+            String userIsEstablished = String.valueOf(user.getIsEstablishedOnStack());
+            for (String tag : Tags.tagsToCharacterize) {
                 scoresPerTag.put(tag, new ArrayList<>());
             }
             while (postResults.next()) {
                 String tagsOfCurrentPost = postResults.getString("tags");
                 if (tagsOfCurrentPost == null || !postTagsContainTagsToCharacterize(tagsOfCurrentPost)) continue;
-                int postBodyLength = postResults.getInt("bodyLength");
                 int postId = postResults.getInt("id");
                 ResultSet votesOfCurrentPost = StackDatabase.getVotesOfPost(stackDbConnection, postId);
 
-                int upVotes=0;
-                int downVotes=0;
-                int isAccepted=0;
+                double upVotes = 0;
+                double downVotes = 0;
+                String isAccepted = "0";
 
-                if(votesOfCurrentPost.next()){
+                if (votesOfCurrentPost.next()) {
                     upVotes = votesOfCurrentPost.getInt("upVotes");
-                    downVotes =votesOfCurrentPost.getInt("downVotes");;
-                    isAccepted = votesOfCurrentPost.getInt("isAccepted");;
+                    downVotes = votesOfCurrentPost.getInt("downVotes");
+                    ;
+                    isAccepted = votesOfCurrentPost.getString("isAccepted");
+
                 }
 
+                postToClassify[0] = upVotes;
+                postToClassify[1] = downVotes;
+                postToClassify[2] = (upVotes + downVotes) == 0 ? 0 : upVotes / (upVotes + downVotes);
+                postToClassify[3] = isAccepted;
+                postToClassify[4] = userIsEstablished;
 
-                double expertise = Classifier.classify(upVotes, downVotes, isAccepted, postBodyLength);
-                //if(tagsOfCurrentPost.contains("c#"))Logger.info("Post c# "+ postId +" -> " + upVotes + "/"+ downVotes + "/" + isAccepted + "/" + postBodyLength + " ... Expertise: " + expertise);
-                for(String tag: Tags.tagsToCharacterize){
-                    if(tagsOfCurrentPost.contains("<"+tag+">"))scoresPerTag.get(tag).add(expertise);
+                String isMainTag = "0";
+                for (String tag : user.getMainTags())
+                    if (tagsOfCurrentPost.contains("<" + tag + ">")) {
+                        isMainTag = "1";
+                    }
+
+                postToClassify[5] = isMainTag;
+
+
+                double expertise = WekaClassifier.classify(postToClassify);
+                if (expertise == 0) continue;
+
+                for (String tag : Tags.tagsToCharacterize) {
+                    if (tagsOfCurrentPost.contains("<" + tag + ">"))
+                        scoresPerTag.get(tag).add(expertise);
                 }
             }
 
-            scoresPerTag.forEach((key,value)-> {
+            scoresPerTag.forEach((key, value) -> {
                 double score = value.stream().mapToDouble(Double::doubleValue).sum() / value.size();
+                int leftShiftedScore = (int) (score * 100);
+                score = leftShiftedScore / 100.0;
                 user.getExpertise().getStackExpertise().put(key, score);
             });
         } catch (SQLException e) {
             e.printStackTrace();
         }
         StackDatabase.getConnectionPool().releaseDBConnection(stackDbConnection);
+
         Logger.info("Computed following expertise for " + user.getStackDisplayName() + " : " + user.getExpertise().getStackExpertise().toString());
     }
 

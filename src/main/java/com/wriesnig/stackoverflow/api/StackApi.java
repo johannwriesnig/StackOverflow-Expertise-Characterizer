@@ -35,6 +35,15 @@ public class StackApi {
         return StackApiDataParser.parseUsersResponse(usersAsJson);
     }
 
+    public static ArrayList<String> getMainTags(int id){
+        String path = "users/" + id + "/top-answer-tags?site=stackoverflow";
+        InputStream apiStream = getStreamFromAPICall(path);
+        String stream = getStringFromStream(apiStream);
+        JSONObject tags = new JSONObject(stream);
+
+        return StackApiDataParser.parseTagsResponse(tags);
+    }
+
     private static InputStream getStreamFromAPICall(String path) {
         try {
             URL url = new URL(apiUrl + path);

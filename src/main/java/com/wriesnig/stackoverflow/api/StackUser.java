@@ -1,5 +1,7 @@
 package com.wriesnig.stackoverflow.api;
 
+import java.util.ArrayList;
+
 public class StackUser {
     private int id;
     private int reputation;
@@ -8,6 +10,7 @@ public class StackUser {
     private String link;
     private String profileImageUrl;
     private int accountId;
+    private ArrayList<String> mainTags;
 
     public StackUser(int id, int reputation, String displayName, String websiteUrl, String link, String profileImageUrl, int accountId) {
         this.id = id;
@@ -17,6 +20,7 @@ public class StackUser {
         this.link = link;
         this.profileImageUrl = profileImageUrl;
         this.accountId = accountId;
+        mainTags = new ArrayList<>();
     }
 
     @Override
@@ -50,5 +54,13 @@ public class StackUser {
 
     public int getAccountId() {
         return accountId;
+    }
+
+    public void setMainTags(ArrayList<String> mainTags) {
+        this.mainTags = mainTags;
+    }
+
+    public ArrayList<String> getMainTags() {
+        return mainTags;
     }
 }

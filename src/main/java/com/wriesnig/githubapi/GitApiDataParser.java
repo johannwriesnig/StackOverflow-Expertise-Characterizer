@@ -20,7 +20,7 @@ public class GitApiDataParser {
 
         String login = user.getString("login");
         String profileImageUrl = user.getString("avatar_url");
-        String name = user.getString("name");
+        String name = user.isNull("name")?"":user.getString("name");
         String websiteUrl = user.getString("blog");
         String htmlUrl = user.getString("html_url");
 

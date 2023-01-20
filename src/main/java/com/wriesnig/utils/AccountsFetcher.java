@@ -21,6 +21,8 @@ public class AccountsFetcher {
      */
     public static ArrayList<Pair<StackUser, GitUser>> fetchMatchingAccounts(ArrayList<Integer> stackIds){
         ArrayList<StackUser> stackUsers = fetchStackUsers(stackIds);
+        for(StackUser user: stackUsers)
+            user.setMainTags(StackApi.getMainTags(user.getId()));
         HashMap<StackUser, ArrayList<GitUser>> potentially_matching_accounts = fetchStackUsersWithPotentialGitUsers(stackUsers);
 
         return determineMatchingAccounts(potentially_matching_accounts);
