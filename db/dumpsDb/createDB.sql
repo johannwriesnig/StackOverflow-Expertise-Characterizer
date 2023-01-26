@@ -42,9 +42,9 @@ CREATE UNLOGGED TABLE Posts(
 	Tags varchar(200)
 );
 
-\copy Users FROM 'data/Users.csv' WITH DELIMITER ',' CSV HEADER ENCODING 'UTF8';
-\copy Votes FROM 'data/Votes.csv' WITH DELIMITER ',' CSV HEADER ENCODING 'UTF8';
-\copy Posts FROM 'data/Posts.csv' WITH DELIMITER ',' CSV HEADER ENCODING 'UTF8';
+\copy Users FROM 'csv/Users.csv' WITH DELIMITER ',' CSV HEADER ENCODING 'UTF8';
+\copy Votes FROM 'csv/Votes.csv' WITH DELIMITER ',' CSV HEADER ENCODING 'UTF8';
+\copy Posts FROM 'csv/Posts.csv' WITH DELIMITER ',' CSV HEADER ENCODING 'UTF8';
 
 ALTER TABLE Users
 ADD CONSTRAINT users_pk
