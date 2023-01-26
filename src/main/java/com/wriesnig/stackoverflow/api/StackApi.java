@@ -8,21 +8,13 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
-/**
- * Interface to the StackOverflowApi that is needed since some data are missing in the dumps
- */
 public class StackApi {
     private static final String apiUrl = "https://api.stackexchange.com/2.3/";
 
     private StackApi() {
 
     }
-    /**
-     * Get Users based on their Ids
-     *
-     * @param ids
-     * @return
-     */
+
     public static ArrayList<StackUser> getUsers(ArrayList<Integer> ids) {
         String idsList = ids.stream().map(Object::toString)
                 .collect(Collectors.joining(";"));

@@ -8,17 +8,10 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * utility class to fetch so-accounts with their possible gh-account
- */
+
 public class AccountsFetcher {
     private AccountsFetcher(){}
 
-    /**
-     * Based on a list of StackoverflowUsers this method returns all matching Stackoverflow- and GithubAccounts
-     * @param stackIds
-     * @return
-     */
     public static ArrayList<Pair<StackUser, GitUser>> fetchMatchingAccounts(ArrayList<Integer> stackIds){
         ArrayList<StackUser> stackUsers = fetchStackUsers(stackIds);
         for(StackUser user: stackUsers)
@@ -32,9 +25,6 @@ public class AccountsFetcher {
         return StackApi.getUsers(stackIds);
     }
 
-    /**
-     * Fetches possible GHUsers. Firstly GHUser with same login is stored, secondly User with same full_name
-     */
     private static HashMap<StackUser, ArrayList<GitUser>> fetchStackUsersWithPotentialGitUsers(ArrayList<StackUser> stackUsers) {
         HashMap<StackUser, ArrayList<GitUser>> potentiallyMatchingAccounts = new HashMap<>();
 
@@ -46,11 +36,6 @@ public class AccountsFetcher {
         return potentiallyMatchingAccounts;
     }
 
-    /**
-     * fetches potential GH Accounts based on Login, Full Name and linked Website
-     * @param stackUser
-     * @return
-     */
     private static ArrayList<GitUser> fetchPotentialGitUsers(StackUser stackUser){
         ArrayList<GitUser> potentialMatches = new ArrayList<>();
         GitUser gitUser;

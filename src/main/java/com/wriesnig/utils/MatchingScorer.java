@@ -4,9 +4,6 @@ import com.wriesnig.githubapi.GitUser;
 import com.wriesnig.stackoverflow.api.StackUser;
 import java.awt.image.BufferedImage;
 
-/**
- * Scores the matching between Stackoverflow- and GithubUser
- */
 public class MatchingScorer {
     private static final double MATCHING_NAMES_SCORE = 0.4;
     private static final double MATCHING_IMAGES_SCORE = 0.4;

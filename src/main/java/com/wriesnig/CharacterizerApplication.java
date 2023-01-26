@@ -9,10 +9,6 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-
-/**
- * Application
- */
 public class CharacterizerApplication {
     private ArrayList<Integer> ids;
 
