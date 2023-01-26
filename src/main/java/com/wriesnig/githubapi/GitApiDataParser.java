@@ -4,17 +4,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
-/**
- * Class parses the JSON-Responses from the Api.
- */
 public class GitApiDataParser {
     private GitApiDataParser(){}
 
-    /**
-     * Creates an GHUser based on the Rest Api response.
-     * @param user
-     * @return
-     */
     public static GitUser parseUserByLoginResponse(JSONObject user){
         if(user.has("message") && user.get("message").equals("Not Found")) return null;
 
@@ -28,11 +20,6 @@ public class GitApiDataParser {
 
     }
 
-    /**
-     * Returns the unique logins from the full_name search.
-     * @param response
-     * @return
-     */
     public static ArrayList<String> parseUsersByFullName(JSONObject response){
         if(response.getInt("total_count") == 0) return new ArrayList<>();
         ArrayList<String> usersLogin = new ArrayList<>();

@@ -1,5 +1,7 @@
 package com.wriesnig.githubapi;
 
+import com.wriesnig.expertise.git.badges.BuildStatus;
+
 import java.util.ArrayList;
 
 public class Repo {
@@ -7,6 +9,10 @@ public class Repo {
     private String mainLanguage;
     private String name;
     private ArrayList<String> presentTags;
+    private double coverage;
+    private BuildStatus buildStatus;
+    private double complexity;
+    private int quality;
 
     public Repo(String name, String mainLanguage) {
         this.name = name;
@@ -43,4 +49,35 @@ public class Repo {
         if(!presentTags.contains(tag)) presentTags.add(tag);
     }
 
+    public double getCoverage() {
+        return coverage;
+    }
+
+    public void setCoverage(double coverage) {
+        this.coverage = coverage;
+    }
+
+    public BuildStatus getBuildStatus() {
+        return buildStatus;
+    }
+
+    public void setBuildStatus(BuildStatus buildStatus) {
+        this.buildStatus = buildStatus;
+    }
+
+    public double getComplexity() {
+        return complexity;
+    }
+
+    public void setComplexity(double complexity) {
+        this.complexity = complexity;
+    }
+
+    public int getQuality() {
+        return quality;
+    }
+
+    public void setQuality(int quality) {
+        this.quality = quality;
+    }
 }

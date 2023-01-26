@@ -1,21 +1,16 @@
 package com.wriesnig;
 
-import com.hankcs.hanlp.summary.TextRankKeyword;
 import com.wriesnig.expertise.ExpertiseDatabase;
 import com.wriesnig.expertise.git.badges.StatusBadgesAnalyser;
 import com.wriesnig.githubapi.GitApi;
 import com.wriesnig.stackoverflow.db.StackDatabase;
 import com.wriesnig.utils.Logger;
-
 import java.io.*;
-import java.nio.file.Files;
 import java.util.Properties;
 
 public class Main {
 
     public static void main(String[] args){
-        //Wie UI aussieht wird noch entschieden
-        //Deshalb erstmal mit ausgewählten Usern, hier sind es die Top SO-User
         Logger.info("Application initialization...");
         Properties properties = getPropertiesFromConfigFile();
         initDatabases(properties);
@@ -30,7 +25,7 @@ public class Main {
         File readMe = new File("test.md");
         StatusBadgesAnalyser analyser = new StatusBadgesAnalyser(readMe);
         System.out.println(analyser.getBuildStatus());
-        System.out.println(analyser.getTestCoverage());
+        System.out.println(analyser.getCoverage());
 
     }
 

@@ -2,7 +2,6 @@ package com.wriesnig.expertise;
 
 import com.wriesnig.githubapi.GitUser;
 import com.wriesnig.stackoverflow.api.StackUser;
-
 import java.util.ArrayList;
 
 public class User {

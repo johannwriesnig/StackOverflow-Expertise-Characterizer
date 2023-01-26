@@ -2,11 +2,9 @@ package com.wriesnig.expertise.stack;
 
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
-import com.wriesnig.expertise.stack.WekaClassifier;
 import com.wriesnig.stackoverflow.db.StackDbConnection;
 import com.wriesnig.stackoverflow.db.StackDatabase;
 import com.wriesnig.utils.Logger;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;

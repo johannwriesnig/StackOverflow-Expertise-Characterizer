@@ -7,7 +7,6 @@ import java.util.ArrayList;
 public class StackApiDataParser {
     private StackApiDataParser(){}
 
-
     public static ArrayList<StackUser> parseUsersResponse(JSONObject response){
         JSONArray usersAsJson = response.getJSONArray("items");
 

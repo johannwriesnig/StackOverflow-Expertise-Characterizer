@@ -12,9 +12,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 
-/**
- * Class is the Interface to the Github-RestApi. It offers different GET-Methods to retrieve specific data.
- */
 public class GitApi {
     private final static String apiUrl = "https://api.github.com/";
     private static String token;
@@ -27,12 +24,6 @@ public class GitApi {
         GitApi.token = token;
     }
 
-    /**
-     * Get GithubUser by his login(unique).
-     *
-     * @param login
-     * @return
-     */
     public static GitUser getUserByLogin(String login) {
         if (login.contains(" ")) return null;
 
@@ -43,12 +34,6 @@ public class GitApi {
         return GitApiDataParser.parseUserByLoginResponse(userAsJson);
     }
 
-    /**
-     * Get GithubUsers based on full_name which is not unique.
-     *
-     * @param fullName
-     * @return
-     */
     public static ArrayList<String> getUsersByFullName(String fullName) {
         fullName = fullName.replace(" ", "+");
         String path = "search/users?q=fullname:" + fullName;

@@ -3,11 +3,11 @@ package com.wriesnig.expertise.git;
 import com.hankcs.hanlp.summary.TextRankKeyword;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
+import com.wriesnig.expertise.git.badges.StatusBadgesAnalyser;
 import com.wriesnig.expertise.git.metrics.java.JavaCyclomaticComplexity;
 import com.wriesnig.expertise.git.metrics.python.PythonCyclomaticComplexity;
 import com.wriesnig.githubapi.GitApi;
 import com.wriesnig.githubapi.Repo;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -65,8 +65,9 @@ public class GitExpertiseJob implements Runnable {
 
     public void computeExpertise(Repo repo) {
         if (repo.getMainLanguage().equals("")) return;
+        File readMe = new File(repo.getFileName() + "/README.md");
         repo.addTag(repo.getMainLanguage());
-        repo.addTags(getTagsFromFile(new File(repo.getFileName() + "/README.md")));
+        repo.addTags(getTagsFromFile(readMe));
         switch(repo.getMainLanguage()){
             case "java":
                 computeTagsForJavaProject(repo);
@@ -77,16 +78,18 @@ public class GitExpertiseJob implements Runnable {
                 computePythonMetrics(repo);
                 break;
         }
+        StatusBadgesAnalyser badgesAnalyser = new StatusBadgesAnalyser(readMe);
+        repo.setBuildStatus(badgesAnalyser.getBuildStatus());
+        repo.setCoverage(badgesAnalyser.getCoverage());
 
-        System.out.println("Following repo: " + repo.getName() + " includes following tags: " + repo.getPresentTags());
-
+        //classifier to add
+        repo.setQuality(3);
     }
 
     public void computeJavaMetrics(Repo repo){
         if (repo.getPresentTags().isEmpty()) return;
         JavaCyclomaticComplexity javaCyclomaticComplexity = new JavaCyclomaticComplexity(new File(repo.getFileName()));
         double complexity = javaCyclomaticComplexity.getProjectComplexity();
-
     }
 
     public void computePythonMetrics(Repo repo){

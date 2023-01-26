@@ -3,11 +3,9 @@ package com.wriesnig.expertise.git.badges;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -72,16 +70,16 @@ public class StatusBadgesAnalyser {
         return buildStatus;
     }
 
-    public double getTestCoverage(){
+    public double getCoverage(){
         double coverage=-1.0;
         for(Document doc: badgesHtml){
-            if((coverage = getTestCoverageFromDoc(doc)) != -1.0)break;
+            if((coverage = getCoverageFromDoc(doc)) != -1.0)break;
         }
 
         return coverage;
     }
 
-    private double getTestCoverageFromDoc(Document doc){
+    private double getCoverageFromDoc(Document doc){
         double coverage = -1.0;
         boolean isContainsTestCoverage=false;
         for(Element text: doc.select("svg g text")) {
