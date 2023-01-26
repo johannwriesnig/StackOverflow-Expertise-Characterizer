@@ -1,5 +1,8 @@
 package com.wriesnig.expertise;
 
+import com.wriesnig.expertise.git.GitExpertiseJob;
+import com.wriesnig.expertise.git.badges.StatusBadgesAnalyser;
+import com.wriesnig.expertise.stack.StackExpertiseJob;
 import com.wriesnig.stackoverflow.db.StackDatabase;
 import com.wriesnig.utils.Logger;
 import java.io.File;
@@ -14,8 +17,8 @@ public class ExpertiseCalculator {
     }
 
     public static void computeExpertise(ArrayList<User> users) {
-        computeSOExpertise(users);
-        //computeGHExpertise(users);
+        //computeSOExpertise(users);
+        computeGHExpertise(users);
         storeUsersExpertise(users);
     }
 

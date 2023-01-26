@@ -1,5 +1,8 @@
-package com.wriesnig.expertise;
+package com.wriesnig.expertise.stack;
 
+import com.wriesnig.expertise.Tags;
+import com.wriesnig.expertise.User;
+import com.wriesnig.expertise.stack.WekaClassifier;
 import com.wriesnig.stackoverflow.db.StackDbConnection;
 import com.wriesnig.stackoverflow.db.StackDatabase;
 import com.wriesnig.utils.Logger;

@@ -21,6 +21,7 @@ public class CharacterizerApplication {
         ids = new ArrayList<>(Arrays.asList(22656));
         ids = new ArrayList<>(Arrays.asList(22656, 1144035, 6309, 157882, 29407, 605744, 571407, 104349, 104349, 654031, 400617));
         ids = new ArrayList<>(Arrays.asList(605744,654031,400617, 1663352));
+        ids = new ArrayList<>(Arrays.asList(654031));
     }
 
     public void run() {
@@ -32,11 +33,6 @@ public class CharacterizerApplication {
         }
 
         ExpertiseCalculator.computeExpertise(users);
-        printExpertisePerUser(users);
     }
 
-
-    public void printExpertisePerUser(ArrayList<User> users){
-
-    }
 }

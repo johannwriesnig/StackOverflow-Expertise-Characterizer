@@ -2,6 +2,7 @@ package com.wriesnig;
 
 import com.hankcs.hanlp.summary.TextRankKeyword;
 import com.wriesnig.expertise.ExpertiseDatabase;
+import com.wriesnig.expertise.git.badges.StatusBadgesAnalyser;
 import com.wriesnig.githubapi.GitApi;
 import com.wriesnig.stackoverflow.db.StackDatabase;
 import com.wriesnig.utils.Logger;
@@ -26,16 +27,11 @@ public class Main {
     }
 
     public static void test(){
-        File readMe = new File("test.xml");
-        if(readMe.exists()){
-            String document = "";
-            try {
-                document = Files.readString(readMe.toPath());
-            } catch (IOException e) {
-                System.out.println("Reading failed");
-            }
-            System.out.println(TextRankKeyword.getKeywordList(document, 1000));
-        }
+        File readMe = new File("test.md");
+        StatusBadgesAnalyser analyser = new StatusBadgesAnalyser(readMe);
+        System.out.println(analyser.getBuildStatus());
+        System.out.println(analyser.getTestCoverage());
+
     }
 
     public static void setGitApiToken(Properties properties){

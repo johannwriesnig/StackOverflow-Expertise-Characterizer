@@ -1,4 +1,4 @@
-package com.wriesnig.expertise;
+package com.wriesnig.expertise.stack;
 
 public class WekaClassifier {
     public static double classify(Object[] i){
