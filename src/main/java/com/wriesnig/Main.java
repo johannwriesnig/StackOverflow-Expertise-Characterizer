@@ -1,6 +1,7 @@
 package com.wriesnig;
 
 import com.wriesnig.expertise.ExpertiseDatabase;
+import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.git.badges.StatusBadgesAnalyser;
 import com.wriesnig.githubapi.GitApi;
 import com.wriesnig.stackoverflow.db.StackDatabase;
@@ -13,8 +14,9 @@ public class Main {
     public static void main(String[] args){
         Logger.info("Application initialization...");
         Properties properties = getPropertiesFromConfigFile();
-        initDatabases(properties);
+        initDatabasesConnection(properties);
         setGitApiToken(properties);
+        setTags(properties);
 
         CharacterizerApplication application = new CharacterizerApplication();
         application.run();
@@ -29,6 +31,11 @@ public class Main {
 
     }
 
+    public static void setTags(Properties properties){
+        String tags = properties.getProperty("tags");
+        Tags.tagsToCharacterize = tags.split(",");
+    }
+
     public static void setGitApiToken(Properties properties){
         String gitToken = properties.getProperty("git.token");
         GitApi.setToken(gitToken);
@@ -40,7 +47,7 @@ public class Main {
         ExpertiseDatabase.closeConnection();
     }
 
-    public static void initDatabases(Properties properties){
+    public static void initDatabasesConnection(Properties properties){
         initDumpsDatabase(properties);
         initExpertiseDatabase(properties);
     }
