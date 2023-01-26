@@ -2,6 +2,7 @@ package com.wriesnig.db.stack.sodumpsconvert;
 
 import com.wriesnig.db.stack.sodumpsconvert.datainfo.AttributeType;
 import com.wriesnig.db.stack.sodumpsconvert.datainfo.DataInfo;
+import com.wriesnig.utils.Logger;
 import javafx.util.Pair;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -12,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ConvertJob{
-    private final FileWriter writer;
+    private FileWriter writer;
 
     private final String fileName;
     private final SAXParser parser;
@@ -22,23 +23,27 @@ public class ConvertJob{
     private int counter = 0;
     private int mill_counter = 1;
 
-    public ConvertJob(DataInfo dataInfo, String fileName, SAXParser parser) throws IOException {
+    public ConvertJob(DataInfo dataInfo, String fileName, SAXParser parser){
         this.dataInfo = dataInfo;
         this.fileName = fileName;
         this.parser = parser;
-
-        File csv = new File("output/" + dataInfo.getDataName() + ".csv");
-        writer = new FileWriter(csv);
     }
 
-    public void convert() {
+    public void convert() throws IOException {
+        if(!new File(fileName).exists()){
+            Logger.error(fileName + " is not available. No csv will be created.");
+            return;
+        }
+        File csv = new File(ConvertApplication.dataPath + "/csv/" + dataInfo.getDataName() + ".csv");
+        writer = new FileWriter(csv);
         start = System.nanoTime();
         startParsing();
         try {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            Logger.error("Error using filewriter", e);
+            throw new RuntimeException();
         }
 
     }
@@ -54,7 +59,7 @@ public class ConvertJob{
             parser.parse(new File(fileName), xml_handler);
 
         } catch (SAXException | IOException e) {
-            System.out.println("Running parser failed...");
+            Logger.error("Error while parsing xml", e);
         }
 
     }
@@ -98,7 +103,8 @@ public class ConvertJob{
         try {
             writer.write("\n");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            Logger.error("IOError while writing to csv file", e);
+            throw new RuntimeException();
         }
 
 
@@ -110,7 +116,7 @@ public class ConvertJob{
 
         double stop = System.nanoTime() - start;
         stop /= 1000000000.0;
-        System.out.println("Needed " + String.format("%.2f", stop) + "sec to insert " + (mill_counter++) + "mill entries into " + dataInfo.getDataName() + ".");
+        Logger.info("Needed " + String.format("%.2f", stop) + "sec to insert " + (mill_counter++) + "mill entries into " + dataInfo.getDataName() + ".");
         counter = 0;
     }
 }

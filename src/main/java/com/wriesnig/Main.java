@@ -1,6 +1,7 @@
 package com.wriesnig;
 
 import com.wriesnig.db.expertise.ExpertiseDatabase;
+import com.wriesnig.db.stack.sodumpsconvert.ConvertApplication;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.api.git.GitApi;
 import com.wriesnig.db.stack.StackDatabase;
@@ -12,6 +13,18 @@ import java.util.Properties;
 public class Main {
 
     public static void main(String[] args) {
+        if(args.length>1){
+            Logger.error("Too many arguments");
+            return;
+        }
+
+        if(args.length == 1 && args[0].equals("c")){
+            Logger.info("Converting xml...");
+            ConvertApplication convertApplication = new ConvertApplication();
+            convertApplication.run();
+            return;
+        }
+
         Logger.info("Application initialization...");
         Properties properties = getPropertiesFromConfigFile();
         initDatabasesConnection(properties);
