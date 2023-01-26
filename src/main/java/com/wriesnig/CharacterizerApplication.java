@@ -13,9 +13,9 @@ public class CharacterizerApplication {
     public CharacterizerApplication() {
         //Jon Skeet, Gordon Linoff, Von C, BalusC, Darin Dimitrov, Tomasz Nuzrkie(spring), jb nizet(spring), daniel roseman(django), chris pratt(django), davidism(flusk)
         ids = new ArrayList<>(Arrays.asList(22656));
-        ids = new ArrayList<>(Arrays.asList(605744, 654031, 400617, 1663352));
-        ids = new ArrayList<>(Arrays.asList(22656, 1144035, 6309, 157882, 29407, 605744, 571407, 104349, 104349, 654031, 400617));
         ids = new ArrayList<>(Arrays.asList(654031));
+        ids = new ArrayList<>(Arrays.asList(22656, 1144035, 6309, 157882, 29407, 605744, 571407, 104349, 104349, 654031, 400617));
+        ids = new ArrayList<>(Arrays.asList(605744, 654031, 400617, 1663352));
     }
 
     public void run() {

@@ -21,7 +21,7 @@ public class StatusBadgesAnalyser {
     public StatusBadgesAnalyser(File readMe){
         String readMeContent = "";
         try {
-            readMeContent = Files.readString(readMe.toPath());
+            if(readMe.exists())readMeContent = Files.readString(readMe.toPath());
         } catch (IOException e) {
             e.printStackTrace();
         }

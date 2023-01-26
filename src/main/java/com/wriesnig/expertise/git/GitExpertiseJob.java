@@ -8,6 +8,8 @@ import com.wriesnig.expertise.git.metrics.java.JavaCyclomaticComplexity;
 import com.wriesnig.expertise.git.metrics.python.PythonCyclomaticComplexity;
 import com.wriesnig.api.git.GitApi;
 import com.wriesnig.api.git.Repo;
+import com.wriesnig.utils.Logger;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,7 +46,7 @@ public class GitExpertiseJob implements Runnable {
         try {
             while (true) {
                 Repo currentRepo = downloadedRepos.take();
-                currentRepo.setFileName(userReposPath + "/" + currentRepo.getFileName());
+                currentRepo.setFileName(userReposPath + currentRepo.getFileName());
                 if (currentRepo.getName().equals("")) break;
                 computeExpertise(currentRepo);
                 deleteDirectory(new File(currentRepo.getFileName()));
@@ -81,6 +83,9 @@ public class GitExpertiseJob implements Runnable {
         StatusBadgesAnalyser badgesAnalyser = new StatusBadgesAnalyser(readMe);
         repo.setBuildStatus(badgesAnalyser.getBuildStatus());
         repo.setCoverage(badgesAnalyser.getCoverage());
+
+        Logger.info("Repo: "+ repo.getFileName() + " has following tags " + repo.getPresentTags() + " " +
+                "and following stats... Build: " + repo.getBuildStatus() + " Coverage: " + repo.getCoverage() + " Complexity: " + repo.getComplexity());
 
         //classifier to add
         repo.setQuality(3);
@@ -123,21 +128,20 @@ public class GitExpertiseJob implements Runnable {
                                 while(line != null && (line.startsWith("import") || line.startsWith("from") || line.startsWith(" ") || line.startsWith("#"))){
                                     if(line.startsWith("import") || line.startsWith("from")){
                                         fileWriter.write(line);
-                                        System.out.println(line);
                                     }
                                     line = bufferedReader.readLine();
                                 }
                             } catch (FileNotFoundException e) {
-                                System.out.println("issues");
+                                Logger.error("Issues finding file", e);
                             } catch (IOException e) {
-                                throw new RuntimeException(e);
+                                Logger.error("Issues", e);
                             }
                         });
             } catch (IOException e) {
-                System.out.println("traversing issues");
+                Logger.error("Issues traversing files", e);
             }
         } catch (Exception e) {
-            System.out.println("Error fiel writing dir");
+            Logger.error("Issues while computing pythong tags", e);
         }
 
         repo.addTags(getTagsFromFile(new File("repos/" + user.getGitLogin()+"/keywords.info")));
