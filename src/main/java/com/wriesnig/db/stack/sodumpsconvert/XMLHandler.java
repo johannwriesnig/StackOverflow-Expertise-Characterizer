@@ -1,4 +1,4 @@
-package com.wriesnig.stackoverflow.db.sodumpsconvert;
+package com.wriesnig.db.stack.sodumpsconvert;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;

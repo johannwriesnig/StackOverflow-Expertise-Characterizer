@@ -1,27 +1,30 @@
 package com.wriesnig.utils;
 
-import com.wriesnig.githubapi.GitUser;
-import com.wriesnig.githubapi.GitApi;
-import com.wriesnig.stackoverflow.api.StackUser;
-import com.wriesnig.stackoverflow.api.StackApi;
+import com.wriesnig.expertise.User;
+import com.wriesnig.api.git.GitUser;
+import com.wriesnig.api.git.GitApi;
+import com.wriesnig.api.stack.StackUser;
+import com.wriesnig.api.stack.StackApi;
 import javafx.util.Pair;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 
 public class AccountsFetcher {
-    private AccountsFetcher(){}
+    private AccountsFetcher() {
+    }
 
-    public static ArrayList<Pair<StackUser, GitUser>> fetchMatchingAccounts(ArrayList<Integer> stackIds){
+    public static ArrayList<User> fetchMatchingAccounts(ArrayList<Integer> stackIds) {
         ArrayList<StackUser> stackUsers = fetchStackUsers(stackIds);
-        for(StackUser user: stackUsers)
+        for (StackUser user : stackUsers)
             user.setMainTags(StackApi.getMainTags(user.getId()));
         HashMap<StackUser, ArrayList<GitUser>> potentially_matching_accounts = fetchStackUsersWithPotentialGitUsers(stackUsers);
 
-        return determineMatchingAccounts(potentially_matching_accounts);
+        return matchAccounts(potentially_matching_accounts);
     }
 
-    private static ArrayList<StackUser> fetchStackUsers(ArrayList<Integer> stackIds){
+    private static ArrayList<StackUser> fetchStackUsers(ArrayList<Integer> stackIds) {
         return StackApi.getUsers(stackIds);
     }
 
@@ -36,7 +39,7 @@ public class AccountsFetcher {
         return potentiallyMatchingAccounts;
     }
 
-    private static ArrayList<GitUser> fetchPotentialGitUsers(StackUser stackUser){
+    private static ArrayList<GitUser> fetchPotentialGitUsers(StackUser stackUser) {
         ArrayList<GitUser> potentialMatches = new ArrayList<>();
         GitUser gitUser;
 
@@ -50,7 +53,7 @@ public class AccountsFetcher {
             potentialMatches.add(gitUser);
         }
 
-        if(isGitUserLink(stackUser.getWebsiteUrl())){
+        if (isGitUserLink(stackUser.getWebsiteUrl())) {
             String login = getLoginFromGitUserLink(stackUser.getWebsiteUrl());
             gitUser = GitApi.getUserByLogin(login);
             potentialMatches.add(gitUser);
@@ -59,39 +62,40 @@ public class AccountsFetcher {
         return potentialMatches;
     }
 
-    private static String getLoginFromGitUserLink(String url){
+    private static String getLoginFromGitUserLink(String url) {
         String[] urlParts = url.split("/");
-        return urlParts[urlParts.length-1];
+        return urlParts[urlParts.length - 1];
     }
 
-    private static boolean isGitUserLink(String link){
-        boolean isLink= link.matches("https://github.com/[a-zA-Z0-9-]+");
+    private static boolean isGitUserLink(String link) {
+        boolean isLink = link.matches("https://github.com/[a-zA-Z0-9-]+");
 
         String login = getLoginFromGitUserLink(link);
-        if(login.startsWith("-") || login.endsWith("-") || login.contains("--"))isLink=false;
+        if (login.startsWith("-") || login.endsWith("-") || login.contains("--")) isLink = false;
 
         return isLink;
     }
 
-    /**
-     * Determines if so and gh accounts are matching
-     * @param potentiallyMatchingAccounts
-     * @return
-     */
-    private static ArrayList<Pair<StackUser, GitUser>> determineMatchingAccounts(HashMap<StackUser, ArrayList<GitUser>> potentiallyMatchingAccounts){
+    private static ArrayList<User> matchAccounts(HashMap<StackUser, ArrayList<GitUser>> potentiallyMatchingAccounts) {
         ArrayList<Pair<StackUser, GitUser>> linkedAccounts = new ArrayList<>();
         for (StackUser stackUser : potentiallyMatchingAccounts.keySet()) {
             Pair<GitUser, Double> highest_match = new Pair<>(null, -1.0);
             for (GitUser gitUser : potentiallyMatchingAccounts.get(stackUser)) {
-                double score = MatchingScorer.getMatchingScore(stackUser, gitUser);
-                if(score>highest_match.getValue()) highest_match = new Pair<>(gitUser, score);
+                double score = AccountsMatchScorer.getMatchingScore(stackUser, gitUser);
+                if (score > highest_match.getValue()) highest_match = new Pair<>(gitUser, score);
             }
-            if(highest_match.getValue()>0.5) {
+            if (highest_match.getValue() > 0.5) {
                 linkedAccounts.add(new Pair<>(stackUser, highest_match.getKey()));
                 Logger.info("Matched accounts " + stackUser.getDisplayName() + "/" + highest_match.getKey().getLogin() + " with score of " + highest_match.getValue());
             }
         }
-        return linkedAccounts;
+
+        ArrayList<User> users = new ArrayList<>();
+        for (Pair<StackUser, GitUser> matching_accounts : linkedAccounts) {
+            users.add(new User(matching_accounts.getKey(), matching_accounts.getValue()));
+        }
+
+        return users;
     }
 
 }

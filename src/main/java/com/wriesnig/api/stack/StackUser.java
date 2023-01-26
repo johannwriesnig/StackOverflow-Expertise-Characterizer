@@ -1,15 +1,15 @@
-package com.wriesnig.stackoverflow.api;
+package com.wriesnig.api.stack;
 
 import java.util.ArrayList;
 
 public class StackUser {
-    private int id;
-    private int reputation;
-    private String displayName;
-    private String websiteUrl;
-    private String link;
-    private String profileImageUrl;
-    private int accountId;
+    private final int id;
+    private final int reputation;
+    private final String displayName;
+    private final String websiteUrl;
+    private final String link;
+    private final String profileImageUrl;
+    private final int accountId;
     private ArrayList<String> mainTags;
 
     public StackUser(int id, int reputation, String displayName, String websiteUrl, String link, String profileImageUrl, int accountId) {

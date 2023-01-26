@@ -1,15 +1,15 @@
 package com.wriesnig.utils;
 
-import com.wriesnig.githubapi.GitUser;
-import com.wriesnig.stackoverflow.api.StackUser;
+import com.wriesnig.api.git.GitUser;
+import com.wriesnig.api.stack.StackUser;
 import java.awt.image.BufferedImage;
 
-public class MatchingScorer {
+public class AccountsMatchScorer {
     private static final double MATCHING_NAMES_SCORE = 0.4;
     private static final double MATCHING_IMAGES_SCORE = 0.4;
     private static final double MATCHING_LINKED_WEBSITES_SCORE = 0.2;
     private static final double NO_MATCH_SCORE = 0;
-    private MatchingScorer(){}
+    private AccountsMatchScorer(){}
 
     public static double getMatchingScore(StackUser stackUser, GitUser gitUser){
         double score=0;

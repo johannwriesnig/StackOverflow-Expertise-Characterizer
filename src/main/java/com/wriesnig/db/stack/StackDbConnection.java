@@ -1,4 +1,4 @@
-package com.wriesnig.stackoverflow.db;
+package com.wriesnig.db.stack;
 
 import com.wriesnig.utils.Logger;
 import java.sql.Connection;
@@ -10,7 +10,6 @@ public class StackDbConnection {
     private final Connection connection;
     private final PreparedStatement postsByUserId;
     private final PreparedStatement votesByPostId;
-
 
     public StackDbConnection(String url, String user, String password) {
         try {

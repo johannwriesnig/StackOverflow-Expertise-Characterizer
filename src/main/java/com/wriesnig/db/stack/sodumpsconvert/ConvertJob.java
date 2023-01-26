@@ -1,7 +1,7 @@
-package com.wriesnig.stackoverflow.db.sodumpsconvert;
+package com.wriesnig.db.stack.sodumpsconvert;
 
-import com.wriesnig.stackoverflow.db.sodumpsconvert.datainfo.AttributeType;
-import com.wriesnig.stackoverflow.db.sodumpsconvert.datainfo.DataInfo;
+import com.wriesnig.db.stack.sodumpsconvert.datainfo.AttributeType;
+import com.wriesnig.db.stack.sodumpsconvert.datainfo.DataInfo;
 import javafx.util.Pair;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

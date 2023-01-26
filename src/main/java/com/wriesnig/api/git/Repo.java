@@ -1,7 +1,6 @@
-package com.wriesnig.githubapi;
+package com.wriesnig.api.git;
 
 import com.wriesnig.expertise.git.badges.BuildStatus;
-
 import java.util.ArrayList;
 
 public class Repo {

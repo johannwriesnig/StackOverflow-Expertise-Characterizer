@@ -1,4 +1,4 @@
-package com.wriesnig.stackoverflow.db;
+package com.wriesnig.db.stack;
 
 import java.sql.*;
 

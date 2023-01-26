@@ -2,8 +2,8 @@ package com.wriesnig.expertise.stack;
 
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
-import com.wriesnig.stackoverflow.db.StackDbConnection;
-import com.wriesnig.stackoverflow.db.StackDatabase;
+import com.wriesnig.db.stack.StackDbConnection;
+import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.utils.Logger;
 import java.sql.ResultSet;
 import java.sql.SQLException;

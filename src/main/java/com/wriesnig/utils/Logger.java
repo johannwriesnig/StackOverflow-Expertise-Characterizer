@@ -1,66 +1,35 @@
 package com.wriesnig.utils;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 
 public class Logger {
-    private static final File logFile = new File("log.txt");
-    private static final FileWriter writer;
     private static boolean shouldPrint = true;
 
-    static {
-        try {
-            writer = new FileWriter(logFile);
-        } catch (IOException e) {
-            throw new RuntimeException("Issues with log file",e);
-        }
+    private Logger() {
     }
 
-    private Logger(){}
-
-    public static void deactivatePrinting(){
-        shouldPrint=false;
+    public static void deactivatePrinting() {
+        shouldPrint = false;
     }
 
-    public static void error(String message, Throwable stackTrace){
-        try {
-            print(message);
-            writer.write(getTimeStamp() + " [ERROR]: " + message + "\n");
-            writer.write("\t" + stackTrace);
-            writer.flush();
-        } catch (IOException e) {
-            throw new RuntimeException("Issues writing to log file",e);
-        }
+    public static void error(String message, Throwable stackTrace) {
+        if (!shouldPrint) return;
+        System.out.println(getTimeStamp() + " [ERROR]: " + message);
+        stackTrace.printStackTrace();
     }
 
-    public static void error(String message){
-        try {
-            print(message);
-            writer.write(getTimeStamp() + " [ERROR]: " + message + "\n");
-            writer.flush();
-        } catch (IOException e) {
-            throw new RuntimeException("Issues writing to log file",e);
-        }
+    public static void error(String message) {
+        if (!shouldPrint) return;
+        System.out.println(getTimeStamp() + " [ERROR]: " + message);
     }
 
-    public static void info(String message){
-        try {
-            print(message);
-            writer.write(getTimeStamp() + " [INFO]: " + message + "\n");
-            writer.flush();
-        } catch (IOException e) {
-            throw new RuntimeException("Issues writing to log file",e);
-        }
+    public static void info(String message) {
+        if (!shouldPrint) return;
+        System.out.println(getTimeStamp() + " [INFO]: " + message);
     }
 
-    private static void print(String message){
-        if(shouldPrint) System.out.println(message);
-    }
-
-    private static String getTimeStamp(){
+    private static String getTimeStamp() {
         LocalDateTime now = LocalDateTime.now();
         int hour = now.getHour();
         int minute = now.getMinute();

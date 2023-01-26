@@ -7,24 +7,24 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class ProfileImageFetcher {
-    private ProfileImageFetcher(){}
+    private ProfileImageFetcher() {
+    }
 
-    public static BufferedImage getImageFromUrl(String imageUrl){
-        if(imageUrl.contains("google")) imageUrl = imageUrl.replaceAll("=k-s\\d*", "=k-s256");
+    public static BufferedImage getImageFromUrl(String imageUrl) {
+        if (imageUrl.contains("google")) imageUrl = imageUrl.replaceAll("=k-s\\d*", "=k-s256");
         else {
             imageUrl = imageUrl.replaceAll("&*s=\\d*", "");
             imageUrl = imageUrl + "&s=256";
-
         }
 
-        BufferedImage image=null;
+        BufferedImage image = null;
 
         try {
             URL url = new URL(imageUrl);
             image = ImageIO.read(url);
-        } catch (MalformedURLException e){
-            Logger.error("Malformed url when fetching profile images -> " + imageUrl);
-        } catch(IOException e){
+        } catch (MalformedURLException e) {
+            Logger.error("Malformed url while fetching profile images -> " + imageUrl);
+        } catch (IOException e) {
             Logger.error("Issues reading image from " + imageUrl);
         }
 

@@ -1,4 +1,4 @@
-package com.wriesnig.expertise;
+package com.wriesnig.db.expertise;
 
 import com.wriesnig.utils.Logger;
 import java.sql.Connection;
