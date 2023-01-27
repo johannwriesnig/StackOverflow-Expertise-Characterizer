@@ -1,10 +1,10 @@
 package com.wriesnig.expertise.stack;
 
-public class WekaClassifier {
+public class StackClassifier {
     public static double classify(Object[] i){
 
         double p = Double.NaN;
-        p = WekaClassifier.N2b90198c0(i);
+        p = StackClassifier.N2b90198c0(i);
         return p;
     }
     static double N2b90198c0(Object []i) {
@@ -12,9 +12,9 @@ public class WekaClassifier {
         if (i[0] == null) {
             p = 0;
         } else if (((Double) i[0]).doubleValue() <= 1.0) {
-            p = WekaClassifier.N6a463a9e1(i);
+            p = StackClassifier.N6a463a9e1(i);
         } else if (((Double) i[0]).doubleValue() > 1.0) {
-            p = WekaClassifier.N2affbc009(i);
+            p = StackClassifier.N2affbc009(i);
         }
         return p;
     }
@@ -23,9 +23,9 @@ public class WekaClassifier {
         if (i[1] == null) {
             p = 0;
         } else if (((Double) i[1]).doubleValue() <= 1.0) {
-            p = WekaClassifier.N3e0633332(i);
+            p = StackClassifier.N3e0633332(i);
         } else if (((Double) i[1]).doubleValue() > 1.0) {
-            p = WekaClassifier.N3bd439497(i);
+            p = StackClassifier.N3bd439497(i);
         }
         return p;
     }
@@ -34,9 +34,9 @@ public class WekaClassifier {
         if (i[3] == null) {
             p = 0;
         } else if (i[3].equals("0")) {
-            p = WekaClassifier.N1aa8948d3(i);
+            p = StackClassifier.N1aa8948d3(i);
         } else if (i[3].equals("1")) {
-            p = WekaClassifier.N6a96fc525(i);
+            p = StackClassifier.N6a96fc525(i);
         }
         return p;
     }
@@ -47,7 +47,7 @@ public class WekaClassifier {
         } else if (((Double) i[0]).doubleValue() <= 0.0) {
             p = 0;
         } else if (((Double) i[0]).doubleValue() > 0.0) {
-            p = WekaClassifier.N315fa22d4(i);
+            p = StackClassifier.N315fa22d4(i);
         }
         return p;
     }
@@ -67,7 +67,7 @@ public class WekaClassifier {
         if (i[4] == null) {
             p = 3;
         } else if (i[4].equals("0")) {
-            p = WekaClassifier.N6506c5986(i);
+            p = StackClassifier.N6506c5986(i);
         } else if (i[4].equals("1")) {
             p = 4;
         }
@@ -89,7 +89,7 @@ public class WekaClassifier {
         if (i[3] == null) {
             p = 1;
         } else if (i[3].equals("0")) {
-            p = WekaClassifier.N7756aad48(i);
+            p = StackClassifier.N7756aad48(i);
         } else if (i[3].equals("1")) {
             p = 3;
         }
@@ -111,9 +111,9 @@ public class WekaClassifier {
         if (i[2] == null) {
             p = 2;
         } else if (((Double) i[2]).doubleValue() <= 0.78) {
-            p = WekaClassifier.N798686c210(i);
+            p = StackClassifier.N798686c210(i);
         } else if (((Double) i[2]).doubleValue() > 0.78) {
-            p = WekaClassifier.N6382f6ca11(i);
+            p = StackClassifier.N6382f6ca11(i);
         }
         return p;
     }
@@ -133,9 +133,9 @@ public class WekaClassifier {
         if (i[4] == null) {
             p = 3;
         } else if (i[4].equals("0")) {
-            p = WekaClassifier.N2140e06412(i);
+            p = StackClassifier.N2140e06412(i);
         } else if (i[4].equals("1")) {
-            p = WekaClassifier.N4fb5ea6715(i);
+            p = StackClassifier.N4fb5ea6715(i);
         }
         return p;
     }
@@ -144,9 +144,9 @@ public class WekaClassifier {
         if (i[3] == null) {
             p = 3;
         } else if (i[3].equals("0")) {
-            p = WekaClassifier.N760847f013(i);
+            p = StackClassifier.N760847f013(i);
         } else if (i[3].equals("1")) {
-            p = WekaClassifier.N3b756f6514(i);
+            p = StackClassifier.N3b756f6514(i);
         }
         return p;
     }
@@ -177,7 +177,7 @@ public class WekaClassifier {
         if (i[3] == null) {
             p = 4;
         } else if (i[3].equals("0")) {
-            p = WekaClassifier.N69d0603516(i);
+            p = StackClassifier.N69d0603516(i);
         } else if (i[3].equals("1")) {
             p = 5;
         }

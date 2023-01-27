@@ -2,6 +2,7 @@ package com.wriesnig.expertise;
 
 import com.wriesnig.api.git.GitUser;
 import com.wriesnig.api.stack.StackUser;
+
 import java.util.ArrayList;
 
 public class User {
@@ -10,15 +11,17 @@ public class User {
     private String gitLogin;
     private Expertise expertise;
     private int isEstablishedOnStack;
+    private String profileImageUrl;
     private ArrayList<String> mainTags;
 
-    public User(StackUser so_user, GitUser gh_user){
-        this.stackDisplayName = so_user.getDisplayName();
-        this.stackId = so_user.getId();
-        this.gitLogin = gh_user.getLogin();
+    public User(StackUser stackUser, GitUser gitUser) {
+        this.stackDisplayName = stackUser.getDisplayName();
+        this.stackId = stackUser.getId();
+        this.gitLogin = gitUser.getLogin();
         this.expertise = new Expertise();
-        this.isEstablishedOnStack = so_user.getReputation()>=3000?1:0;
-        this.mainTags = so_user.getMainTags();
+        this.isEstablishedOnStack = stackUser.getReputation() >= 3000 ? 1 : 0;
+        this.mainTags = stackUser.getMainTags();
+        this.profileImageUrl = stackUser.getProfileImageUrl();
     }
 
     public int getStackId() {
@@ -53,9 +56,15 @@ public class User {
         this.expertise = expertise;
     }
 
-    public int getIsEstablishedOnStack(){ return isEstablishedOnStack;}
+    public int getIsEstablishedOnStack() {
+        return isEstablishedOnStack;
+    }
 
     public ArrayList<String> getMainTags() {
         return mainTags;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
     }
 }

@@ -64,7 +64,7 @@ public class StackExpertiseJob implements Runnable {
                 postToClassify[5] = isMainTag;
 
 
-                double expertise = WekaClassifier.classify(postToClassify);
+                double expertise = StackClassifier.classify(postToClassify);
                 if (expertise == 0) continue;
 
                 for (String tag : Tags.tagsToCharacterize) {

@@ -24,9 +24,15 @@ public class Expertise {
         return stackExpertise;
     }
 
-    public HashMap<String, Double> getFinalExpertise(){
-        //some computation
-        return stackExpertise;
+    public HashMap<String, Double> getOverAllExpertise(){
+        HashMap<String, Double> overAllExpertise = new HashMap<>();
+        for(String tag: Tags.tagsToCharacterize){
+            double stackTagExpertise = stackExpertise.get(tag);
+            double gitTagExpertise = gitExpertise.get(tag);
+            double avgExpertise = (stackTagExpertise+gitTagExpertise)/2;
+            overAllExpertise.put(tag, avgExpertise);
+        }
+        return overAllExpertise;
     }
 
 }

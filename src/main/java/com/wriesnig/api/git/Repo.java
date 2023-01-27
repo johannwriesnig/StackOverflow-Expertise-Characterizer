@@ -11,7 +11,7 @@ public class Repo {
     private double coverage;
     private BuildStatus buildStatus;
     private double complexity;
-    private int quality;
+    private double quality;
 
     public Repo(String name, String mainLanguage) {
         this.name = name;
@@ -72,11 +72,11 @@ public class Repo {
         this.complexity = complexity;
     }
 
-    public int getQuality() {
+    public double getQuality() {
         return quality;
     }
 
-    public void setQuality(int quality) {
+    public void setQuality(double quality) {
         this.quality = quality;
     }
 }

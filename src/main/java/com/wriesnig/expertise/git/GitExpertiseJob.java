@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -54,7 +55,27 @@ public class GitExpertiseJob implements Runnable {
         } catch (InterruptedException e) {
             throw new RuntimeException();
         }
-        boolean isDeleted = deleteDirectory(userReposDir);
+        deleteDirectory(userReposDir);
+        HashMap<String, ArrayList<Double>> scoresPerTag = computeExpertisePerTag(repos);
+        scoresPerTag.forEach((key, value) -> {
+            double score = value.stream().mapToDouble(Double::doubleValue).sum() / value.size();
+            int leftShiftedScore = (int) (score * 100);
+            score = leftShiftedScore / 100.0;
+            user.getExpertise().getGitExpertise().put(key, score);
+        });
+
+    }
+
+    public HashMap<String, ArrayList<Double>> computeExpertisePerTag(ArrayList<Repo> repos){
+        HashMap<String, ArrayList<Double>> scoresPerTag = new HashMap<>();
+        for (String tag : Tags.tagsToCharacterize) {
+            scoresPerTag.put(tag, new ArrayList<>());
+            for(Repo repo: repos){
+                if(repo.getPresentTags().contains(tag)) scoresPerTag.get(tag).add(repo.getQuality());
+            }
+        }
+
+        return scoresPerTag;
     }
 
     public void cleanseRepos(ArrayList<Repo> repos) {
@@ -88,7 +109,8 @@ public class GitExpertiseJob implements Runnable {
                 "and following stats... Build: " + repo.getBuildStatus() + " Coverage: " + repo.getCoverage() + " Complexity: " + repo.getComplexity());
 
         //classifier to add
-        repo.setQuality(3);
+        double quality = GitClassifier.classify();
+        repo.setQuality(quality);
     }
 
     public void computeJavaMetrics(Repo repo){

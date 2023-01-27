@@ -27,9 +27,10 @@ public class Main {
 
         Logger.info("Application initialization...");
         Properties properties = getPropertiesFromConfigFile();
-        initDatabasesConnection(properties);
         setGitApiToken(properties);
         setTags(properties);
+        initDatabasesConnection(properties);
+
 
         CharacterizerApplication application = new CharacterizerApplication();
         application.run();

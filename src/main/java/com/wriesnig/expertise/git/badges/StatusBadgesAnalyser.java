@@ -1,5 +1,6 @@
 package com.wriesnig.expertise.git.badges;
 
+import com.wriesnig.utils.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -38,7 +39,7 @@ public class StatusBadgesAnalyser {
             try (InputStream in = new URL(badges.group(1)).openStream()) {
                 html = new String(in.readAllBytes(), StandardCharsets.UTF_8);
             } catch (IOException e){
-                e.printStackTrace();
+                Logger.error("Issues calling URL. Probably link is broken -> " + badges.group(1));
             }
 
             badgesHtml.add(Jsoup.parse(html));
