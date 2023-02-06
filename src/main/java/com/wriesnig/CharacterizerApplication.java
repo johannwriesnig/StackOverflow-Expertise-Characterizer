@@ -19,7 +19,7 @@ public class CharacterizerApplication {
         ids = new ArrayList<>(Arrays.asList(654031));
         ids = new ArrayList<>(Arrays.asList(21153013));
         ids = new ArrayList<>(Arrays.asList(22656, 1144035, 6309, 157882, 29407, 605744, 571407, 104349, 104349, 654031, 400617));
-        ids = new ArrayList<>(Arrays.asList(22656, 1144035, 6309, 157882, 29407, 605744, 571407, 104349, 104349, 654031, 400617));
+        ids = new ArrayList<>(Arrays.asList(29407, 605744, 571407, 104349, 104349, 654031, 400617));
     }
 
     public void run() {

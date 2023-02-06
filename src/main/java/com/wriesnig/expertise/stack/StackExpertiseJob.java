@@ -69,7 +69,7 @@ public class StackExpertiseJob implements Runnable {
             }
 
             scoresPerTag.forEach((key, value) -> {
-                double score = value.stream().mapToDouble(Double::doubleValue).sum() / value.size();
+                double score = value.size()!=0?value.stream().mapToDouble(Double::doubleValue).sum() / value.size():1;
                 user.getExpertise().getStackExpertise().put(key, score);
             });
         } catch (SQLException e) {
