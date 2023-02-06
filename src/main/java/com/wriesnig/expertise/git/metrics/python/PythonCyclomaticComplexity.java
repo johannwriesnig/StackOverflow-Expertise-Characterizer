@@ -11,6 +11,7 @@ public class PythonCyclomaticComplexity extends CyclomaticComplexity {
 
     @Override
     public double getProjectComplexity() {
+
         return 0;
     }
 }

@@ -60,6 +60,11 @@
             <version>1.15.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>net.sourceforge.pmd</groupId>
+            <artifactId>pmd-java</artifactId>
+            <version>6.53.0</version>
+        </dependency>
 
 
 

@@ -15,7 +15,7 @@ public class ExpertiseCalculator {
     }
 
     public static void computeExpertise(ArrayList<User> users) {
-        computeSOExpertise(users);
+        //computeSOExpertise(users);
         computeGHExpertise(users);
     }
 

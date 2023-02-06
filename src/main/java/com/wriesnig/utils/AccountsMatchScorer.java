@@ -33,7 +33,7 @@ public class AccountsMatchScorer {
 
         double images_difference = getImagesDissimilarity(so_user_image, gh_user_image);
 
-        return images_difference<8? MATCHING_IMAGES_SCORE : NO_MATCH_SCORE;
+        return images_difference<8 && images_difference!=-1? MATCHING_IMAGES_SCORE : NO_MATCH_SCORE;
     }
 
     private static double getImagesDissimilarity(BufferedImage img1, BufferedImage img2){

@@ -59,8 +59,6 @@ public class GitExpertiseJob implements Runnable {
         HashMap<String, ArrayList<Double>> scoresPerTag = computeExpertisePerTag(repos);
         scoresPerTag.forEach((key, value) -> {
             double score = value.stream().mapToDouble(Double::doubleValue).sum() / value.size();
-            int leftShiftedScore = (int) (score * 100);
-            score = leftShiftedScore / 100.0;
             user.getExpertise().getGitExpertise().put(key, score);
         });
 
@@ -105,11 +103,17 @@ public class GitExpertiseJob implements Runnable {
         repo.setBuildStatus(badgesAnalyser.getBuildStatus());
         repo.setCoverage(badgesAnalyser.getCoverage());
 
-        Logger.info("Repo: "+ repo.getFileName() + " has following tags " + repo.getPresentTags() + " " +
-                "and following stats... Build: " + repo.getBuildStatus() + " Coverage: " + repo.getCoverage() + " Complexity: " + repo.getComplexity());
+        Logger.info("Repo: "+ repo.getName() + " has following tags " + repo.getPresentTags() + " " +
+                "and following stats... Build: " + repo.getBuildStatus() + " Coverage: " + repo.getCoverage() + " Complexity: " + repo.getComplexity() + " ReadMe exists: " + readMe.exists());
 
         //classifier to add
-        double quality = GitClassifier.classify();
+        Object[] classificationData = {repo.getComplexity(), readMe.exists()?"1":"0", "0", repo.getCoverage(), "1"};
+        double quality = 0;
+        try {
+            quality = GitClassifier.classify(classificationData);
+        } catch (Exception e) {
+            Logger.error("Error while classifying git repo", e);
+        }
         repo.setQuality(quality);
     }
 
@@ -117,12 +121,14 @@ public class GitExpertiseJob implements Runnable {
         if (repo.getPresentTags().isEmpty()) return;
         JavaCyclomaticComplexity javaCyclomaticComplexity = new JavaCyclomaticComplexity(new File(repo.getFileName()));
         double complexity = javaCyclomaticComplexity.getProjectComplexity();
+        repo.setComplexity(complexity);
     }
 
     public void computePythonMetrics(Repo repo){
         if (repo.getPresentTags().isEmpty()) return;
         PythonCyclomaticComplexity pythonCyclomaticComplexity = new PythonCyclomaticComplexity(new File(repo.getFileName()));
         double complexity = pythonCyclomaticComplexity.getProjectComplexity();
+        repo.setComplexity(complexity);
     }
 
 

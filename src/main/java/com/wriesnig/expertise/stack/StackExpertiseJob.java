@@ -26,7 +26,7 @@ public class StackExpertiseJob implements Runnable {
         try {
 
             HashMap<String, ArrayList<Double>> scoresPerTag = new HashMap<>();
-            Object[] postToClassify = new Object[6];
+            Object[] postToClassify;
             String userIsEstablished = String.valueOf(user.getIsEstablishedOnStack());
             for (String tag : Tags.tagsToCharacterize) {
                 scoresPerTag.put(tag, new ArrayList<>());
@@ -44,16 +44,11 @@ public class StackExpertiseJob implements Runnable {
                 if (votesOfCurrentPost.next()) {
                     upVotes = votesOfCurrentPost.getInt("upVotes");
                     downVotes = votesOfCurrentPost.getInt("downVotes");
-                    ;
                     isAccepted = votesOfCurrentPost.getString("isAccepted");
 
                 }
 
-                postToClassify[0] = upVotes;
-                postToClassify[1] = downVotes;
-                postToClassify[2] = (upVotes + downVotes) == 0 ? 0 : upVotes / (upVotes + downVotes);
-                postToClassify[3] = isAccepted;
-                postToClassify[4] = userIsEstablished;
+                double score = (upVotes + downVotes) == 0 ? 0 : upVotes / (upVotes + downVotes);
 
                 String isMainTag = "0";
                 for (String tag : user.getMainTags())
@@ -61,7 +56,7 @@ public class StackExpertiseJob implements Runnable {
                         isMainTag = "1";
                     }
 
-                postToClassify[5] = isMainTag;
+                postToClassify = new Object[]{upVotes, downVotes, score, isAccepted, userIsEstablished, isMainTag};
 
 
                 double expertise = StackClassifier.classify(postToClassify);
@@ -75,8 +70,6 @@ public class StackExpertiseJob implements Runnable {
 
             scoresPerTag.forEach((key, value) -> {
                 double score = value.stream().mapToDouble(Double::doubleValue).sum() / value.size();
-                int leftShiftedScore = (int) (score * 100);
-                score = leftShiftedScore / 100.0;
                 user.getExpertise().getStackExpertise().put(key, score);
             });
         } catch (SQLException e) {
