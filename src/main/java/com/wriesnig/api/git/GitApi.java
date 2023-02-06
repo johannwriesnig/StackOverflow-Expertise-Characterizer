@@ -111,7 +111,7 @@ public class GitApi {
                 downloadedRepos.put(repo);
             }
         }
-        downloadedRepos.put(new Repo("", ""));
+        downloadedRepos.put(new Repo("", "", 0));
     }
 
     private static void processZipEntry(String path, ZipEntry entry, ZipInputStream zipIn) throws IOException {

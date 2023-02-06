@@ -13,8 +13,8 @@ public class Expertise {
         stackExpertise = new HashMap<>();
 
         for(String tag: Tags.tagsToCharacterize){
-            gitExpertise.put(tag, 0.0);
-            stackExpertise.put(tag, 0.0);
+            gitExpertise.put(tag, 1.0);
+            stackExpertise.put(tag, 1.0);
         }
     }
 
@@ -32,6 +32,8 @@ public class Expertise {
             double stackTagExpertise = stackExpertise.get(tag);
             double gitTagExpertise = gitExpertise.get(tag);
             double avgExpertise = (Expertise.STACK_WEIGHT * stackTagExpertise+gitTagExpertise * Expertise.GIT_WEIGHT);
+            int cutOffExpertise = (int)(avgExpertise * 100);
+            avgExpertise = cutOffExpertise/100.0;
             overAllExpertise.put(tag, avgExpertise);
         }
         return overAllExpertise;

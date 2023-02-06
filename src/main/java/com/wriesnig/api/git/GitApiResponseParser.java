@@ -40,9 +40,12 @@ public class GitApiResponseParser {
 
         for (int i = 0; i < response.length(); i++) {
             JSONObject currentRepo = response.getJSONObject(i);
+            boolean isFork = currentRepo.getBoolean("fork");
+            if(isFork)continue;
             String repoName = currentRepo.getString("full_name");
             String repoMainLanguage = currentRepo.isNull("language") ? "" : currentRepo.getString("language").toLowerCase();
-            repos.add(new Repo(repoName, repoMainLanguage));
+            int stars = currentRepo.getInt("stargazers_count");
+            repos.add(new Repo(repoName, repoMainLanguage,stars));
         }
 
         return repos;

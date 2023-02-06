@@ -12,12 +12,14 @@ public class Repo {
     private BuildStatus buildStatus;
     private double complexity;
     private double quality;
+    private int stars;
 
 
-    public Repo(String name, String mainLanguage) {
+    public Repo(String name, String mainLanguage, int stars) {
         this.name = name;
         this.mainLanguage = mainLanguage;
         this.presentTags = new ArrayList<>();
+        this.stars=stars;
     }
 
     public String getName() {
@@ -80,4 +82,8 @@ public class Repo {
     public void setQuality(double quality) {
         this.quality = quality;
     }
+
+    public void setStars(int stars){this.stars=stars;}
+
+    public int getStars(){return this.stars;}
 }

@@ -3,11 +3,13 @@ package com.wriesnig.expertise.git;
 import com.hankcs.hanlp.summary.TextRankKeyword;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
+import com.wriesnig.expertise.git.badges.BuildStatus;
 import com.wriesnig.expertise.git.badges.StatusBadgesAnalyser;
 import com.wriesnig.expertise.git.metrics.java.JavaCyclomaticComplexity;
 import com.wriesnig.expertise.git.metrics.python.PythonCyclomaticComplexity;
 import com.wriesnig.api.git.GitApi;
 import com.wriesnig.api.git.Repo;
+import com.wriesnig.utils.GitClassifierBuilder;
 import com.wriesnig.utils.Logger;
 
 import java.io.*;
@@ -84,9 +86,10 @@ public class GitExpertiseJob implements Runnable {
         }
     }
 
+
     public void computeExpertise(Repo repo) {
         if (repo.getMainLanguage().equals("")) return;
-        File readMe = new File(repo.getFileName() + "/README.md");
+        File readMe = getReadMeFile(repo);
         repo.addTag(repo.getMainLanguage());
         repo.addTags(getTagsFromFile(readMe));
         switch(repo.getMainLanguage()){
@@ -105,7 +108,7 @@ public class GitExpertiseJob implements Runnable {
 
         Logger.info("Repo: "+ repo.getName() + " has following tags " + repo.getPresentTags() + " " +
                 "and following stats... Build: " + repo.getBuildStatus() + " Coverage: " + repo.getCoverage() + " Complexity: " + repo.getComplexity() + " ReadMe exists: " + readMe.exists());
-
+        if(repo.getMainLanguage().equals("java")) GitClassifierBuilder.writeLine(repo.getComplexity()+","+readMe.exists()+","+(repo.getBuildStatus() != BuildStatus.FAILING) +","+repo.getCoverage()+","+ repo.getStars());
         //classifier to add
         Object[] classificationData = {repo.getComplexity(), readMe.exists()?"1":"0", "0", repo.getCoverage(), "1"};
         double quality = 0;
@@ -114,13 +117,26 @@ public class GitExpertiseJob implements Runnable {
         } catch (Exception e) {
             Logger.error("Error while classifying git repo", e);
         }
+
         repo.setQuality(quality);
+    }
+
+    public File getReadMeFile(Repo repo){
+        String[] possibleFileExtensions = new String[]{".md", ".rst", ".adoc", ".markdown", ".mdown", ".mkdn", ".textile", "rdoc", ".org", ".creole", ".mediawiki", ".wiki",
+        ".asciidoc", ".asc", ".pod"};
+        File readMe = new File("");
+        for(String fileExtension: possibleFileExtensions){
+            readMe = new File(repo.getFileName()+"/readme"+fileExtension);
+            if(readMe.exists())break;
+        }
+        return readMe;
     }
 
     public void computeJavaMetrics(Repo repo){
         if (repo.getPresentTags().isEmpty()) return;
         JavaCyclomaticComplexity javaCyclomaticComplexity = new JavaCyclomaticComplexity(new File(repo.getFileName()));
         double complexity = javaCyclomaticComplexity.getProjectComplexity();
+        complexity = ((int)(complexity*10))/10.0;
         repo.setComplexity(complexity);
     }
 
