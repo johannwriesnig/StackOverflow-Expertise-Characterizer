@@ -11,6 +11,7 @@ import com.wriesnig.api.git.GitApi;
 import com.wriesnig.api.git.Repo;
 import com.wriesnig.utils.GitClassifierBuilder;
 import com.wriesnig.utils.Logger;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -52,12 +53,18 @@ public class GitExpertiseJob implements Runnable {
                 currentRepo.setFileName(userReposPath + currentRepo.getFileName());
                 if (currentRepo.getName().equals("")) break;
                 computeExpertise(currentRepo);
-                deleteDirectory(new File(currentRepo.getFileName()));
+                FileUtils.deleteDirectory(new File(currentRepo.getFileName()));
             }
         } catch (InterruptedException e) {
-            throw new RuntimeException();
+            //
+        } catch (IOException e) {
+            //
         }
-        deleteDirectory(userReposDir);
+        try {
+            FileUtils.deleteDirectory(userReposDir);
+        } catch (IOException e) {
+            //throw new RuntimeException(e);
+        }
         HashMap<String, ArrayList<Double>> scoresPerTag = computeExpertisePerTag(repos);
         scoresPerTag.forEach((key, value) -> {
             double score = value.stream().mapToDouble(Double::doubleValue).sum() / value.size();
@@ -221,15 +228,4 @@ public class GitExpertiseJob implements Runnable {
         return (ArrayList<String>) TextRankKeyword.getKeywordList(document, 1000);
     }
 
-    public boolean deleteDirectory(File file) {
-        if (file.isDirectory()) {
-            File[] entries = file.listFiles();
-            if (entries != null) {
-                for (File entry : entries) {
-                    deleteDirectory(entry);
-                }
-            }
-        }
-        return file.delete();
-    }
 }

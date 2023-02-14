@@ -35,7 +35,7 @@ public class StackApiTest {
 
     @Test
     public void streamToString() throws IOException {
-        String testSentence = "This represents the content of a gzip file!";
+        String testSentence = "This represents the content of a gzip stream!";
 
         String streamContent = StackApi.getStringFromStream(getGzipInputStreamFromString(testSentence));
         assertEquals(testSentence, streamContent);

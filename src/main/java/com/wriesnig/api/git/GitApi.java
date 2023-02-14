@@ -30,7 +30,6 @@ public class GitApi {
 
     public static GitUser getUserByLogin(String login) {
         if (login.contains(" ")) return null;
-
         String path = "users/" + login;
         InputStream apiStream = getStreamFromAPICall(path);
         JSONObject userAsJson = new JSONObject(getStringFromStream(apiStream));
@@ -114,7 +113,7 @@ public class GitApi {
         downloadedRepos.put(new Repo("", "", 0));
     }
 
-    private static void processZipEntry(String path, ZipEntry entry, ZipInputStream zipIn) throws IOException {
+    public static void processZipEntry(String path, ZipEntry entry, ZipInputStream zipIn) throws IOException {
         String filePath = path + entry.getName();
         if (!entry.isDirectory()) {
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
@@ -130,7 +129,7 @@ public class GitApi {
         }
     }
 
-    private static ZipInputStream getZipStreamFromRepo(String repo) {
+    public static ZipInputStream getZipStreamFromRepo(String repo) {
         String apiPath = "repos/" + repo + "/zipball";
         InputStream in = getStreamFromAPICall(apiPath);
         return new ZipInputStream(in);
