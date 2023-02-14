@@ -23,11 +23,6 @@ public class StackUser {
         mainTags = new ArrayList<>();
     }
 
-    @Override
-    public String toString() {
-        return "User: " + displayName;
-    }
-
     public int getId() {
         return id;
     }

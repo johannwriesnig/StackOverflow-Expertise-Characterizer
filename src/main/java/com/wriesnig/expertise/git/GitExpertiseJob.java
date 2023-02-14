@@ -103,6 +103,7 @@ public class GitExpertiseJob implements Runnable {
                 break;
         }
         StatusBadgesAnalyser badgesAnalyser = new StatusBadgesAnalyser(readMe);
+        badgesAnalyser.initBadges();
         repo.setBuildStatus(badgesAnalyser.getBuildStatus());
         repo.setCoverage(badgesAnalyser.getCoverage());
 

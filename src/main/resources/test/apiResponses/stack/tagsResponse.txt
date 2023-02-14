@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "user_id": 2344,
+      "answer_count": 4,
+      "answer_score": 21,
+      "question_count": 2,
+      "question_score": 16,
+      "tag_name": ".net"
+    },
+    {
+      "user_id": 2344,
+      "answer_count": 5,
+      "answer_score": 17,
+      "question_count": 1,
+      "question_score": 6,
+      "tag_name": "wcf"
+    },
+    {
+      "user_id": 2344,
+      "answer_count": 8,
+      "answer_score": 14,
+      "question_count": 2,
+      "question_score": 12,
+      "tag_name": "c#"
+    }
+    ],
+      "has_more": true,
+      "quota_max": 10000,
+      "quota_remaining": 9965
+}

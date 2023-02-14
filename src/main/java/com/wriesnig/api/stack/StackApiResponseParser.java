@@ -6,10 +6,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class StackApiResponseParser {
-    private StackApiResponseParser() {
-    }
 
-    public static ArrayList<StackUser> parseUsersResponse(JSONObject response) {
+    public ArrayList<StackUser> parseUsersResponse(JSONObject response) {
         JSONArray usersAsJson = response.getJSONArray("items");
 
         ArrayList<StackUser> users = new ArrayList<>();
@@ -29,11 +27,11 @@ public class StackApiResponseParser {
         return users;
     }
 
-    public static ArrayList<String> parseTagsResponse(JSONObject response) {
+    public ArrayList<String> parseTagsResponse(JSONObject response) {
         JSONArray tags = response.getJSONArray("items");
         ArrayList<String> mainTags = new ArrayList<>();
 
-        for (int i = 0; i < tags.length() && i < 6; i++) {
+        for (int i = 0; i < tags.length(); i++) {
             JSONObject currentTag = tags.getJSONObject(i);
             String tag = currentTag.getString("tag_name");
             mainTags.add(tag);

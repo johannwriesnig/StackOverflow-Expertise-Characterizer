@@ -7,7 +7,6 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -18,6 +17,7 @@ import java.util.zip.ZipInputStream;
 
 public class GitApi {
     private final static String apiUrl = "https://api.github.com/";
+    private final static GitApiResponseParser responseParser = new GitApiResponseParser();
     private static String token;
 
 
@@ -35,7 +35,7 @@ public class GitApi {
         InputStream apiStream = getStreamFromAPICall(path);
         JSONObject userAsJson = new JSONObject(getStringFromStream(apiStream));
 
-        return GitApiResponseParser.parseUserByLoginResponse(userAsJson);
+        return responseParser.parseUserByLoginResponse(userAsJson);
     }
 
     public static ArrayList<String> getUsersByFullName(String fullName) {
@@ -44,7 +44,7 @@ public class GitApi {
         InputStream apiStream = getStreamFromAPICall(path);
         JSONObject usersAsJson = new JSONObject(getStringFromStream(apiStream));
 
-        return GitApiResponseParser.parseUsersByFullName(usersAsJson);
+        return responseParser.parseUsersByFullName(usersAsJson);
     }
 
     public static ArrayList<Repo> getReposByLogin(String login) {
@@ -52,7 +52,7 @@ public class GitApi {
         InputStream apiStream = getStreamFromAPICall(path);
         JSONArray repos = new JSONArray(getStringFromStream(apiStream));
 
-        return GitApiResponseParser.parseReposByLogin(repos);
+        return responseParser.parseReposByLogin(repos);
     }
 
     public static InputStream getStreamFromAPICall(String path) {

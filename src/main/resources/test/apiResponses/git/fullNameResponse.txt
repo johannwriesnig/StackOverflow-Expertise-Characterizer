@@ -1,0 +1,48 @@
+{
+  "total_count": 2,
+  "incomplete_results": false,
+  "items": [
+    {
+      "login": "jonhoo",
+      "id": 176295,
+      "node_id": "MDQ6VXNlcjE3NjI5NQ==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/176295?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jonhoo",
+      "html_url": "https://github.com/jonhoo",
+      "followers_url": "https://api.github.com/users/jonhoo/followers",
+      "following_url": "https://api.github.com/users/jonhoo/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jonhoo/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jonhoo/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jonhoo/subscriptions",
+      "organizations_url": "https://api.github.com/users/jonhoo/orgs",
+      "repos_url": "https://api.github.com/users/jonhoo/repos",
+      "events_url": "https://api.github.com/users/jonhoo/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jonhoo/received_events",
+      "type": "User",
+      "site_admin": false,
+      "score": 1.0
+    },
+    {
+      "login": "jskeet",
+      "id": 17011,
+      "node_id": "MDQ6VXNlcjE3MDEx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17011?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jskeet",
+      "html_url": "https://github.com/jskeet",
+      "followers_url": "https://api.github.com/users/jskeet/followers",
+      "following_url": "https://api.github.com/users/jskeet/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jskeet/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jskeet/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jskeet/subscriptions",
+      "organizations_url": "https://api.github.com/users/jskeet/orgs",
+      "repos_url": "https://api.github.com/users/jskeet/repos",
+      "events_url": "https://api.github.com/users/jskeet/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jskeet/received_events",
+      "type": "User",
+      "site_admin": false,
+      "score": 1.0
+    }
+  ]
+}

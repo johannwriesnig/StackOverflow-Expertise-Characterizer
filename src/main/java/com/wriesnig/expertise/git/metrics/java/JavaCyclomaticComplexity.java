@@ -22,7 +22,7 @@ public class JavaCyclomaticComplexity extends CyclomaticComplexity {
     public double getProjectComplexity() {
         PMDConfiguration configuration = new PMDConfiguration();
         configuration.setInputPaths(root.getPath());
-        configuration.addRuleSet("rules.xml");
+        configuration.addRuleSet("src/main/resources/src/rules.xml");
         configuration.setReportFormat("json");
         configuration.setReportProperties(new Properties());
         File report = new File(root.getPath() + "/output.json");

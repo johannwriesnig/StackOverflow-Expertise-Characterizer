@@ -7,6 +7,7 @@ import org.jsoup.nodes.Element;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -17,26 +18,25 @@ import java.util.regex.Pattern;
 public class StatusBadgesAnalyser {
     private final String link = "https://([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])";
     private ArrayList<Document> badgesHtml;
+    private File readMe;
 
 
     public StatusBadgesAnalyser(File readMe){
+        this.readMe = readMe;
+    }
+    public void initBadges(){
         String readMeContent = "";
         try {
             if(readMe.exists())readMeContent = Files.readString(readMe.toPath());
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.error("", e);
         }
         badgesHtml = new ArrayList<>();
-        initBadges(readMeContent);
-
-    }
-    private void initBadges(String content){
         Pattern badge = Pattern.compile("\\[!\\[[^\\]]+]\\(("+link+")\\)\\]\\(" + link + "\\)");
-        Matcher badges = badge.matcher(content);
+        Matcher badges = badge.matcher(readMeContent);
         while(badges.find()){
             String html="";
-
-            try (InputStream in = new URL(badges.group(1)).openStream()) {
+            try (InputStream in = getInputStreamFromBadge(badges.group(1))) {
                 html = new String(in.readAllBytes(), StandardCharsets.UTF_8);
             } catch (IOException e){
                 Logger.error("Issues calling URL. Probably link is broken -> " + badges.group(1));
@@ -44,6 +44,10 @@ public class StatusBadgesAnalyser {
 
             badgesHtml.add(Jsoup.parse(html));
         }
+    }
+
+    public InputStream getInputStreamFromBadge(String link) throws IOException {
+        return new URL(link).openStream();
     }
 
     public BuildStatus getBuildStatus(){

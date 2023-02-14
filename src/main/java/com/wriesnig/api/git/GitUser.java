@@ -15,11 +15,6 @@ public class GitUser {
         this.websiteUrl = websiteUrl;
     }
 
-    @Override
-    public String toString() {
-        return "GHUser: " + login;
-    }
-
     public String getLogin() {
         return login;
     }

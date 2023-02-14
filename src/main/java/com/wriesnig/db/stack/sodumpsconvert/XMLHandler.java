@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 public class XMLHandler extends DefaultHandler {
     private final Consumer<Attributes> processRow;
 
-
     public XMLHandler(Consumer<Attributes> processRow) {
         this.processRow = processRow;
     }

@@ -6,11 +6,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class GitApiResponseParser {
-    private GitApiResponseParser() {
-    }
 
-    public static GitUser parseUserByLoginResponse(JSONObject user) {
-        if (user.has("message") && user.get("message").equals("Not Found")) return null;
+    public GitUser parseUserByLoginResponse(JSONObject user) {
+        if (user.has("message")) return null;
 
         String login = user.getString("login");
         String profileImageUrl = user.getString("avatar_url");
@@ -19,10 +17,9 @@ public class GitApiResponseParser {
         String htmlUrl = user.getString("html_url");
 
         return new GitUser(login, profileImageUrl, name, htmlUrl, websiteUrl);
-
     }
 
-    public static ArrayList<String> parseUsersByFullName(JSONObject response) {
+    public ArrayList<String> parseUsersByFullName(JSONObject response) {
         if (response.getInt("total_count") == 0) return new ArrayList<>();
         ArrayList<String> usersLogin = new ArrayList<>();
 
@@ -35,7 +32,7 @@ public class GitApiResponseParser {
         return usersLogin;
     }
 
-    public static ArrayList<Repo> parseReposByLogin(JSONArray response) {
+    public ArrayList<Repo> parseReposByLogin(JSONArray response) {
         ArrayList<Repo> repos = new ArrayList<>();
 
         for (int i = 0; i < response.length(); i++) {
