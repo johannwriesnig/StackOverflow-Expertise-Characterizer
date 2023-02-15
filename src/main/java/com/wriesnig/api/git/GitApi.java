@@ -135,5 +135,6 @@ public class GitApi {
         return new ZipInputStream(in);
     }
 
+    public static String getToken(){return token;}
 
 }

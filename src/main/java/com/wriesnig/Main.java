@@ -13,12 +13,12 @@ import java.util.Properties;
 public class Main {
 
     public static void main(String[] args) {
-        if(args.length>1){
-            Logger.error("Too many arguments");
+        if(args.length!=1){
+            Logger.error("Wrong Arguments");
             return;
         }
 
-        if(args.length == 1 && args[0].equals("c")){
+        if(args[0].equals("c")){
             Logger.info("Converting xml...");
             ConvertApplication convertApplication = new ConvertApplication();
             convertApplication.run();
@@ -26,14 +26,11 @@ public class Main {
         }
 
         Logger.info("Application initialization...");
-        Properties properties = getPropertiesFromConfigFile();
+        Properties properties = getPropertiesFromConfigFile(args[0]);
         setGitApiToken(properties);
         setTags(properties);
-        initDatabasesConnection(properties);
-
-
-        CharacterizerApplication application = new CharacterizerApplication();
-        application.run();
+        setDbCredentials(properties);
+        startApplication();
         closeDbConnections();
     }
 
@@ -52,31 +49,31 @@ public class Main {
         ExpertiseDatabase.closeConnection();
     }
 
-    public static void initDatabasesConnection(Properties properties) {
-        initDumpsDatabase(properties);
-        initExpertiseDatabase(properties);
+    public static void setDbCredentials(Properties properties) {
+        setStackDbCredentials(properties);
+        setExpertiseDbCredentials(properties);
     }
 
-    public static void initDumpsDatabase(Properties properties) {
+    public static void setStackDbCredentials(Properties properties) {
         String url = properties.getProperty("dumpsDB.url");
         String user = properties.getProperty("dumpsDB.user");
         String password = properties.getProperty("dumpsDB.password");
-        StackDatabase.initDB(user, password, url);
+        StackDatabase.setCredentials(user, password, url);
         Logger.info("Created connection to stack-database");
     }
 
-    public static void initExpertiseDatabase(Properties properties) {
+    public static void setExpertiseDbCredentials(Properties properties) {
         String url = properties.getProperty("expertiseDB.url");
         String user = properties.getProperty("expertiseDB.user");
         String password = properties.getProperty("expertiseDB.password");
-        ExpertiseDatabase.initDB(url, user, password);
+        ExpertiseDatabase.setCredentials(user, password, url);
         Logger.info("Created connection to expertise-database");
     }
 
-    public static Properties getPropertiesFromConfigFile() {
+    public static Properties getPropertiesFromConfigFile(String configFile) {
         Properties properties = new Properties();
         try {
-            InputStream inputStream = new FileInputStream("config.properties");
+            InputStream inputStream = new FileInputStream(configFile);
             properties.load(inputStream);
             inputStream.close();
         } catch (FileNotFoundException e) {
@@ -88,5 +85,10 @@ public class Main {
         }
 
         return properties;
+    }
+
+    public static void startApplication(){
+        CharacterizerApplication application = new CharacterizerApplication();
+        application.run();
     }
 }

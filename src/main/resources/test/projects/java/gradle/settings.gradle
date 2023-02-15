@@ -1,0 +1,4 @@
+rootProject.name = 'gradle'
+include 'src:main:module'
+findProject(':src:main:module')?.name = 'module'
+

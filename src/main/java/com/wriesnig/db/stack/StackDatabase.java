@@ -8,6 +8,9 @@ public class StackDatabase {
     private static String user;
     private static String password;
     private static String url;
+    private static boolean isCredentialsSet=false;
+
+    private StackDatabase(){}
 
 
     public static ResultSet getVotesOfPost(StackDbConnection stackDbConnection, int postId){
@@ -23,12 +26,16 @@ public class StackDatabase {
         return resultSet;
     }
 
-    public static void initDB(String user, String password, String url){
-        connectionPool = new ConnectionPool(connectionSize, url, password, user);
+    public static void setCredentials(String user, String password, String url){
+        StackDatabase.user = user;
+        StackDatabase.password = password;
+        StackDatabase.url = url;
+        StackDatabase.isCredentialsSet=true;
     }
 
     public static void closeConnections(){
-        connectionPool.closeConnections();
+        if(connectionPool!=null)
+            connectionPool.closeConnections();
     }
 
 
@@ -45,8 +52,17 @@ public class StackDatabase {
         return resultSet;
     }
 
-    public static ConnectionPool getConnectionPool() {
-        return connectionPool;
+    public static boolean isCredentialsSet(){
+        return isCredentialsSet;
+    }
+    public static StackDbConnection getConnection(){
+        if(connectionPool==null)
+            connectionPool = new ConnectionPool(connectionSize, url, password, user);
+        return connectionPool.getDBConnection();
+    }
+
+    public static void releaseConnection(StackDbConnection dbConnection){
+        connectionPool.releaseDBConnection(dbConnection);
     }
 
     public static int getConnectionSize(){

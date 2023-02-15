@@ -1,5 +1,6 @@
 package com.wriesnig.db.expertise;
 
+import com.wriesnig.expertise.Expertise;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
 import com.wriesnig.utils.Logger;
@@ -17,7 +18,19 @@ public class ExpertiseDatabase {
     private static PreparedStatement getUsers;
     private static Connection connection;
 
-    public static void initDB(String url, String user, String password) {
+    private static String user;
+    private static String password;
+    private static String url;
+    private static boolean isCredentialsSet;
+
+    public static void setCredentials(String user, String password, String url){
+        ExpertiseDatabase.user = user;
+        ExpertiseDatabase.password = password;
+        ExpertiseDatabase.url = url;
+        isCredentialsSet = true;
+    }
+
+    public static void initDB() {
         try {
             connection = DriverManager.getConnection(url, user, password);
             String insertStmt = getInsertUserStatement();
@@ -49,6 +62,7 @@ public class ExpertiseDatabase {
     }
 
     public static void closeConnection() {
+        if(connection==null)return;
         try {
             connection.close();
         } catch (SQLException e) {
@@ -77,5 +91,9 @@ public class ExpertiseDatabase {
             Logger.error("Inserting into users failed", e);
         }
 
+    }
+
+    public static boolean isCredentialsSet(){
+        return isCredentialsSet;
     }
 }

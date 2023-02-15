@@ -93,7 +93,7 @@ public class GitApiTest {
             assertEquals(repo, downloadedRepo);
 
             File repoDir = new File(path+downloadedRepo.getFileName());
-            assertTrue(repoDir.exists());
+            assertTrue(repoDir.isDirectory());
             FileUtils.deleteDirectory(repoDir);
         }
     }

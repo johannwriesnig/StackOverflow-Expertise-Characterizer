@@ -21,7 +21,7 @@ public class StackExpertiseJob implements Runnable {
 
     @Override
     public void run() {
-        StackDbConnection stackDbConnection = StackDatabase.getConnectionPool().getDBConnection();
+        StackDbConnection stackDbConnection = StackDatabase.getConnection();
         ResultSet postResults = StackDatabase.getPostsFromUser(stackDbConnection, user.getStackId());
         try {
 
@@ -75,7 +75,7 @@ public class StackExpertiseJob implements Runnable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        StackDatabase.getConnectionPool().releaseDBConnection(stackDbConnection);
+        StackDatabase.releaseConnection(stackDbConnection);
 
         Logger.info("Computed following expertise for " + user.getStackDisplayName() + " : " + user.getExpertise().getStackExpertise().toString());
     }

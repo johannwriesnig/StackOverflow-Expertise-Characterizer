@@ -65,7 +65,7 @@ public class GitExpertiseJob implements Runnable {
         } catch (IOException e) {
             //throw new RuntimeException(e);
         }
-        HashMap<String, ArrayList<Double>> scoresPerTag = computeExpertisePerTag(repos);
+        HashMap<String, ArrayList<Double>> scoresPerTag = getExpertisePerTag(repos);
         scoresPerTag.forEach((key, value) -> {
             double score = value.stream().mapToDouble(Double::doubleValue).sum() / value.size();
             user.getExpertise().getGitExpertise().put(key, score);
@@ -73,12 +73,12 @@ public class GitExpertiseJob implements Runnable {
 
     }
 
-    public HashMap<String, ArrayList<Double>> computeExpertisePerTag(ArrayList<Repo> repos){
+    public HashMap<String, ArrayList<Double>> getExpertisePerTag(ArrayList<Repo> repos) {
         HashMap<String, ArrayList<Double>> scoresPerTag = new HashMap<>();
         for (String tag : Tags.tagsToCharacterize) {
             scoresPerTag.put(tag, new ArrayList<>());
-            for(Repo repo: repos){
-                if(repo.getPresentTags().contains(tag)) scoresPerTag.get(tag).add(repo.getQuality());
+            for (Repo repo : repos) {
+                if (repo.getPresentTags().contains(tag)) scoresPerTag.get(tag).add(repo.getQuality());
             }
         }
 
@@ -86,11 +86,7 @@ public class GitExpertiseJob implements Runnable {
     }
 
     public void cleanseRepos(ArrayList<Repo> repos) {
-        Iterator<Repo> iterator = repos.iterator();
-        while (iterator.hasNext()) {
-            Repo repo = iterator.next();
-            if (!Arrays.asList(Tags.tagsToCharacterize).contains(repo.getMainLanguage())) iterator.remove();
-        }
+        repos.removeIf(repo -> !Arrays.asList(Tags.tagsToCharacterize).contains(repo.getMainLanguage()));
     }
 
 
@@ -99,13 +95,13 @@ public class GitExpertiseJob implements Runnable {
         File readMe = getReadMeFile(repo);
         repo.addTag(repo.getMainLanguage());
         repo.addTags(getTagsFromFile(readMe));
-        switch(repo.getMainLanguage()){
+        switch (repo.getMainLanguage()) {
             case "java":
-                computeTagsForJavaProject(repo);
+                findTagsForJavaProject(repo);
                 computeJavaMetrics(repo);
                 break;
             case "python":
-                computeTagsForPythonProject(repo);
+                findTagsForPythonProject(repo);
                 computePythonMetrics(repo);
                 break;
         }
@@ -114,11 +110,12 @@ public class GitExpertiseJob implements Runnable {
         repo.setBuildStatus(badgesAnalyser.getBuildStatus());
         repo.setCoverage(badgesAnalyser.getCoverage());
 
-        Logger.info("Repo: "+ repo.getName() + " has following tags " + repo.getPresentTags() + " " +
+        Logger.info("Repo: " + repo.getName() + " has following tags " + repo.getPresentTags() + " " +
                 "and following stats... Build: " + repo.getBuildStatus() + " Coverage: " + repo.getCoverage() + " Complexity: " + repo.getComplexity() + " ReadMe exists: " + readMe.exists());
-        if(repo.getMainLanguage().equals("java")) GitClassifierBuilder.writeLine(repo.getComplexity()+","+readMe.exists()+","+(repo.getBuildStatus() != BuildStatus.FAILING) +","+repo.getCoverage()+","+ repo.getStars());
+        if (repo.getMainLanguage().equals("java"))
+            GitClassifierBuilder.writeLine(repo.getComplexity() + "," + readMe.exists() + "," + (repo.getBuildStatus() != BuildStatus.FAILING) + "," + repo.getCoverage() + "," + repo.getStars());
         //classifier to add
-        Object[] classificationData = {repo.getComplexity(), readMe.exists()?"1":"0", "0", repo.getCoverage(), "1"};
+        Object[] classificationData = {repo.getComplexity(), readMe.exists() ? "1" : "0", "0", repo.getCoverage(), "1"};
         double quality = 0;
         try {
             quality = GitClassifier.classify(classificationData);
@@ -129,26 +126,26 @@ public class GitExpertiseJob implements Runnable {
         repo.setQuality(quality);
     }
 
-    public File getReadMeFile(Repo repo){
+    public File getReadMeFile(Repo repo) {
         String[] possibleFileExtensions = new String[]{".md", ".rst", ".adoc", ".markdown", ".mdown", ".mkdn", ".textile", "rdoc", ".org", ".creole", ".mediawiki", ".wiki",
-        ".asciidoc", ".asc", ".pod"};
+                ".asciidoc", ".asc", ".pod"};
         File readMe = new File("");
-        for(String fileExtension: possibleFileExtensions){
-            readMe = new File(repo.getFileName()+"/readme"+fileExtension);
-            if(readMe.exists())break;
+        for (String fileExtension : possibleFileExtensions) {
+            readMe = new File(repo.getFileName() + "/readme" + fileExtension);
+            if (readMe.exists()) break;
         }
         return readMe;
     }
 
-    public void computeJavaMetrics(Repo repo){
+    public void computeJavaMetrics(Repo repo) {
         if (repo.getPresentTags().isEmpty()) return;
         JavaCyclomaticComplexity javaCyclomaticComplexity = new JavaCyclomaticComplexity(new File(repo.getFileName()));
         double complexity = javaCyclomaticComplexity.getProjectComplexity();
-        complexity = ((int)(complexity*10))/10.0;
+        complexity = ((int) (complexity * 10)) / 10.0;
         repo.setComplexity(complexity);
     }
 
-    public void computePythonMetrics(Repo repo){
+    public void computePythonMetrics(Repo repo) {
         if (repo.getPresentTags().isEmpty()) return;
         PythonCyclomaticComplexity pythonCyclomaticComplexity = new PythonCyclomaticComplexity(new File(repo.getFileName()));
         double complexity = pythonCyclomaticComplexity.getProjectComplexity();
@@ -156,60 +153,61 @@ public class GitExpertiseJob implements Runnable {
     }
 
 
-
     public ArrayList<String> getTagsFromFile(File file) {
         if (!file.exists() && !file.isFile()) return new ArrayList<>();
         ArrayList<String> fileKeywords = getTextRankKeywords(file);
         ArrayList<String> tags = new ArrayList<>();
+        ArrayList<String> tagsToCharacterize = new ArrayList<>(Arrays.asList(Tags.tagsToCharacterize));
         for (String tag : fileKeywords) {
-            if (Arrays.asList(Tags.tagsToCharacterize).contains(tag)) tags.add(tag);
+            if (tagsToCharacterize.contains(tag)) tags.add(tag);
+            else if (tag.contains("framework") && tagsToCharacterize.contains(tag.replace("framework", "")))
+                tags.add(tag.replace("framework", ""));
         }
         return tags;
     }
 
-    //refactoren
-    public void computeTagsForPythonProject(Repo repo) {
-        try {
-            FileWriter fileWriter = new FileWriter("repos/" + user.getGitLogin()+"/keywords.info");
-            try (Stream<Path> stream = Files.walk(Paths.get(repo.getFileName()))) {
-                stream.filter(f -> f.getFileName().toString().matches(".*\\.py"))
-                        .forEach(f -> {
-                            try {
-                                BufferedReader bufferedReader = new BufferedReader(new FileReader(f.toFile()));
-                                String line = bufferedReader.readLine();
-                                while(line != null && (line.startsWith("import") || line.startsWith("from") || line.startsWith(" ") || line.startsWith("#"))){
-                                    if(line.startsWith("import") || line.startsWith("from")){
-                                        fileWriter.write(line);
-                                    }
-                                    line = bufferedReader.readLine();
-                                }
-                            } catch (FileNotFoundException e) {
-                                Logger.error("Issues finding file", e);
-                            } catch (IOException e) {
-                                Logger.error("Issues", e);
-                            }
-                        });
-            } catch (IOException e) {
-                Logger.error("Issues traversing files", e);
-            }
-        } catch (Exception e) {
-            Logger.error("Issues while computing pythong tags", e);
+    public void findTagsForPythonProject(Repo repo) {
+        File importsFile = new File("src/main/resources/src/workspace" + "/" + repo.getName());
+        try (Stream<Path> stream = Files.walk(Paths.get(repo.getFileName())); FileWriter fileWriter = new FileWriter(importsFile.getPath())) {
+            stream.filter(f -> f.getFileName().toString().matches(".*\\.py"))
+                    .forEach(f -> {
+                        storePythonImports(fileWriter, f);
+                    });
+        } catch (IOException e) {
+            Logger.error("Issues traversing files", e);
         }
-
-        repo.addTags(getTagsFromFile(new File("repos/" + user.getGitLogin()+"/keywords.info")));
+        repo.addTags(getTagsFromFile(importsFile));
+        if(!importsFile.delete()) Logger.error("Could not delete file -> " + importsFile.getPath());
     }
 
-    public void computeTagsForJavaProject(Repo repo) {
-        computeTagsForPom(repo);
-        computeTagsForGradle(repo);
+    private void storePythonImports(FileWriter fileWriter, Path f){
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(f.toFile()));
+            String line = bufferedReader.readLine();
+            while (line != null && (line.startsWith("import") || line.startsWith("from") || line.startsWith(" ") || line.startsWith("#"))) {
+                if (line.startsWith("import") || line.startsWith("from")) {
+                    fileWriter.write(line + "\n");
+                }
+                line = bufferedReader.readLine();
+            }
+        } catch (IOException e){
+            Logger.error("...", e);
+        }
     }
 
-    public void computeTagsForPom(Repo repo) {
+
+
+    public void findTagsForJavaProject(Repo repo) {
+        findTagsForPom(repo);
+        findTagsForGradle(repo);
+    }
+
+    public void findTagsForPom(Repo repo) {
         File pomXML = new File(repo.getFileName() + "/pom.xml");
         repo.addTags(getTagsFromFile(pomXML));
     }
 
-    public void computeTagsForGradle(Repo repo) {
+    public void findTagsForGradle(Repo repo) {
         try (Stream<Path> stream = Files.walk(Paths.get(repo.getFileName()))) {
             stream.filter(f -> f.getFileName().toString().equals("build.gradle"))
                     .forEach(f -> repo.addTags(getTagsFromFile(f.toFile())));
