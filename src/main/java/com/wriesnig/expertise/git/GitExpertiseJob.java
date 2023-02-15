@@ -1,6 +1,7 @@
 package com.wriesnig.expertise.git;
 
 import com.hankcs.hanlp.summary.TextRankKeyword;
+import com.hankcs.hanlp.summary.TextRankSentence;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
 import com.wriesnig.expertise.git.badges.BuildStatus;
@@ -14,6 +15,7 @@ import com.wriesnig.utils.Logger;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -176,6 +178,11 @@ public class GitExpertiseJob implements Runnable {
         } catch (IOException e) {
             Logger.error("Issues traversing files", e);
         }
+        try {
+            System.out.println(Files.readString(Paths.get(importsFile.getPath())));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         repo.addTags(getTagsFromFile(importsFile));
         if(!importsFile.delete()) Logger.error("Could not delete file -> " + importsFile.getPath());
     }
@@ -224,6 +231,10 @@ public class GitExpertiseJob implements Runnable {
             System.out.println("Reading failed");
         }
         return (ArrayList<String>) TextRankKeyword.getKeywordList(document, 1000);
+    }
+
+    public ArrayList<String> getTextRankKeywords(String file){
+        return null;
     }
 
 }
