@@ -155,7 +155,7 @@ public class GitExpertiseJob implements Runnable {
     }
 
 
-    public ArrayList<String> getTagsFromFile(File file) {
+    public static ArrayList<String> getTagsFromFile(File file) {
         if (!file.exists() && !file.isFile()) return new ArrayList<>();
         ArrayList<String> fileKeywords = getTextRankKeywords(file);
         ArrayList<String> tags = new ArrayList<>();
@@ -169,37 +169,52 @@ public class GitExpertiseJob implements Runnable {
     }
 
     public void findTagsForPythonProject(Repo repo) {
-        File importsFile = new File("src/main/resources/src/workspace" + "/" + repo.getName());
-        try (Stream<Path> stream = Files.walk(Paths.get(repo.getFileName())); FileWriter fileWriter = new FileWriter(importsFile.getPath())) {
+        StringBuilder builder = new StringBuilder();
+        try (Stream<Path> stream = Files.walk(Paths.get(repo.getFileName()))){
             stream.filter(f -> f.getFileName().toString().matches(".*\\.py"))
                     .forEach(f -> {
-                        storePythonImports(fileWriter, f);
+                        builder.append(getPythonImports(f));
                     });
         } catch (IOException e) {
             Logger.error("Issues traversing files", e);
         }
-        try {
-            System.out.println(Files.readString(Paths.get(importsFile.getPath())));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        repo.addTags(getTagsFromFile(importsFile));
-        if(!importsFile.delete()) Logger.error("Could not delete file -> " + importsFile.getPath());
+
+        addPythonTagsFromImportsFile(repo, builder.toString());
+
     }
 
-    private void storePythonImports(FileWriter fileWriter, Path f){
+    private static synchronized void addPythonTagsFromImportsFile(Repo repo, String imports){
+        String importsFilePath = "src/main/resources/src/workspace/pythonImports.txt";
+        File importsFile = new File("src/main/resources/src/workspace/pythonImports.txt");
+
+        try {
+            Files.writeString(Path.of(importsFilePath),imports);
+        } catch (IOException e) {
+            Logger.error("Writing to pythonImports.txt failed", e);
+        }
+
+
+        repo.addTags(getTagsFromFile(importsFile));
+    }
+
+
+
+    private String getPythonImports( Path f){
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(f.toFile()));
             String line = bufferedReader.readLine();
+            StringBuilder importsBuilder = new StringBuilder();
             while (line != null && (line.startsWith("import") || line.startsWith("from") || line.startsWith(" ") || line.startsWith("#"))) {
                 if (line.startsWith("import") || line.startsWith("from")) {
-                    fileWriter.write(line + "\n");
+                    importsBuilder.append(line).append("\n");
                 }
                 line = bufferedReader.readLine();
             }
+            return importsBuilder.toString();
         } catch (IOException e){
             Logger.error("...", e);
         }
+        return "";
     }
 
 
@@ -223,7 +238,7 @@ public class GitExpertiseJob implements Runnable {
         }
     }
 
-    public ArrayList<String> getTextRankKeywords(File file) {
+    public static ArrayList<String> getTextRankKeywords(File file) {
         String document = "";
         try {
             document = Files.readString(file.toPath());
