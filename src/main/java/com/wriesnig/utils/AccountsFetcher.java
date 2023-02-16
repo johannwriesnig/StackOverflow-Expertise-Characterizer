@@ -6,7 +6,6 @@ import com.wriesnig.api.git.GitApi;
 import com.wriesnig.api.stack.StackUser;
 import com.wriesnig.api.stack.StackApi;
 import javafx.util.Pair;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 

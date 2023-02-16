@@ -14,6 +14,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -170,6 +172,17 @@ public class AccountsMatchScorerTest {
     }
 
     @Test
+    public void readImageFromUrlThrowsIOException(){
+        accountsMatchScorer = new AccountsMatchScorer();
+        try (MockedStatic<ImageIO> mockedImageIO = Mockito.mockStatic(ImageIO.class);
+            MockedStatic<Logger> mockedLogger = Mockito.mockStatic(Logger.class)) {
+            mockedImageIO.when(()-> ImageIO.read((URL) any())).thenThrow(IOException.class);
+            accountsMatchScorer.getImageFromUrl("https://website/Picture1?s=500");
+            mockedLogger.verify(()-> Logger.error(any(), any()),times(1));
+        }
+    }
+
+    @Test
     public void imageRetrievalGoogleUrl() throws IOException {
         BufferedImage urlImage = ImageIO.read(new File(picture1));
         try (MockedStatic<ImageIO> dummy = Mockito.mockStatic(ImageIO.class)) {
@@ -195,6 +208,8 @@ public class AccountsMatchScorerTest {
 
         assertEquals(100, accountsMatchScorer.getImagesDissimilarity(normal, differentWidth));
     }
+
+
 
 
     @AfterEach
