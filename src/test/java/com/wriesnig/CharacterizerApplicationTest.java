@@ -1,8 +1,6 @@
 package com.wriesnig;
 
-import com.wriesnig.api.git.GitApi;
 import com.wriesnig.db.expertise.ExpertiseDatabase;
-import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.expertise.User;
 import com.wriesnig.expertise.git.GitExpertiseJob;
 import com.wriesnig.expertise.stack.StackExpertiseJob;
