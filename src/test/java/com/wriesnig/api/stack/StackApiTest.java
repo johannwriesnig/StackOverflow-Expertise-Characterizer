@@ -1,27 +1,20 @@
 package com.wriesnig.api.stack;
 
-import org.checkerframework.checker.units.qual.A;
-import org.json.JSONObject;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import com.wriesnig.api.git.GitApi;
+import com.wriesnig.utils.Logger;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Stack;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 public class StackApiTest {
@@ -78,6 +71,29 @@ public class StackApiTest {
         gzipOutputStream.finish();
         gzipOutputStream.close();
         return new GZIPInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+    }
+
+    @Test
+    public void getStreamFromApiCallThrowsIOException() {
+        try (MockedStatic<Logger> mockedLogger = mockStatic(Logger.class);
+             MockedStatic<StackApi> mockedStackApi = mockStatic(StackApi.class)){
+            mockedStackApi.when(() -> StackApi.getGzipInputStream(any())).thenThrow(IOException.class);
+            mockedStackApi.when(() -> StackApi.getStreamFromAPICall(any())).thenCallRealMethod();
+            assertNull(StackApi.getStreamFromAPICall("path"));
+            mockedLogger.verify(() -> Logger.error(any(), any()), times(1));
+        }
+    }
+
+    @Test
+    public void getStringFromInputStreamThrowsIOException() throws IOException {
+        try (MockedStatic<Logger> mockedLogger = mockStatic(Logger.class);
+             MockedConstruction<InputStreamReader> mockedReader = mockConstruction(InputStreamReader.class,
+                     (mock, context) -> {
+                         doThrow(IOException.class).when(mock).read();
+                     })) {
+            StackApi.getStringFromStream(getGzipInputStreamFromString("test"));
+            mockedLogger.verify(() -> Logger.error(any(), any()), times(1));
+        }
     }
 
 }

@@ -43,19 +43,22 @@ public class StackApi {
             URL getUrl = new URL(apiUrl + path);
             HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
             connection.setRequestMethod("GET");
-            return new GZIPInputStream(connection.getInputStream());
+            return getGzipInputStream(connection);
         } catch (MalformedURLException e) {
             Logger.error("Url for requesting stack-api is malformed -> " + url, e);
         } catch (IOException e) {
             Logger.error("Processing stack-api input stream failed.", e);
         }
-
         return null;
     }
 
+    public static GZIPInputStream getGzipInputStream(HttpURLConnection connection) throws IOException {
+        System.out.println("hallo");
+        return new GZIPInputStream(connection.getInputStream());
+    }
 
     public static String getStringFromStream(GZIPInputStream inputStream) {
-        if(inputStream == null) return "";
+        if(inputStream==null)return "";
         StringBuilder stringBuilder = new StringBuilder();
         try {
             Reader reader = new InputStreamReader(inputStream);
