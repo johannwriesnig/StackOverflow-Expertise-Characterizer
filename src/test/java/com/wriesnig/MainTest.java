@@ -12,6 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.Properties;
+
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -61,6 +66,25 @@ public class MainTest {
         }
     }
 
+    @Test
+    public void noConfigFileThrowsRuntimeException(){
+        try (MockedStatic<Logger> mockedLogger = mockStatic(Logger.class)) {
+            assertThrows(RuntimeException.class,()->Main.main(new String[]{"noConfigFile.txt"}));
+            mockedLogger.verify(()-> Logger.error(any(), any()),times(1));
+        }
+    }
+
+    @Test
+    public void processingConfigFileThrowsIOException(){
+        try (MockedStatic<Logger> mockedLogger = mockStatic(Logger.class);
+             MockedConstruction<Properties> mockedProperties = mockConstruction(Properties.class,
+                     (mock, context) -> {
+                         doThrow(IOException.class).when(mock).load((InputStream) any());
+                     })) {
+            assertThrows(RuntimeException.class,()->Main.main(new String[]{"src/main/resources/src/testConfig.properties"}));
+            mockedLogger.verify(()-> Logger.error(any(), any()),times(1));
+        }
+    }
 
 
 

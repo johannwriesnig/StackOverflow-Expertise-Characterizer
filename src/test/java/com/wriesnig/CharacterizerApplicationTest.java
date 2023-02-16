@@ -5,11 +5,15 @@ import com.wriesnig.expertise.User;
 import com.wriesnig.expertise.git.GitExpertiseJob;
 import com.wriesnig.expertise.stack.StackExpertiseJob;
 import com.wriesnig.utils.AccountsFetcher;
+import com.wriesnig.utils.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
+
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -19,7 +23,7 @@ public class CharacterizerApplicationTest {
     private CharacterizerApplication characterizerApplication;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         characterizerApplication = new CharacterizerApplication();
     }
 
@@ -35,10 +39,24 @@ public class CharacterizerApplicationTest {
             verify(fetcherInstance, times(1)).fetchMatchingAccounts(any());
             assertNotEquals(0, gitExpertiseJob.constructed().size());
             assertNotEquals(0, stackExpertiseJob.constructed().size());
-            mockedExpertiseDb.verify(ExpertiseDatabase::initDB,times(1));
-            mockedExpertiseDb.verify(()->ExpertiseDatabase.insertUser(any()),times(2));
+            mockedExpertiseDb.verify(ExpertiseDatabase::initDB, times(1));
+            mockedExpertiseDb.verify(() -> ExpertiseDatabase.insertUser(any()), times(2));
         }
     }
+
+    @Test
+    public void executorServiceAwaitFails() {
+        try (MockedConstruction<AccountsFetcher> accountsFetcher = getMockedAccountsFetcher();
+             MockedConstruction<ThreadPoolExecutor> executorService = getMockedExecutorService();
+             MockedStatic<ExpertiseDatabase> mockedExpertiseDb = mockStatic(ExpertiseDatabase.class);
+             MockedStatic<Logger> mockedLogger = mockStatic(Logger.class)) {
+
+            characterizerApplication = new CharacterizerApplication();
+            characterizerApplication.run();
+            mockedLogger.verify(()-> Logger.error(any(), any()),times(2));
+        }
+    }
+
 
     public MockedConstruction<AccountsFetcher> getMockedAccountsFetcher() {
         return mockConstruction(AccountsFetcher.class,
@@ -66,8 +84,15 @@ public class CharacterizerApplicationTest {
                 });
     }
 
+    public MockedConstruction<ThreadPoolExecutor> getMockedExecutorService() {
+        return mockConstruction(ThreadPoolExecutor.class,
+                (mock, context) -> {
+                    doThrow(InterruptedException.class).when(mock).awaitTermination(anyLong(), any());
+                });
+    }
+
     @Test
-    public void tearDown(){
+    public void tearDown() {
         characterizerApplication = null;
     }
 }

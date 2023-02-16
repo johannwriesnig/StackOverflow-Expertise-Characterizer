@@ -51,7 +51,6 @@ public class CharacterizerApplication {
     }
 
     private void startThreadedComputation(ArrayList<User> users, Class<?> clazz, int threadPoolSize) {
-        if (!(clazz == StackExpertiseJob.class || clazz == GitExpertiseJob.class)) return;
         double start = System.nanoTime();
         ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
         for (User user : users) {
@@ -63,7 +62,7 @@ public class CharacterizerApplication {
         try {
             executorService.awaitTermination(1, TimeUnit.HOURS);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            Logger.error("Expertise thread was interrupted.", e);
         }
         double stop = System.nanoTime() - start;
         stop /= 1000000000.0;
