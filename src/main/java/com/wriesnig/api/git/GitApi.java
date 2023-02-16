@@ -60,13 +60,18 @@ public class GitApi {
             HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
-            return connection.getInputStream();
+            return getInputStream(connection);
         } catch (MalformedURLException e) {
             Logger.error("Url for requesting git-api is malformed -> " + url, e);
         } catch (IOException e) {
             Logger.error("Processing git-api input stream failed.", e);
         }
         return InputStream.nullInputStream();
+    }
+
+    //Since cannot mock UrlConnection
+    public static InputStream getInputStream(HttpURLConnection connection) throws IOException {
+        return connection.getInputStream();
     }
 
     public static String getStringFromStream(InputStream inputStream) {
