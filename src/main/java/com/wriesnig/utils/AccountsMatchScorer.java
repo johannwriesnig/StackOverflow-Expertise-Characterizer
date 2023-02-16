@@ -2,6 +2,7 @@ package com.wriesnig.utils;
 
 import com.wriesnig.api.git.GitUser;
 import com.wriesnig.api.stack.StackUser;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -41,14 +42,12 @@ public class AccountsMatchScorer {
     }
 
     public BufferedImage getImageFromUrl(String imageUrl) {
-        if (imageUrl.contains("google")) imageUrl = imageUrl.replaceAll("=k-s\\d*", "=k-s256");
-        else {
-            imageUrl = imageUrl.replaceAll("&*s=\\d*", "");
-            imageUrl = imageUrl + "&s=256";
-        }
+        imageUrl = adaptUrlForStandardImageSize(imageUrl);
+        return readImageFromUrl(imageUrl);
+    }
 
+    public BufferedImage readImageFromUrl(String imageUrl){
         BufferedImage image = null;
-
         try {
             URL url = new URL(imageUrl);
             image = ImageIO.read(url);
@@ -57,8 +56,17 @@ public class AccountsMatchScorer {
         } catch (IOException e) {
             Logger.error("I/O error while reading profile image from url.", e);
         }
-
         return image;
+    }
+
+    public String adaptUrlForStandardImageSize(String imageUrl){
+        if (imageUrl.contains("google"))
+            imageUrl = imageUrl.replaceAll("=k-s\\d*", "=k-s256");
+        else {
+            imageUrl = imageUrl.replaceAll("&*s=\\d*", "");
+            imageUrl = imageUrl + "&s=256";
+        }
+        return imageUrl;
     }
 
     public double getImagesDissimilarity(BufferedImage img1, BufferedImage img2) {

@@ -6,13 +6,14 @@ import com.wriesnig.api.stack.StackUser;
 import java.util.ArrayList;
 
 public class User {
-    private int stackId;
-    private String stackDisplayName;
-    private String gitLogin;
+    private final int stackId;
+    private final String stackDisplayName;
+    private final String gitLogin;
+    private final int isEstablishedOnStack;
+    private final String profileImageUrl;
+    private final ArrayList<String> mainTags;
+
     private Expertise expertise;
-    private int isEstablishedOnStack;
-    private String profileImageUrl;
-    private ArrayList<String> mainTags;
 
     public User(StackUser stackUser, GitUser gitUser) {
         this.stackDisplayName = stackUser.getDisplayName();
@@ -28,25 +29,15 @@ public class User {
         return stackId;
     }
 
-    public void setStackId(int stackId) {
-        this.stackId = stackId;
-    }
 
     public String getStackDisplayName() {
         return stackDisplayName;
-    }
-
-    public void setStackDisplayName(String stackDisplayName) {
-        this.stackDisplayName = stackDisplayName;
     }
 
     public String getGitLogin() {
         return gitLogin;
     }
 
-    public void setGitLogin(String gitLogin) {
-        this.gitLogin = gitLogin;
-    }
 
     public Expertise getExpertise() {
         return expertise;

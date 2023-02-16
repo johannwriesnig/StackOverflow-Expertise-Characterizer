@@ -22,12 +22,12 @@ public class AccountsFetcher {
         ArrayList<StackUser> stackUsers = StackApi.getUsers(stackIds);
         for (StackUser user : stackUsers)
             user.setMainTags(StackApi.getMainTags(user.getId()));
-        HashMap<StackUser, ArrayList<GitUser>> potentially_matching_accounts = fetchStackUsersWithPotentialGitUsers(stackUsers);
+        HashMap<StackUser, ArrayList<GitUser>> potentially_matching_accounts = getStackUsersWithPotentialGitUsers(stackUsers);
 
         return matchAccounts(potentially_matching_accounts);
     }
 
-    public HashMap<StackUser, ArrayList<GitUser>> fetchStackUsersWithPotentialGitUsers(ArrayList<StackUser> stackUsers) {
+    public HashMap<StackUser, ArrayList<GitUser>> getStackUsersWithPotentialGitUsers(ArrayList<StackUser> stackUsers) {
         HashMap<StackUser, ArrayList<GitUser>> potentiallyMatchingAccounts = new HashMap<>();
 
         for (StackUser stackUser : stackUsers) {
@@ -84,9 +84,9 @@ public class AccountsFetcher {
                 if (score > highest_match.getValue()) highest_match = new Pair<>(gitUser, score);
             }
 
-            if (highest_match.getValue() > 0.5) {
+            if (highest_match.getValue() >= AccountsMatchScorer.MATCHING_NAMES_SCORE+AccountsMatchScorer.MATCHING_LINKED_WEBSITES_SCORE) {
                 linkedAccounts.add(new Pair<>(stackUser, highest_match.getKey()));
-                Logger.info("Matched accounts " + stackUser.getDisplayName() + "/" + highest_match.getKey().getLogin() + " with score of " + highest_match.getValue());
+                Logger.info("Matched " + stackUser.getDisplayName() + "/" + highest_match.getKey().getLogin() + " with score " + highest_match.getValue()+".");
             }
         }
 

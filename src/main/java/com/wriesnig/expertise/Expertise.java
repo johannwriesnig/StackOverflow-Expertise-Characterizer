@@ -3,10 +3,11 @@ package com.wriesnig.expertise;
 import java.util.HashMap;
 
 public class Expertise {
-    private HashMap<String, Double> gitExpertise;
-    private HashMap<String, Double> stackExpertise;
     private final static double STACK_WEIGHT = 2/3.0;
     private final static double GIT_WEIGHT = 1/3.0;
+
+    private HashMap<String, Double> gitExpertise;
+    private HashMap<String, Double> stackExpertise;
 
     public Expertise(){
         gitExpertise = new HashMap<>();

@@ -13,10 +13,10 @@ public class Logger {
         shouldPrint = false;
     }
 
-    public static void error(String message, Throwable stackTrace) {
+    public static void error(String message, Throwable throwable) {
         if (!shouldPrint) return;
         System.out.println(getTimeStamp() + " [ERROR]: " + message);
-        stackTrace.printStackTrace();
+        throwable.printStackTrace();
     }
 
     public static void error(String message) {
