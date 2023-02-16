@@ -47,10 +47,7 @@ public class CharacterizerApplication {
 
     private void runGitExpertiseJob(ArrayList<User> users) {
         Logger.info("Running git-expertise job.");
-        File reposDir = new File("repos");
-        reposDir.mkdirs();
         startThreadedComputation(users, GitExpertiseJob.class, 5);
-        reposDir.delete();
     }
 
     private void startThreadedComputation(ArrayList<User> users, Class<?> clazz, int threadPoolSize) {

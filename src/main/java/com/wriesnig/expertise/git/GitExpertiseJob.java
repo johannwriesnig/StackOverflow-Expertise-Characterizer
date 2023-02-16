@@ -24,7 +24,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Stream;
 
 public class GitExpertiseJob implements Runnable {
-    private User user;
+    private static final String reposWorkspace = "src/main/resources/src/workspace/repos";
+
+    private final User user;
 
     public GitExpertiseJob(User user) {
         this.user = user;
@@ -32,7 +34,7 @@ public class GitExpertiseJob implements Runnable {
 
     @Override
     public void run() {
-        String userReposPath = "repos/" + user.getGitLogin() + "/";
+        String userReposPath = reposWorkspace + "/" + user.getGitLogin() + "/";
         File userReposDir = new File(userReposPath);
         userReposDir.mkdirs();
 

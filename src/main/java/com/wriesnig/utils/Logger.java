@@ -12,6 +12,9 @@ public class Logger {
     public static void deactivatePrinting() {
         shouldPrint = false;
     }
+    public static void activatePrinting() {
+        shouldPrint = true;
+    }
 
     public static void error(String message, Throwable throwable) {
         if (!shouldPrint) return;
