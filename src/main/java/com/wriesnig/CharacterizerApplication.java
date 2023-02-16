@@ -1,16 +1,16 @@
 package com.wriesnig;
 
-
 import com.wriesnig.db.expertise.ExpertiseDatabase;
 import com.wriesnig.expertise.ExpertiseCalculator;
 import com.wriesnig.expertise.User;
 import com.wriesnig.utils.AccountsFetcher;
+import com.wriesnig.utils.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class CharacterizerApplication {
-    private ArrayList<Integer> ids;
+    private final ArrayList<Integer> ids;
     private final AccountsFetcher accountsFetcher;
 
     public CharacterizerApplication() {
@@ -22,6 +22,7 @@ public class CharacterizerApplication {
     }
 
     public void run() {
+        Logger.info("Running characterizer application.");
         ArrayList<User> users = accountsFetcher.fetchMatchingAccounts(ids);
         ExpertiseCalculator.computeExpertise(users);
         storeUsersExpertise(users);

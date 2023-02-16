@@ -20,10 +20,12 @@ public class ExpertiseCalculator {
     }
 
     private static void computeSOExpertise(ArrayList<User> users) {
+        Logger.info("Running stack-expertise job.");
         startThreadedComputation(users, StackExpertiseJob.class, StackDatabase.getConnectionSize());
     }
 
     private static void computeGHExpertise(ArrayList<User> users) {
+        Logger.info("Running git-expertise job.");
         File reposDir = new File("repos");
         reposDir.mkdirs();
         startThreadedComputation(users, GitExpertiseJob.class, 5);
@@ -32,7 +34,6 @@ public class ExpertiseCalculator {
 
     private static void startThreadedComputation(ArrayList<User> users, Class<?> clazz, int threadPoolSize) {
         if (!(clazz == StackExpertiseJob.class || clazz == GitExpertiseJob.class)) return;
-        Logger.info("Starting expertise computation");
         double start = System.nanoTime();
         ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
         for (User user : users) {
@@ -48,7 +49,7 @@ public class ExpertiseCalculator {
         }
         double stop = System.nanoTime() - start;
         stop /= 1000000000.0;
-        Logger.info("Computation took " + stop + " secs");
+        Logger.info("Expertise-characterization took " + stop + " seconds.");
     }
 
 }

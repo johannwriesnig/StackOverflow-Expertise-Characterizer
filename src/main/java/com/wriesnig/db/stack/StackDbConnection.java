@@ -30,7 +30,7 @@ public class StackDbConnection {
                     "where id=?");
 
         } catch (SQLException e) {
-            Logger.error("Connection issues to StackDatabase in StackDbConnection constructor", e);
+            Logger.error("Accessing stack-database failed.", e);
             throw new RuntimeException();
         }
     }
@@ -47,7 +47,7 @@ public class StackDbConnection {
         try {
             connection.close();
         } catch (SQLException e) {
-            Logger.error("Issues with closing StackDbConnection...", e);
+            Logger.error("Closing stack-database connection failed.", e);
         }
     }
 }

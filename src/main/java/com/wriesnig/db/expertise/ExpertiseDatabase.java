@@ -1,15 +1,12 @@
 package com.wriesnig.db.expertise;
 
-import com.wriesnig.expertise.Expertise;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
 import com.wriesnig.utils.Logger;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ExpertiseDatabase {
@@ -38,7 +35,7 @@ public class ExpertiseDatabase {
             getUsers = connection.prepareStatement("SELECT * FROM Users");
             deleteUser = connection.prepareStatement("DELETE FROM Users where id=?");
         } catch (SQLException e) {
-            Logger.error("Connection issues with ExpertiseDatabase in initDB(...)", e);
+            Logger.error("Accessing expertise-database failed.", e);
             throw new RuntimeException();
         }
     }
@@ -66,7 +63,7 @@ public class ExpertiseDatabase {
         try {
             connection.close();
         } catch (SQLException e) {
-            Logger.error("Issues with closing ExpertiseDbConnection...", e);
+            Logger.error("Closing expertise-database connection failed.", e);
         }
     }
 
@@ -88,7 +85,7 @@ public class ExpertiseDatabase {
             Logger.info(insertUser.toString());
             insertUser.executeUpdate();
         } catch (SQLException e) {
-            Logger.error("Inserting into users failed", e);
+            Logger.error("Inserting user into expertise-database failed.", e);
         }
 
     }

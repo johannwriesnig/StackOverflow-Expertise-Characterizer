@@ -6,8 +6,6 @@ import net.sourceforge.pmd.PMD;
 import net.sourceforge.pmd.PMDConfiguration;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,7 +31,7 @@ public class JavaCyclomaticComplexity extends CyclomaticComplexity {
         try {
             content = new String(Files.readAllBytes(report.toPath()));
         } catch (IOException e) {
-            Logger.error("Reading json output failed.", e);
+            Logger.error("Reading ck-report for java project failed.", e);
             return -1;
         }
 

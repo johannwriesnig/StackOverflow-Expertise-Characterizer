@@ -2,8 +2,7 @@ package com.wriesnig.expertise.git;
 
 class GitClassifier {
 
-    public static double classify(Object[] i)
-            throws Exception {
+    public static double classify(Object[] i) {
 
         double p = Double.NaN;
         p = GitClassifier.N592d7e1e0(i);

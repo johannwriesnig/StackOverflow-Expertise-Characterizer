@@ -4,12 +4,11 @@ import com.wriesnig.utils.Logger;
 import org.json.JSONObject;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 public class StackApi {
     private static final String apiUrl = "https://api.stackexchange.com/2.3/";
@@ -39,13 +38,16 @@ public class StackApi {
     }
 
     public static GZIPInputStream getStreamFromAPICall(String path) {
+        String url = apiUrl + path;
         try {
-            URL url = new URL(apiUrl + path);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            URL getUrl = new URL(apiUrl + path);
+            HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
             connection.setRequestMethod("GET");
             return new GZIPInputStream(connection.getInputStream());
+        } catch (MalformedURLException e) {
+            Logger.error("Url for requesting stack-api is malformed -> " + url, e);
         } catch (IOException e) {
-            Logger.error("Issues while requesting stack api", e);
+            Logger.error("Processing stack-api input stream failed.", e);
         }
 
         return null;
@@ -62,7 +64,7 @@ public class StackApi {
                 stringBuilder.append((char) ch);
             }
         } catch (IOException e) {
-            Logger.error("Issues while creating string from stack api stream", e);
+            Logger.error("Reading from stack-api input stream failed.", e);
         }
         return stringBuilder.toString();
     }

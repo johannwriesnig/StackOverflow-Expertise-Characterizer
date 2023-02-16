@@ -3,7 +3,6 @@ package com.wriesnig.api.git;
 import com.wriesnig.utils.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -55,16 +54,17 @@ public class GitApi {
     }
 
     public static InputStream getStreamFromAPICall(String path) {
+        String url = apiUrl + path;
         try {
-            URL url = new URL(apiUrl + path);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            URL getUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
             return connection.getInputStream();
         } catch (MalformedURLException e) {
-            Logger.error("URL issues while using git api", e);
+            Logger.error("Url for requesting git-api is malformed -> " + url, e);
         } catch (IOException e) {
-            Logger.error("Issues while requesting git api", e);
+            Logger.error("Processing git-api input stream failed.", e);
         }
         return InputStream.nullInputStream();
     }
@@ -78,7 +78,7 @@ public class GitApi {
                 stringBuilder.append((char) currentChar);
             }
         } catch (IOException e) {
-            Logger.error("Issues while creating string from buffered stream", e);
+            Logger.error("Reading from bufferedReader that contains git-api request failed.", e);
         }
         return stringBuilder.toString();
     }
@@ -87,9 +87,9 @@ public class GitApi {
         try {
             tryDownloadRepos(repos, path, downloadedRepos);
         } catch (IOException e) {
-            Logger.error("Issues while working with repo download stream", e);
+            Logger.error("Error while processing repo download stream.", e);
         } catch (InterruptedException e) {
-            Logger.error("Issues when queuing downloaded repos", e);
+            Logger.error("Error in repo download queue.", e);
         }
     }
 

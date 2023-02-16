@@ -7,7 +7,6 @@ import org.jsoup.nodes.Element;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -39,7 +38,7 @@ public class StatusBadgesAnalyser {
             try (InputStream in = getInputStreamFromBadge(badges.group(1))) {
                 html = new String(in.readAllBytes(), StandardCharsets.UTF_8);
             } catch (IOException e){
-                Logger.error("Issues calling URL. Probably link is broken -> " + badges.group(1));
+                Logger.error("Reading status badge from url failed -> " + badges.group(1), e);
             }
 
             badgesHtml.add(Jsoup.parse(html));

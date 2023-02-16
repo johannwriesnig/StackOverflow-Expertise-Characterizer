@@ -6,7 +6,6 @@ import com.wriesnig.expertise.Tags;
 import com.wriesnig.api.git.GitApi;
 import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.utils.Logger;
-
 import java.io.*;
 import java.util.Properties;
 
@@ -14,18 +13,17 @@ public class Main {
 
     public static void main(String[] args) {
         if(args.length!=1){
-            Logger.error("Wrong Arguments");
+            Logger.error("Wrong arguments.");
             return;
         }
 
         if(args[0].equals("c")){
-            Logger.info("Converting xml...");
             ConvertApplication convertApplication = new ConvertApplication();
             convertApplication.run();
             return;
         }
 
-        Logger.info("Application initialization...");
+        Logger.info("Setting properties.");
         Properties properties = getPropertiesFromConfigFile(args[0]);
         setGitApiToken(properties);
         setTags(properties);
@@ -59,7 +57,6 @@ public class Main {
         String user = properties.getProperty("dumpsDB.user");
         String password = properties.getProperty("dumpsDB.password");
         StackDatabase.setCredentials(user, password, url);
-        Logger.info("Created connection to stack-database");
     }
 
     public static void setExpertiseDbCredentials(Properties properties) {
@@ -67,7 +64,6 @@ public class Main {
         String user = properties.getProperty("expertiseDB.user");
         String password = properties.getProperty("expertiseDB.password");
         ExpertiseDatabase.setCredentials(user, password, url);
-        Logger.info("Created connection to expertise-database");
     }
 
     public static Properties getPropertiesFromConfigFile(String configFile) {
@@ -77,10 +73,10 @@ public class Main {
             properties.load(inputStream);
             inputStream.close();
         } catch (FileNotFoundException e) {
-            Logger.error("Issues with .properties file", e);
+            Logger.error("Properties file not found.", e);
             throw new RuntimeException();
         } catch (IOException e) {
-            Logger.error("Issues with IO operations concerning .properties file", e);
+            Logger.error("I/O error while processing properties file.", e);
             throw new RuntimeException();
         }
 

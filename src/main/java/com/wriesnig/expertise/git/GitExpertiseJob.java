@@ -1,7 +1,6 @@
 package com.wriesnig.expertise.git;
 
 import com.hankcs.hanlp.summary.TextRankKeyword;
-import com.hankcs.hanlp.summary.TextRankSentence;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
 import com.wriesnig.expertise.git.badges.BuildStatus;
@@ -13,16 +12,13 @@ import com.wriesnig.api.git.Repo;
 import com.wriesnig.utils.GitClassifierBuilder;
 import com.wriesnig.utils.Logger;
 import org.apache.commons.io.FileUtils;
-
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Stream;
@@ -57,15 +53,13 @@ public class GitExpertiseJob implements Runnable {
                 computeExpertise(currentRepo);
                 FileUtils.deleteDirectory(new File(currentRepo.getFileName()));
             }
-        } catch (InterruptedException e) {
-            //
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             //
         }
         try {
             FileUtils.deleteDirectory(userReposDir);
         } catch (IOException e) {
-            //throw new RuntimeException(e);
+            Logger.error("Deleting directory failed -> " + userReposDir, e);
         }
         HashMap<String, ArrayList<Double>> scoresPerTag = getExpertisePerTag(repos);
         scoresPerTag.forEach((key, value) -> {
@@ -118,12 +112,8 @@ public class GitExpertiseJob implements Runnable {
             GitClassifierBuilder.writeLine(repo.getComplexity() + "," + readMe.exists() + "," + (repo.getBuildStatus() != BuildStatus.FAILING) + "," + repo.getCoverage() + "," + repo.getStars());
         //classifier to add
         Object[] classificationData = {repo.getComplexity(), readMe.exists() ? "1" : "0", "0", repo.getCoverage(), "1"};
-        double quality = 0;
-        try {
-            quality = GitClassifier.classify(classificationData);
-        } catch (Exception e) {
-            Logger.error("Error while classifying git repo", e);
-        }
+        double quality = GitClassifier.classify(classificationData);
+
 
         repo.setQuality(quality);
     }
@@ -176,7 +166,7 @@ public class GitExpertiseJob implements Runnable {
                         builder.append(getPythonImports(f));
                     });
         } catch (IOException e) {
-            Logger.error("Issues traversing files", e);
+            Logger.error("Traversing python project files failed.", e);
         }
 
         addPythonTagsFromImportsFile(repo, builder.toString());
@@ -190,7 +180,7 @@ public class GitExpertiseJob implements Runnable {
         try {
             Files.writeString(Path.of(importsFilePath),imports);
         } catch (IOException e) {
-            Logger.error("Writing to pythonImports.txt failed", e);
+            Logger.error("Writing to pythonImports.txt failed.", e);
         }
 
 
@@ -212,7 +202,7 @@ public class GitExpertiseJob implements Runnable {
             }
             return importsBuilder.toString();
         } catch (IOException e){
-            Logger.error("...", e);
+            Logger.error("Reading imports from python file failed.", e);
         }
         return "";
     }

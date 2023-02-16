@@ -73,11 +73,11 @@ public class StackExpertiseJob implements Runnable {
                 user.getExpertise().getStackExpertise().put(key, score);
             });
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logger.error("");
         }
         StackDatabase.releaseConnection(stackDbConnection);
 
-        Logger.info("Computed following expertise for " + user.getStackDisplayName() + " : " + user.getExpertise().getStackExpertise().toString());
+        Logger.info("Stack expertise for " + user.getStackDisplayName() + ": " + user.getExpertise().getStackExpertise().toString()+".");
     }
 
     private boolean postTagsContainTagsToCharacterize(String inputStr) {
