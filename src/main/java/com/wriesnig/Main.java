@@ -1,7 +1,7 @@
 package com.wriesnig;
 
 import com.wriesnig.db.expertise.ExpertiseDatabase;
-import com.wriesnig.db.stack.sodumpsconvert.ConvertApplication;
+import com.wriesnig.db.stack.stackdumpsconvert.ConvertApplication;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.api.git.GitApi;
 import com.wriesnig.db.stack.StackDatabase;

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<posts>
+	<row Id="1" PostTypeId="1" AcceptedAnswerId="1" CreationDate="2008-07-31T22:08:08.620" Score="5" ViewCount="10" Body="This is a Body" OwnerUserId="9" LastEditorUserId="9134576" LastEditorDisplayName="user14723686" LastEditDate="2021-01-29T18:46:45.963" LastActivityDate="2021-01-29T18:46:45.963" Title="This is a title" Tags="&lt;c#&gt;&lt;floating-point&gt;&lt;type-conversion&gt;&lt;double&gt;&lt;decimal&gt;" AnswerCount="7" CommentCount="0" FavoriteCount="13" ContentLicense="CC BY-SA 4.0" />
+	<row Id="2" PostTypeId="1" AcceptedAnswerId="2" CreationDate="2008-07-31T22:08:08.620" Score="6" ViewCount="11" Body="This is a Body" OwnerUserId="9" LastEditorUserId="9134576" LastEditorDisplayName="user14723686" LastEditDate="2021-01-29T18:46:45.963" LastActivityDate="2021-01-29T18:46:45.963" Title="This is a title" Tags="&lt;c#&gt;&lt;floating-point&gt;&lt;type-conversion&gt;&lt;double&gt;&lt;decimal&gt;" AnswerCount="7" CommentCount="0" FavoriteCount="13" ContentLicense="CC BY-SA 4.0" />
+	<row Id="3" PostTypeId="1" AcceptedAnswerId="3" CreationDate="2008-07-31T22:08:08.620" Score="7" ViewCount="12" Body="This is a Body" OwnerUserId="9" LastEditorUserId="9134576" LastEditorDisplayName="user14723686" LastEditDate="2021-01-29T18:46:45.963" LastActivityDate="2021-01-29T18:46:45.963" Title="This is a title" Tags="&lt;c#&gt;&lt;floating-point&gt;&lt;type-conversion&gt;&lt;double&gt;&lt;decimal&gt;" AnswerCount="7" CommentCount="0" FavoriteCount="13" ContentLicense="CC BY-SA 4.0" />
+</posts>
+

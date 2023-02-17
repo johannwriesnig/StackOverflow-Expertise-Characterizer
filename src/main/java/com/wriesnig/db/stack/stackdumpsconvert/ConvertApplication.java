@@ -1,18 +1,17 @@
-package com.wriesnig.db.stack.sodumpsconvert;
+package com.wriesnig.db.stack.stackdumpsconvert;
 
 
-import com.wriesnig.db.stack.sodumpsconvert.datainfo.PostsInfo;
-import com.wriesnig.db.stack.sodumpsconvert.datainfo.UsersInfo;
-import com.wriesnig.db.stack.sodumpsconvert.datainfo.VotesInfo;
+import com.wriesnig.db.stack.stackdumpsconvert.datainfo.PostsInfo;
+import com.wriesnig.db.stack.stackdumpsconvert.datainfo.UsersInfo;
+import com.wriesnig.db.stack.stackdumpsconvert.datainfo.VotesInfo;
 import com.wriesnig.utils.Logger;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
-import java.io.File;
 import java.io.IOException;
 
 public class ConvertApplication {
-    public static final String dataPath = "db/dumpsDb/";
+    public static String dataPath = "db/dumpsDb/";
 
     public ConvertApplication() {
     }

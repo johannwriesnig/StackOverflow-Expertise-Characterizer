@@ -1,7 +1,7 @@
-package com.wriesnig.db.stack.sodumpsconvert;
+package com.wriesnig.db.stack.stackdumpsconvert;
 
-import com.wriesnig.db.stack.sodumpsconvert.datainfo.AttributeType;
-import com.wriesnig.db.stack.sodumpsconvert.datainfo.DataInfo;
+import com.wriesnig.db.stack.stackdumpsconvert.datainfo.AttributeType;
+import com.wriesnig.db.stack.stackdumpsconvert.datainfo.DataInfo;
 import com.wriesnig.utils.Logger;
 import javafx.util.Pair;
 import org.xml.sax.Attributes;

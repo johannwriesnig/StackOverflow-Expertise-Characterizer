@@ -43,6 +43,7 @@
                         <exclude>com/wriesnig/expertise/git/GitClassifier.class</exclude>
                         <exclude>com/wriesnig/db/stack/sodumpsconvert/**</exclude>
                         <exclude>com/wriesnig/expertise/git/metrics/**</exclude>
+                        <exclude>com/wriesnig/db/stack/ConnectionPool.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>

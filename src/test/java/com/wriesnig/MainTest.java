@@ -3,18 +3,15 @@ package com.wriesnig;
 import com.wriesnig.api.git.GitApi;
 import com.wriesnig.db.expertise.ExpertiseDatabase;
 import com.wriesnig.db.stack.StackDatabase;
-import com.wriesnig.db.stack.sodumpsconvert.ConvertApplication;
+import com.wriesnig.db.stack.stackdumpsconvert.ConvertApplication;
 import com.wriesnig.utils.Logger;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.util.Properties;
 
 import static org.mockito.Mockito.*;

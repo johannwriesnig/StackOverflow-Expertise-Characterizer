@@ -1,4 +1,4 @@
-package com.wriesnig.db.stack.sodumpsconvert.datainfo;
+package com.wriesnig.db.stack.stackdumpsconvert.datainfo;
 
 import javafx.util.Pair;
 import java.util.ArrayList;
