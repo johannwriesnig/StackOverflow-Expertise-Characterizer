@@ -6,10 +6,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
+import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 public class ConvertApplicationTest {
@@ -22,7 +25,7 @@ public class ConvertApplicationTest {
     }
 
     @Test
-    public void runConvertJobs() throws IOException {
+    public void runConvertJobs() throws IOException, SAXException {
         try(MockedConstruction<ConvertJob> convertJob = mockConstruction(ConvertJob.class,
                 (mock,context)->{
 
@@ -35,13 +38,13 @@ public class ConvertApplicationTest {
     }
 
     @Test
-    public void convertJobThrowsException() throws IOException {
+    public void convertJobThrowsException() throws IOException, SAXException {
         try(MockedStatic<Logger> mockedLogger = mockStatic(Logger.class);
             MockedConstruction<ConvertJob> convertJob = mockConstruction(ConvertJob.class,
                 (mock,context)->{
                     doThrow(IOException.class).when(mock).convert();
                 })){
-            convertApplication.run();
+            assertThrows(RuntimeException.class,()->convertApplication.run());
 
             List<ConvertJob> constructedJobs = convertJob.constructed();
             assertEquals(3, constructedJobs.size());

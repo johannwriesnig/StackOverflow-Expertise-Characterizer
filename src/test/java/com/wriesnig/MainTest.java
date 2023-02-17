@@ -79,7 +79,7 @@ public class MainTest {
                          doThrow(IOException.class).when(mock).load((InputStream) any());
                      })) {
             assertThrows(RuntimeException.class,()->Main.main(new String[]{"src/main/resources/src/testConfig.properties"}));
-            mockedLogger.verify(()-> Logger.error(any(), any()),times(1));
+            mockedLogger.verify(() -> Logger.error(any(), any()), times(1));
         }
     }
 

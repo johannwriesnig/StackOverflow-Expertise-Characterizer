@@ -27,6 +27,7 @@ public class ConvertApplication {
             postsConvertJob.convert();
         } catch (IOException | ParserConfigurationException | SAXException e) {
             Logger.error("Converting xml to csv failed.", e);
+            throw new RuntimeException();
         }
     }
 }
