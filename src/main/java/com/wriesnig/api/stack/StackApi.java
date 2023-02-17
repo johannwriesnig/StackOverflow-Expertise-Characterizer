@@ -53,7 +53,6 @@ public class StackApi {
     }
 
     public static GZIPInputStream getGzipInputStream(HttpURLConnection connection) throws IOException {
-        System.out.println("hallo");
         return new GZIPInputStream(connection.getInputStream());
     }
 

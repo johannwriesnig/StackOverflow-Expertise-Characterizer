@@ -59,11 +59,12 @@ public class ExpertiseDatabase {
     }
 
     public static void closeConnection() {
-        if(connection==null)return;
         try {
             connection.close();
         } catch (SQLException e) {
             Logger.error("Closing expertise-database connection failed.", e);
+        } catch (NullPointerException e){
+            Logger.error("Expertise-database connection is null thus cannot be closed.", e);
         }
     }
 

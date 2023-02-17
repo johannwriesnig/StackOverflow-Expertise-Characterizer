@@ -2,10 +2,15 @@ package com.wriesnig.db.expertise;
 
 import com.wriesnig.api.stack.StackApi;
 import com.wriesnig.expertise.Tags;
+import com.wriesnig.utils.Logger;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
+import org.postgresql.PGConnection;
 
+import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,11 +26,22 @@ public class ExpertiseDatabaseTest {
     }
 
     @Test
-    public void initDBConnectionFail(){
-        try(MockedStatic<DriverManager> mocked = mockStatic(DriverManager.class)){
-            mocked.when(()->DriverManager.getConnection(anyString(),anyString(),anyString())).thenThrow(SQLException.class);
+    public void initDBConnectionFailsDueGetConnection(){
+        try(MockedStatic<DriverManager> mockedDriverManager = mockStatic(DriverManager.class);
+            MockedStatic<Logger> mockedLogger = mockStatic(Logger.class)){
+            mockedDriverManager.when(()->DriverManager.getConnection(any(),any(),any())).thenThrow(SQLException.class);
 
             assertThrows(RuntimeException.class, ExpertiseDatabase::initDB);
+            mockedLogger.verify(()-> Logger.error(any(), any()),times(1));
+        }
+    }
+
+    @Test
+    public void closeConnectionFails(){
+        try(MockedStatic<Logger> mockedLogger = mockStatic(Logger.class)){
+
+            ExpertiseDatabase.closeConnection();
+            mockedLogger.verify(()-> Logger.error(any(), any()),times(1));
         }
     }
 
