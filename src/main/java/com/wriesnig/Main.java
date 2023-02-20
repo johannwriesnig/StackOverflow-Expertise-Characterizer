@@ -43,7 +43,7 @@ public class Main {
     }
 
     public static void closeDbConnections() {
-        StackDatabase.closeConnections();
+        StackDatabase.closeConnection();
         ExpertiseDatabase.closeConnection();
     }
 

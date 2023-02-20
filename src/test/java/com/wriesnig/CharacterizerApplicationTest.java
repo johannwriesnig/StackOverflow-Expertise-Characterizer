@@ -1,6 +1,7 @@
 package com.wriesnig;
 
 import com.wriesnig.db.expertise.ExpertiseDatabase;
+import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.expertise.User;
 import com.wriesnig.expertise.git.GitExpertiseJob;
 import com.wriesnig.expertise.stack.StackExpertiseJob;
@@ -32,7 +33,8 @@ public class CharacterizerApplicationTest {
         try (MockedConstruction<AccountsFetcher> accountsFetcher = getMockedAccountsFetcher();
              MockedConstruction<GitExpertiseJob> gitExpertiseJob = getMockedGitExpertiseJob();
              MockedConstruction<StackExpertiseJob> stackExpertiseJob = getMockedStackExpertiseJob();
-             MockedStatic<ExpertiseDatabase> mockedExpertiseDb = mockStatic(ExpertiseDatabase.class)) {
+             MockedStatic<ExpertiseDatabase> mockedExpertiseDb = mockStatic(ExpertiseDatabase.class);
+             MockedStatic<StackDatabase> mockedStackDb = mockStatic(StackDatabase.class);) {
             characterizerApplication = new CharacterizerApplication();
             characterizerApplication.run();
             AccountsFetcher fetcherInstance = accountsFetcher.constructed().get(0);
@@ -49,7 +51,8 @@ public class CharacterizerApplicationTest {
         try (MockedConstruction<AccountsFetcher> accountsFetcher = getMockedAccountsFetcher();
              MockedConstruction<ThreadPoolExecutor> executorService = getMockedExecutorService();
              MockedStatic<ExpertiseDatabase> mockedExpertiseDb = mockStatic(ExpertiseDatabase.class);
-             MockedStatic<Logger> mockedLogger = mockStatic(Logger.class)) {
+             MockedStatic<Logger> mockedLogger = mockStatic(Logger.class);
+             MockedStatic<StackDatabase> mockedStackDb = mockStatic(StackDatabase.class);) {
 
             characterizerApplication = new CharacterizerApplication();
             characterizerApplication.run();

@@ -15,7 +15,7 @@ public class StackApiResponseParser {
             int id = current_user.getInt("user_id");
             int reputation = current_user.getInt("reputation");
             String displayName = current_user.getString("display_name");
-            String websiteUrl = current_user.getString("website_url");
+            String websiteUrl = current_user.has("website_url")?current_user.getString("website_url"):"";
             String link = current_user.getString("link");
             String profileImageUrl = current_user.getString("profile_image");
             int accountId = current_user.getInt("account_id");

@@ -14,13 +14,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class CharacterizerApplication {
-    private final ArrayList<Integer> ids;
+    private ArrayList<Integer> ids;
     private final AccountsFetcher accountsFetcher;
 
     public CharacterizerApplication() {
         //Jon Skeet, Gordon Linoff, Von C, BalusC, Darin Dimitrov, Tomasz Nuzrkie(spring), jb nizet(spring), daniel roseman(django), chris pratt(django), davidism(flusk)
         //ids = new ArrayList<>(Arrays.asList(22656, 1144035, 6309, 157882, 29407, 605744, 571407, 104349, 104349, 654031, 400617));
         ids = new ArrayList<>(Arrays.asList(605744, 654031, 400617, 1663352));
+        ids = new ArrayList<>(Arrays.asList(22656));
+        ids = new ArrayList<>(Arrays.asList(22656,157882,139985,57695,203907,571407,922184,70604,1221571,276052,829571,21234));
         accountsFetcher = new AccountsFetcher();
     }
 
@@ -33,13 +35,14 @@ public class CharacterizerApplication {
 
     public void runExpertiseJobs(ArrayList<User> users){
         runStackExpertiseJob(users);
-        runGitExpertiseJob(users);
+        //runGitExpertiseJob(users);
     }
 
 
     private void runStackExpertiseJob(ArrayList<User> users) {
         Logger.info("Running stack-expertise job.");
-        startThreadedComputation(users, StackExpertiseJob.class, StackDatabase.getConnectionSize());
+        StackDatabase.initDB();
+        startThreadedComputation(users, StackExpertiseJob.class, 1);
     }
 
     private void runGitExpertiseJob(ArrayList<User> users) {

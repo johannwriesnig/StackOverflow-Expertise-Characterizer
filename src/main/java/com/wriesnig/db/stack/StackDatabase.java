@@ -1,30 +1,45 @@
 package com.wriesnig.db.stack;
 
+import com.wriesnig.utils.Logger;
+
 import java.sql.*;
 
 public class StackDatabase {
-    private static ConnectionPool connectionPool;
-    private static final int connectionSize = 3;
     private static String user;
     private static String password;
     private static String url;
     private static boolean isCredentialsSet=false;
 
+    private static Connection connection;
+    private static PreparedStatement selectPosts;
+    private static PreparedStatement selectPostVotes;
+
+
     private StackDatabase(){}
 
-
-    public static ResultSet getVotesOfPost(StackDbConnection stackDbConnection, int postId){
-        PreparedStatement statement = stackDbConnection.getVotesByPostId();
-        ResultSet resultSet;
+    public static void initDB() {
         try {
-            statement.setInt(1, postId);
-            resultSet = statement.executeQuery();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+            connection = DriverManager.getConnection(url, user, password);
+            selectPosts = connection.prepareStatement("SELECT " +
+                    "Post.ID, length(Post.Body) as bodyLength, ParentPost.Tags " +
+                    "FROM Posts Post, Posts ParentPost " +
+                    "WHERE Post.OwnerUserId=? AND Post.ParentId = ParentPost.Id;");
+            selectPostVotes = connection.prepareStatement("SELECT " +
+                    "(SELECT count(*) from Votes v1 " +
+                    "where v1.PostId=p.id and v1.VoteTypeId=2) as upVotes, " +
+                    "(SELECT count(*) from Votes v2 " +
+                    "where v2.PostId=p.id and v2.VoteTypeId=3) as downVotes, " +
+                    "(SELECT count(*) from Votes v3\n" +
+                    "where v3.PostId=p.id and v3.VoteTypeId=1) as isAccepted " +
+                    "from posts p  " +
+                    "where id=?");
 
-        return resultSet;
+        } catch (SQLException e) {
+            Logger.error("Accessing stack-database failed.", e);
+            throw new RuntimeException();
+        }
     }
+
 
     public static void setCredentials(String user, String password, String url){
         StackDatabase.user = user;
@@ -33,18 +48,34 @@ public class StackDatabase {
         StackDatabase.isCredentialsSet=true;
     }
 
-    public static void closeConnections(){
-        if(connectionPool!=null)
-            connectionPool.closeConnections();
+    public static void closeConnection() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            Logger.error("Closing expertise-database connection failed.", e);
+        } catch (NullPointerException e){
+            Logger.error("Expertise-database connection is null thus cannot be closed.", e);
+        }
     }
 
 
-    public static ResultSet getPostsFromUser(StackDbConnection stackDbConnection, int userId){
-        PreparedStatement statement = stackDbConnection.getPostsByUserId();
+    public static ResultSet getPostsFromUser(int userId){
         ResultSet resultSet;
         try {
-            statement.setInt(1, userId);
-            resultSet = statement.executeQuery();
+            selectPosts.setInt(1, userId);
+            resultSet = selectPosts.executeQuery();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return resultSet;
+    }
+
+    public static ResultSet getVotesOfPost(int postId){
+        ResultSet resultSet;
+        try {
+            selectPostVotes.setInt(1, postId);
+            resultSet = selectPostVotes.executeQuery();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -54,19 +85,6 @@ public class StackDatabase {
 
     public static boolean isCredentialsSet(){
         return isCredentialsSet;
-    }
-    public static StackDbConnection getConnection(){
-        if(connectionPool==null)
-            connectionPool = new ConnectionPool(connectionSize, url, password, user);
-        return connectionPool.getDBConnection();
-    }
-
-    public static void releaseConnection(StackDbConnection dbConnection){
-        connectionPool.releaseDBConnection(dbConnection);
-    }
-
-    public static int getConnectionSize(){
-        return connectionSize;
     }
 
 }

@@ -2,7 +2,6 @@ package com.wriesnig.expertise.stack;
 
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
-import com.wriesnig.db.stack.StackDbConnection;
 import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.utils.Logger;
 import java.sql.ResultSet;
@@ -16,13 +15,11 @@ public class StackExpertiseJob implements Runnable {
 
     public StackExpertiseJob(User user) {
         this.user = user;
-
     }
 
     @Override
     public void run() {
-        StackDbConnection stackDbConnection = StackDatabase.getConnection();
-        ResultSet postResults = StackDatabase.getPostsFromUser(stackDbConnection, user.getStackId());
+        ResultSet postResults = StackDatabase.getPostsFromUser(user.getStackId());
         try {
 
             HashMap<String, ArrayList<Double>> scoresPerTag = new HashMap<>();
@@ -35,7 +32,7 @@ public class StackExpertiseJob implements Runnable {
                 String tagsOfCurrentPost = postResults.getString("tags");
                 if (tagsOfCurrentPost == null || !postTagsContainTagsToCharacterize(tagsOfCurrentPost)) continue;
                 int postId = postResults.getInt("id");
-                ResultSet votesOfCurrentPost = StackDatabase.getVotesOfPost(stackDbConnection, postId);
+                ResultSet votesOfCurrentPost = StackDatabase.getVotesOfPost(postId);
 
                 double upVotes = 0;
                 double downVotes = 0;
@@ -47,8 +44,8 @@ public class StackExpertiseJob implements Runnable {
                     isAccepted = votesOfCurrentPost.getString("isAccepted");
 
                 }
+                if(upVotes==0&&downVotes==0)continue;
 
-                double score = (upVotes + downVotes) == 0 ? 0 : upVotes / (upVotes + downVotes);
 
                 String isMainTag = "0";
                 for (String tag : user.getMainTags())
@@ -56,11 +53,14 @@ public class StackExpertiseJob implements Runnable {
                         isMainTag = "1";
                     }
 
-                postToClassify = new Object[]{upVotes, downVotes, score, isAccepted, userIsEstablished, isMainTag};
+                boolean isActiveOnTag = (isMainTag.equals("1")) && userIsEstablished.equals("1");
+
+                double score = upVotes / (upVotes + downVotes);
+                double s = (double)((int)(score*100))/100.0;
+                postToClassify = new Object[]{upVotes, downVotes, s, isAccepted, isActiveOnTag?"1":"0"};
 
 
-                double expertise = StackClassifier.classify(postToClassify);
-                if (expertise == 0) continue;
+                double expertise = StackClassifier.classify(postToClassify)+1;
 
                 for (String tag : Tags.tagsToCharacterize) {
                     if (tagsOfCurrentPost.contains("<" + tag + ">"))
@@ -70,12 +70,12 @@ public class StackExpertiseJob implements Runnable {
 
             scoresPerTag.forEach((key, value) -> {
                 double score = value.size()!=0?value.stream().mapToDouble(Double::doubleValue).sum() / value.size():1;
+                score = (double)((int)(score*100))/100.0;
                 user.getExpertise().getStackExpertise().put(key, score);
             });
         } catch (SQLException e) {
             Logger.error("");
         }
-        StackDatabase.releaseConnection(stackDbConnection);
 
         Logger.info("Stack expertise for " + user.getStackDisplayName() + ": " + user.getExpertise().getStackExpertise().toString()+".");
     }
