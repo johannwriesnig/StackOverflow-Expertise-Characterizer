@@ -1,5 +1,6 @@
 package com.wriesnig.utils;
 
+import com.wriesnig.api.git.DefaultGitUser;
 import com.wriesnig.expertise.User;
 import com.wriesnig.api.git.GitUser;
 import com.wriesnig.api.git.GitApi;
@@ -86,6 +87,9 @@ public class AccountsFetcher {
             if (highest_match.getValue() >= AccountsMatchScorer.MATCHING_NAMES_SCORE+AccountsMatchScorer.MATCHING_LINKED_WEBSITES_SCORE) {
                 linkedAccounts.add(new Pair<>(stackUser, highest_match.getKey()));
                 Logger.info("Matched " + stackUser.getDisplayName() + "/" + highest_match.getKey().getLogin() + " with score " + highest_match.getValue()+".");
+            } else {
+                linkedAccounts.add(new Pair<>(stackUser, new DefaultGitUser()));
+                Logger.info("No github account could be found for " + stackUser.getDisplayName() + ".");
             }
         }
 

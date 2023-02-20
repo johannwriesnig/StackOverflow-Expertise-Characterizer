@@ -1,6 +1,7 @@
 package com.wriesnig.expertise.git;
 
 import com.hankcs.hanlp.summary.TextRankKeyword;
+import com.wriesnig.api.git.DefaultGitUser;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
 import com.wriesnig.expertise.git.badges.BuildStatus;

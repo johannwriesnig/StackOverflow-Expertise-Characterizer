@@ -1,5 +1,6 @@
 package com.wriesnig.expertise;
 
+import com.wriesnig.api.git.DefaultGitUser;
 import com.wriesnig.api.git.GitUser;
 import com.wriesnig.api.stack.StackUser;
 
@@ -47,5 +48,9 @@ public class User {
 
     public String getProfileImageUrl() {
         return stackUser.getProfileImageUrl();
+    }
+
+    public GitUser getGitUser(){
+        return gitUser;
     }
 }

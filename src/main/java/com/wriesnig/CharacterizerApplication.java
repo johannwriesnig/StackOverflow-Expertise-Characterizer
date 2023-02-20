@@ -1,5 +1,6 @@
 package com.wriesnig;
 
+import com.wriesnig.api.git.DefaultGitUser;
 import com.wriesnig.db.expertise.ExpertiseDatabase;
 import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.expertise.User;
@@ -51,7 +52,7 @@ public class CharacterizerApplication {
         Logger.info("Running git-expertise job.");
         ExecutorService executorService = Executors.newFixedThreadPool(5);
         for (User user : users) {
-            executorService.execute(new GitExpertiseJob(user));
+            if(!(user.getGitUser() instanceof DefaultGitUser))executorService.execute(new GitExpertiseJob(user));
         }
         executorService.shutdown();
         try {
