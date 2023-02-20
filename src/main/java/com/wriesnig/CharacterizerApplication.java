@@ -35,39 +35,32 @@ public class CharacterizerApplication {
 
     public void runExpertiseJobs(ArrayList<User> users){
         runStackExpertiseJob(users);
-        //runGitExpertiseJob(users);
+        runGitExpertiseJob(users);
     }
 
 
     private void runStackExpertiseJob(ArrayList<User> users) {
         Logger.info("Running stack-expertise job.");
         StackDatabase.initDB();
-        startThreadedComputation(users, StackExpertiseJob.class, 1);
+        for (User user : users) {
+            new StackExpertiseJob(user).run();
+        }
     }
 
     private void runGitExpertiseJob(ArrayList<User> users) {
         Logger.info("Running git-expertise job.");
-        startThreadedComputation(users, GitExpertiseJob.class, 5);
-    }
-
-    private void startThreadedComputation(ArrayList<User> users, Class<?> clazz, int threadPoolSize) {
-        double start = System.nanoTime();
-        ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
         for (User user : users) {
-            if (clazz == StackExpertiseJob.class) executorService.execute(new StackExpertiseJob(user));
-            else executorService.execute(new GitExpertiseJob(user));
+            executorService.execute(new GitExpertiseJob(user));
         }
-
         executorService.shutdown();
         try {
             executorService.awaitTermination(1, TimeUnit.HOURS);
         } catch (InterruptedException e) {
             Logger.error("Expertise thread was interrupted.", e);
         }
-        double stop = System.nanoTime() - start;
-        stop /= 1000000000.0;
-        Logger.info("Expertise-characterization took " + stop + " seconds.");
     }
+
 
     public void storeUsersExpertise(ArrayList<User> users){
         ExpertiseDatabase.initDB();
