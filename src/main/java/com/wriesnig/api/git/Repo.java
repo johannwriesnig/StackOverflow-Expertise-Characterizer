@@ -13,6 +13,7 @@ public class Repo {
     private double complexity;
     private double quality;
     private int stars;
+    private boolean hasTests;
 
 
     public Repo(String name, String mainLanguage, int stars) {
@@ -86,4 +87,12 @@ public class Repo {
     public void setStars(int stars){this.stars=stars;}
 
     public int getStars(){return this.stars;}
+
+    public boolean isHasTests(){
+        return hasTests;
+    }
+
+    public void setHasTests(boolean hasTests) {
+        this.hasTests = hasTests;
+    }
 }

@@ -1,7 +1,7 @@
 package com.wriesnig.expertise.git;
 
 import com.hankcs.hanlp.summary.TextRankKeyword;
-import com.wriesnig.api.git.DefaultGitUser;
+import com.wriesnig.api.git.FinishRepo;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
 import com.wriesnig.expertise.git.badges.BuildStatus;
@@ -36,39 +36,15 @@ public class GitExpertiseJob implements Runnable {
     @Override
     public void run() {
         String userReposPath = reposWorkspace + "/" + user.getGitLogin() + "/";
-        File userReposDir = new File(userReposPath);
-        userReposDir.mkdirs();
 
         ArrayList<Repo> repos = GitApi.getReposByLogin(user.getGitLogin());
-        cleanseRepos(repos); //not sure if needed
-
+        cleanseRepos(repos);
         BlockingQueue<Repo> downloadedRepos = new LinkedBlockingQueue<>();
-        Thread reposDownloadJob = new Thread(() -> {
-            GitApi.downloadRepos(repos, userReposPath, downloadedRepos);
-        });
-        reposDownloadJob.start();
-
-        try {
-            while (true) {
-                Repo currentRepo = downloadedRepos.take();
-                currentRepo.setFileName(userReposPath + currentRepo.getFileName());
-                if (currentRepo.getName().equals("")) break;
-                computeExpertise(currentRepo);
-                FileUtils.deleteDirectory(new File(currentRepo.getFileName()));
-            }
-        } catch (InterruptedException | IOException e) {
-            //
-        }
-        try {
-            FileUtils.deleteDirectory(userReposDir);
-        } catch (IOException e) {
-            Logger.error("Deleting directory failed -> " + userReposDir, e);
-        }
-        HashMap<String, ArrayList<Double>> scoresPerTag = getExpertisePerTag(repos);
-        scoresPerTag.forEach((key, value) -> {
-            double score = value.stream().mapToDouble(Double::doubleValue).sum() / value.size();
-            user.getExpertise().getGitExpertise().put(key, score);
-        });
+        downloadReposInNewThread(repos, userReposPath, downloadedRepos);
+        determineReposExpertise(downloadedRepos, userReposPath);
+        deleteUsersReposWorkSpace(new File(userReposPath));
+        HashMap<String, ArrayList<Double>> expertisePerTag = getExpertisePerTag(repos);
+        storeExpertise(expertisePerTag, user);
 
     }
 
@@ -88,37 +64,105 @@ public class GitExpertiseJob implements Runnable {
         repos.removeIf(repo -> !Arrays.asList(Tags.tagsToCharacterize).contains(repo.getMainLanguage()));
     }
 
+    public void downloadReposInNewThread(ArrayList<Repo> repos, String userReposPath, BlockingQueue<Repo> downloadedRepos){
+        Thread reposDownloadJob = new Thread(() -> {
+            GitApi.downloadRepos(repos, userReposPath, downloadedRepos);
+        });
+        reposDownloadJob.start();
+    }
 
-    public void computeExpertise(Repo repo) {
+    public void determineReposExpertise(BlockingQueue<Repo> downloadedRepos, String userReposPath){
+        try {
+            tryDetermineReposExpertise(downloadedRepos, userReposPath);
+        } catch (InterruptedException e) {
+            Logger.error("Repo download queue was interrupted.", e);
+        } catch (IOException e) {
+            Logger.error("Failed to delete repo directory.", e);
+        }
+    }
+
+    public void tryDetermineReposExpertise(BlockingQueue<Repo> downloadedRepos, String userReposPath) throws IOException, InterruptedException {
+        Repo currentRepo;
+        while (!((currentRepo = downloadedRepos.take()) instanceof FinishRepo)) {
+            currentRepo.setFileName(userReposPath + currentRepo.getFileName());
+            determineExpertise(currentRepo);
+            FileUtils.deleteDirectory(new File(currentRepo.getFileName()));
+        }
+    }
+
+
+    public void determineExpertise(Repo repo) {
         if (repo.getMainLanguage().equals("")) return;
         File readMe = getReadMeFile(repo);
         repo.addTag(repo.getMainLanguage());
         repo.addTags(getTagsFromFile(readMe));
+
         switch (repo.getMainLanguage()) {
-            case "java":
+            case "java" -> {
                 findTagsForJavaProject(repo);
-                computeJavaMetrics(repo);
-                break;
-            case "python":
-                findTagsForPythonProject(repo);
-                computePythonMetrics(repo);
-                break;
+                setJavaMetrics(repo);
+            }
+            case "python" -> {
+                findTagsInImportLines(repo);
+                setPythonMetrics(repo);
+            }
         }
         StatusBadgesAnalyser badgesAnalyser = new StatusBadgesAnalyser(readMe);
         badgesAnalyser.initBadges();
         repo.setBuildStatus(badgesAnalyser.getBuildStatus());
         repo.setCoverage(badgesAnalyser.getCoverage());
+        repo.setHasTests(hasRepoTests(repo));
 
         Logger.info("Repo: " + repo.getName() + " has following tags " + repo.getPresentTags() + " " +
                 "and following stats... Build: " + repo.getBuildStatus() + " Coverage: " + repo.getCoverage() + " Complexity: " + repo.getComplexity() + " ReadMe exists: " + readMe.exists());
-        if (repo.getMainLanguage().equals("java"))
-            GitClassifierBuilder.writeLine(repo.getComplexity() + "," + readMe.exists() + "," + (repo.getBuildStatus() != BuildStatus.FAILING) + "," + repo.getCoverage() + "," + repo.getStars());
+
+        GitClassifierBuilder.writeLine(repo.getComplexity() + "," + readMe.exists() + "," + (repo.getBuildStatus() != BuildStatus.FAILING) + "," + repo.isHasTests() + "," + repo.getCoverage() + ",");
         //classifier to add
         Object[] classificationData = {repo.getComplexity(), readMe.exists() ? "1" : "0", "0", repo.getCoverage(), "1"};
         double quality = GitClassifier.classify(classificationData);
 
 
         repo.setQuality(quality);
+    }
+
+    public boolean hasRepoTests(Repo repo){
+        return findTestFiles(repo);
+    }
+
+    public boolean findTestFiles(Repo repo){
+        boolean hasTestFile = false;
+        try (Stream<Path> stream = Files.walk(Paths.get(repo.getFileName()))) {
+            hasTestFile = stream.filter(f -> f.toFile().isDirectory())
+                    .filter(f->f.getFileName().toString().matches("test(s)*"))
+                    .anyMatch(this::containsTestFile);
+        } catch (Exception e) {
+            Logger.error("Traversing project to find test files failed.", e);
+        }
+        return hasTestFile;
+    }
+
+    public boolean containsTestFile(Path testDir){
+        try (Stream<Path> walk = Files.walk(testDir)) {
+            return walk.anyMatch(path -> path.getFileName().toString().matches("(.*\\.py)|(.*\\.java)"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void deleteUsersReposWorkSpace(File workSpace){
+        try {
+            FileUtils.deleteDirectory(workSpace);
+        } catch (IOException e) {
+            Logger.error("Deleting repo workspace failed -> " + workSpace.getPath(), e);
+        }
+    }
+
+    public void storeExpertise(HashMap<String, ArrayList<Double>> scoresPerTag, User user){
+        scoresPerTag.forEach((key, value) -> {
+            double score = value.size()!=0?value.stream().mapToDouble(Double::doubleValue).sum() / value.size():1.0;
+            user.getExpertise().getGitExpertise().put(key, score);
+        });
     }
 
     public File getReadMeFile(Repo repo) {
@@ -132,7 +176,7 @@ public class GitExpertiseJob implements Runnable {
         return readMe;
     }
 
-    public void computeJavaMetrics(Repo repo) {
+    public void setJavaMetrics(Repo repo) {
         if (repo.getPresentTags().isEmpty()) return;
         JavaCyclomaticComplexity javaCyclomaticComplexity = new JavaCyclomaticComplexity(new File(repo.getFileName()));
         double complexity = javaCyclomaticComplexity.getProjectComplexity();
@@ -140,7 +184,7 @@ public class GitExpertiseJob implements Runnable {
         repo.setComplexity(complexity);
     }
 
-    public void computePythonMetrics(Repo repo) {
+    public void setPythonMetrics(Repo repo) {
         if (repo.getPresentTags().isEmpty()) return;
         PythonCyclomaticComplexity pythonCyclomaticComplexity = new PythonCyclomaticComplexity(new File(repo.getFileName()));
         double complexity = pythonCyclomaticComplexity.getProjectComplexity();
@@ -161,43 +205,42 @@ public class GitExpertiseJob implements Runnable {
         return tags;
     }
 
-    public void findTagsForPythonProject(Repo repo) {
+    public void findTagsInImportLines(Repo repo) {
         StringBuilder builder = new StringBuilder();
         try (Stream<Path> stream = Files.walk(Paths.get(repo.getFileName()))){
-            stream.filter(f -> f.getFileName().toString().matches(".*\\.py"))
+            stream.filter(f -> f.getFileName().toString().matches(".*\\.py | .*\\.java"))
                     .forEach(f -> {
-                        builder.append(getPythonImports(f));
+                        builder.append(getImportLines(f));
                     });
         } catch (IOException e) {
-            Logger.error("Traversing python project files failed.", e);
+            Logger.error("Traversing project files to find tags in imports failed.", e);
         }
 
-        addPythonTagsFromImportsFile(repo, builder.toString());
+        addTagsFromImportsFile(repo, builder.toString());
 
     }
 
-    private static synchronized void addPythonTagsFromImportsFile(Repo repo, String imports){
-        String importsFilePath = "src/main/resources/src/workspace/pythonImports.txt";
-        File importsFile = new File("src/main/resources/src/workspace/pythonImports.txt");
+    private static synchronized void addTagsFromImportsFile(Repo repo, String imports){
+        String importsFilePath = "src/main/resources/src/workspace/imports.txt";
+        File importsFile = new File("src/main/resources/src/workspace/imports.txt");
 
         try {
             Files.writeString(Path.of(importsFilePath),imports);
         } catch (IOException e) {
-            Logger.error("Writing to pythonImports.txt failed.", e);
+            Logger.error("Writing to imports.txt failed.", e);
         }
-
 
         repo.addTags(getTagsFromFile(importsFile));
     }
 
 
 
-    private String getPythonImports( Path f){
+    private String getImportLines(Path f){
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(f.toFile()));
             String line = bufferedReader.readLine();
             StringBuilder importsBuilder = new StringBuilder();
-            while (line != null && (line.startsWith("import") || line.startsWith("from") || line.startsWith(" ") || line.startsWith("#"))) {
+            while (line != null && isInImportSection(line)) {
                 if (line.startsWith("import") || line.startsWith("from")) {
                     importsBuilder.append(line).append("\n");
                 }
@@ -205,29 +248,34 @@ public class GitExpertiseJob implements Runnable {
             }
             return importsBuilder.toString();
         } catch (IOException e){
-            Logger.error("Reading imports from python file failed.", e);
+            Logger.error("Reading imports from file failed.", e);
         }
         return "";
+    }
+
+    public boolean isInImportSection(String line){
+        return line.startsWith("import") || line.startsWith("from") || line.startsWith(" ") || line.startsWith("package")
+                || line.startsWith("#") || line.startsWith("//") || line.startsWith("/*") || line.startsWith("*/");
     }
 
 
 
     public void findTagsForJavaProject(Repo repo) {
-        findTagsForPom(repo);
-        findTagsForGradle(repo);
+        File pomXML = new File(repo.getFileName() + "/pom.xml");
+        File gradleBuild = new File(repo.getFileName()+ "/build.gradle");
+
+        if(pomXML.exists())repo.addTags(getTagsFromFile(pomXML));
+        else if(gradleBuild.exists())findTagsForGradle(repo);
+        else findTagsInImportLines(repo);
     }
 
-    public void findTagsForPom(Repo repo) {
-        File pomXML = new File(repo.getFileName() + "/pom.xml");
-        repo.addTags(getTagsFromFile(pomXML));
-    }
 
     public void findTagsForGradle(Repo repo) {
         try (Stream<Path> stream = Files.walk(Paths.get(repo.getFileName()))) {
             stream.filter(f -> f.getFileName().toString().equals("build.gradle"))
                     .forEach(f -> repo.addTags(getTagsFromFile(f.toFile())));
         } catch (Exception e) {
-            System.out.println("Error traversing dir");
+            Logger.error("Traversing gradle project failed.", e);
         }
     }
 
@@ -236,13 +284,8 @@ public class GitExpertiseJob implements Runnable {
         try {
             document = Files.readString(file.toPath());
         } catch (IOException e) {
-            System.out.println("Reading failed");
+            Logger.error("Reading file failed.", e);
         }
         return (ArrayList<String>) TextRankKeyword.getKeywordList(document, 1000);
     }
-
-    public ArrayList<String> getTextRankKeywords(String file){
-        return null;
-    }
-
 }

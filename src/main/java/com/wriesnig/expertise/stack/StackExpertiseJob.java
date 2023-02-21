@@ -28,6 +28,7 @@ public class StackExpertiseJob implements Runnable {
             for (String tag : Tags.tagsToCharacterize) {
                 scoresPerTag.put(tag, new ArrayList<>());
             }
+            System.out.println(user.getMainTags());
             while (postResults.next()) {
                 String tagsOfCurrentPost = postResults.getString("tags");
                 if (tagsOfCurrentPost == null || !postTagsContainTagsToCharacterize(tagsOfCurrentPost)) continue;
@@ -47,24 +48,21 @@ public class StackExpertiseJob implements Runnable {
                 if(upVotes==0&&downVotes==0)continue;
 
 
-                String isMainTag = "0";
-                for (String tag : user.getMainTags())
-                    if (tagsOfCurrentPost.contains("<" + tag + ">")) {
-                        isMainTag = "1";
-                    }
-
-                boolean isActiveOnTag = (isMainTag.equals("1")) && userIsEstablished.equals("1");
-
-                double score = upVotes / (upVotes + downVotes);
-                double s = (double)((int)(score*100))/100.0;
-                postToClassify = new Object[]{upVotes, downVotes, s, isAccepted, isActiveOnTag?"1":"0"};
-
-
-                double expertise = StackClassifier.classify(postToClassify)+1;
+                String isMainTag;
 
                 for (String tag : Tags.tagsToCharacterize) {
-                    if (tagsOfCurrentPost.contains("<" + tag + ">"))
+                    if (tagsOfCurrentPost.contains("<" + tag + ">")){
+
+                        if (user.getMainTags().contains(tag))
+                            isMainTag = "1";
+                        else isMainTag = "0";
+                        boolean isActiveOnTag = (isMainTag.equals("1")) && userIsEstablished.equals("1");
+                        double score = upVotes / (upVotes + downVotes);
+                        double s = (double)((int)(score*100))/100.0;
+                        postToClassify = new Object[]{upVotes, downVotes, s, isAccepted, isActiveOnTag?"1":"0"};
+                        double expertise = StackClassifier.classify(postToClassify)+1;
                         scoresPerTag.get(tag).add(expertise);
+                    }
                 }
             }
 

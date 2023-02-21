@@ -53,7 +53,7 @@ public class GitExpertiseJobTest {
         Tags.tagsToCharacterize = new String[]{tag1, tag2};
         Repo repo = new Repo("repo", "", 0);
         repo.setFileName("src/main/resources/test/projects/python");
-        gitExpertiseJob.findTagsForPythonProject(repo);
+        gitExpertiseJob.findTagsInImportLines(repo);
         assertTrue(repo.getPresentTags().contains(tag1));
         assertTrue(repo.getPresentTags().contains(tag2));
     }
