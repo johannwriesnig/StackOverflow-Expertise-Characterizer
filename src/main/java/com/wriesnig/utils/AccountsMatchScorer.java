@@ -21,7 +21,8 @@ public class AccountsMatchScorer {
         score += getNameMatchingScore(stackUser.getDisplayName(), gitUser);
         score += getImageMatchingScore(stackUser.getProfileImageUrl(), gitUser.getProfileImageUrl());
         score += getLinkedWebsiteMatchingScore(stackUser, gitUser);
-        return score;
+
+        return (double)((int)(score*100))/100.0;
     }
 
     public double getNameMatchingScore(String soUserName, GitUser gitUser) {
@@ -125,8 +126,7 @@ public class AccountsMatchScorer {
     }
 
     public boolean isWebsitesMatching(StackUser stackUser, GitUser gitUser) {
-        return !stackUser.getLink().isEmpty() && stackUser.getLink().equals(gitUser.getWebsiteUrl())
-                || !stackUser.getWebsiteUrl().isEmpty() && stackUser.getWebsiteUrl().equals(gitUser.getHtmlUrl());
+        return !stackUser.getWebsiteUrl().isEmpty() && !gitUser.getWebsiteUrl().isEmpty() && stackUser.getWebsiteUrl().equals(gitUser.getWebsiteUrl());
     }
 
 }

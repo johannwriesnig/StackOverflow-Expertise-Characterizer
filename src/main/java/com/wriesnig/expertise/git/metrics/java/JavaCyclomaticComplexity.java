@@ -50,8 +50,8 @@ public class JavaCyclomaticComplexity extends CyclomaticComplexity {
                 counter++;
             }
         }
-
-        return counter==0?-1:(double)cyclomaticComplexitySum/counter;
+        double returnVal = counter==0?-1:(double)cyclomaticComplexitySum/counter;
+        return (int)(returnVal*100)/100.0;
     }
 
 }

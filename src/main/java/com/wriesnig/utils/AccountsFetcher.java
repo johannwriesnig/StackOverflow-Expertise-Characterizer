@@ -83,8 +83,7 @@ public class AccountsFetcher {
                 double score = accountsMatchScorer.getMatchingScore(stackUser, gitUser);
                 if (score > highest_match.getValue()) highest_match = new Pair<>(gitUser, score);
             }
-
-            if (highest_match.getValue() >= AccountsMatchScorer.MATCHING_NAMES_SCORE+AccountsMatchScorer.MATCHING_LINKED_WEBSITES_SCORE) {
+            if (highest_match.getValue()-(AccountsMatchScorer.MATCHING_NAMES_SCORE+AccountsMatchScorer.MATCHING_LINKED_WEBSITES_SCORE) >= -0.001) {
                 linkedAccounts.add(new Pair<>(stackUser, highest_match.getKey()));
                 Logger.info("Matched " + stackUser.getDisplayName() + "/" + highest_match.getKey().getLogin() + " with score " + highest_match.getValue()+".");
             } else {

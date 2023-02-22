@@ -113,8 +113,8 @@ public class GitExpertiseJob implements Runnable {
         repo.setCoverage(badgesAnalyser.getCoverage());
         repo.setHasTests(hasRepoTests(repo));
 
-        Logger.info("Repo: " + repo.getName() + " has following tags " + repo.getPresentTags() + " " +
-                "and following stats... Build: " + repo.getBuildStatus() + " Coverage: " + repo.getCoverage() + " Complexity: " + repo.getComplexity() + " ReadMe exists: " + readMe.exists());
+        Logger.info(repo.getFileName() + " contains " + repo.getPresentTags() +
+                " with following stats: complexity-> " + repo.getComplexity() + "; hasReadMe-> "+readMe.exists() +"; BuildStatus-> " + repo.getBuildStatus() + "; hasTests-> " + repo.isHasTests() + "; Coverage: " + repo.getCoverage() +";");
 
         GitClassifierBuilder.writeLine(repo.getComplexity() + "," + readMe.exists() + "," + (repo.getBuildStatus() != BuildStatus.FAILING) + "," + repo.isHasTests() + "," + repo.getCoverage() + ",");
         //classifier to add
