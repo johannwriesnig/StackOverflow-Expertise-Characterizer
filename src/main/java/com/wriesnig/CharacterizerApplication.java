@@ -36,7 +36,7 @@ public class CharacterizerApplication {
     }
 
     public void runExpertiseJobs(ArrayList<User> users){
-        //runStackExpertiseJob(users);
+        runStackExpertiseJob(users);
         runGitExpertiseJob(users);
     }
 
