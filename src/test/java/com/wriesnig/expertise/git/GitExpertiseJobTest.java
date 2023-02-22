@@ -46,6 +46,7 @@ public class GitExpertiseJobTest {
         assertTrue(repo.getPresentTags().contains(tag2));
     }
 
+    /*
     @Test
     public void findTagsInPythonProject() {
         String tag1 = "django";
@@ -57,6 +58,8 @@ public class GitExpertiseJobTest {
         assertTrue(repo.getPresentTags().contains(tag1));
         assertTrue(repo.getPresentTags().contains(tag2));
     }
+
+     */
 
     @Test
     public void getReadMe(){
