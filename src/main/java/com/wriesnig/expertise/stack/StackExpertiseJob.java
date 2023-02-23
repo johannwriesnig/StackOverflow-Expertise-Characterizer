@@ -28,7 +28,6 @@ public class StackExpertiseJob implements Runnable {
             for (String tag : Tags.tagsToCharacterize) {
                 scoresPerTag.put(tag, new ArrayList<>());
             }
-            System.out.println(user.getMainTags());
             while (postResults.next()) {
                 String tagsOfCurrentPost = postResults.getString("tags");
                 if (tagsOfCurrentPost == null || !postTagsContainTagsToCharacterize(tagsOfCurrentPost)) continue;

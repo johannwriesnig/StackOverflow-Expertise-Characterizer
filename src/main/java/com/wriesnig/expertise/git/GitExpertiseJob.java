@@ -6,8 +6,8 @@ import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
 import com.wriesnig.expertise.git.badges.BuildStatus;
 import com.wriesnig.expertise.git.badges.StatusBadgesAnalyser;
-import com.wriesnig.expertise.git.metrics.java.JavaCyclomaticComplexity;
-import com.wriesnig.expertise.git.metrics.python.PythonCyclomaticComplexity;
+import com.wriesnig.expertise.git.metrics.JavaMetrics;
+import com.wriesnig.expertise.git.metrics.PythonMetrics;
 import com.wriesnig.api.git.GitApi;
 import com.wriesnig.api.git.Repo;
 import com.wriesnig.utils.GitClassifierBuilder;
@@ -111,7 +111,7 @@ public class GitExpertiseJob implements Runnable {
         badgesAnalyser.initBadges();
         repo.setBuildStatus(badgesAnalyser.getBuildStatus());
         repo.setCoverage(badgesAnalyser.getCoverage());
-        repo.setHasTests(hasRepoTests(repo));
+
 
         Logger.info(repo.getFileName() + " contains " + repo.getPresentTags() +
                 " with following stats: complexity-> " + repo.getComplexity() + "; hasReadMe-> "+readMe.exists() +"; BuildStatus-> " + repo.getBuildStatus() + "; hasTests-> " + repo.isHasTests() + "; Coverage: " + repo.getCoverage() +";");
@@ -177,18 +177,13 @@ public class GitExpertiseJob implements Runnable {
     }
 
     public void setJavaMetrics(Repo repo) {
-        if (repo.getPresentTags().isEmpty()) return;
-        JavaCyclomaticComplexity javaCyclomaticComplexity = new JavaCyclomaticComplexity(new File(repo.getFileName()));
-        double complexity = javaCyclomaticComplexity.getProjectComplexity();
-        complexity = ((int) (complexity * 10)) / 10.0;
-        repo.setComplexity(complexity);
+        JavaMetrics javaMetrics = new JavaMetrics(repo);
+        javaMetrics.setMetrics();
     }
 
     public void setPythonMetrics(Repo repo) {
-        if (repo.getPresentTags().isEmpty()) return;
-        PythonCyclomaticComplexity pythonCyclomaticComplexity = new PythonCyclomaticComplexity(new File(repo.getFileName()));
-        double complexity = pythonCyclomaticComplexity.getProjectComplexity();
-        repo.setComplexity(complexity);
+        PythonMetrics pythonMetrics = new PythonMetrics(repo);
+        pythonMetrics.setMetrics();
     }
 
 

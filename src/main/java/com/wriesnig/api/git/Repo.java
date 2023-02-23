@@ -13,7 +13,8 @@ public class Repo {
     private double complexity;
     private double quality;
     private int stars;
-    private boolean hasTests;
+    private int sLoc;
+    private int testsSloc;
 
 
     public Repo(String name, String mainLanguage, int stars) {
@@ -89,10 +90,24 @@ public class Repo {
     public int getStars(){return this.stars;}
 
     public boolean isHasTests(){
-        return hasTests;
+        double ratio = testsSloc / (double)(sLoc-testsSloc);
+        return ratio>=2/3.0;
     }
 
-    public void setHasTests(boolean hasTests) {
-        this.hasTests = hasTests;
+
+    public int getsLoc() {
+        return sLoc;
+    }
+
+    public void setsLoc(int sLoc) {
+        this.sLoc = sLoc;
+    }
+
+    public int getTestsSloc() {
+        return testsSloc;
+    }
+
+    public void setTestsSloc(int testsSloc) {
+        this.testsSloc = testsSloc;
     }
 }
