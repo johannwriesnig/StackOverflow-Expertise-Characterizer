@@ -89,7 +89,8 @@ public class StatusBadgesAnalyser {
         boolean isContainsTestCoverage=false;
         for(Element text: doc.select("svg g text")) {
             String textContent = text.text().toLowerCase();
-            if (textContent.contains("coverage") || textContent.contains("codecove")) {
+            System.out.println(textContent);
+            if (textContent.contains("coverage") || textContent.contains("codecov")) {
                 isContainsTestCoverage=true;
             }
             if(isContainsTestCoverage && textContent.matches("\\d+(?:\\.\\d+)?%")){;
