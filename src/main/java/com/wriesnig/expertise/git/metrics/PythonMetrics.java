@@ -38,11 +38,6 @@ public class PythonMetrics extends MetricsSetter {
         try {
             Process process = builder.start();
             process.waitFor();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                System.out.println(line);
-            }
             content = new String(Files.readAllBytes(output.toPath()));
         } catch (IOException | InterruptedException e) {
             Logger.error("Process to compute python cc failed.", e);
@@ -121,10 +116,6 @@ public class PythonMetrics extends MetricsSetter {
     public String getSourceLinesOfCodeReport(File root, File output) {
         String content = "";
         setProcessProperties("raw", root.getAbsolutePath(), output.getAbsolutePath());
-        System.out.println(Arrays.toString(radonProcess));
-        for(String s: radonProcess)
-            System.out.print(s + " ");
-        System.out.println();
         ProcessBuilder builder = new ProcessBuilder(radonProcess);
         try {
             Process process = builder.start();
@@ -133,7 +124,6 @@ public class PythonMetrics extends MetricsSetter {
         } catch (IOException | InterruptedException e) {
             Logger.error("Process to compute source lines of code for python project " + repo.getFileName() + " failed.", e);
         }
-        System.out.println(content);
         return content;
     }
 

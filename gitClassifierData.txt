@@ -1,6 +1,0 @@
-3.0,false,303,true,true,-1.0,
-2.21,true,437,true,true,-1.0,
-3.92,false,434,true,true,-1.0,
-2.42,false,412,true,true,-1.0,
-4.4,false,1598,true,true,-1.0,
--1.0,false,26,true,true,-1.0,

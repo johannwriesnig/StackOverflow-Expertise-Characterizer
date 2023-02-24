@@ -5,7 +5,6 @@ import java.util.Arrays;
 class GitClassifier {
 
     public static double classify(Object[] i) {
-        System.out.println(Arrays.toString(i));
         double p = Double.NaN;
         p = GitClassifier.N56b562660(i);
         return p;
