@@ -4,123 +4,143 @@ import com.wriesnig.api.git.Repo;
 import com.wriesnig.utils.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
-public class PythonMetrics extends MetricsSetter{
-    private static final String pythonAbsolute;
-    static{
-        File pythonRelative = new File("tools/Python311");
-        pythonAbsolute = pythonRelative.getAbsolutePath();
-    }
+public class PythonMetrics extends MetricsSetter {
+    private static final int INDEX_RADON_TOOL = 3;
+    private static final int INDEX_RADON_COMMAND = 4;
+    private static final int INDEX_FILE_INPUT = 5;
+    private static final int INDEX_FILE_OUTPUT = 8;
+    private final String[] radonProcess = new String[]{"cmd", "/c", "python", "", "cc", "", "--json", ">", "", "&&", "echo","done"};
+
 
     public PythonMetrics(Repo repo) {
         super(repo);
+        String radonAbsolutePath = new File("tools/Python311/radon-master/radon").getAbsolutePath();
+        radonProcess[INDEX_RADON_TOOL] = radonAbsolutePath;
     }
 
     @Override
-    public void setCC() {
-        String content="";
-        File output = new File(root.getAbsolutePath()+"\\output.json");
-        ProcessBuilder builder = new ProcessBuilder("cmd", "/c", pythonAbsolute+"\\python", pythonAbsolute+"\\radon-master\\radon", "cc", root.getAbsolutePath(),"--json" ,">", output.getPath(), "&&", "echo done");
+    public void setAvgCyclomaticComplexity() {
+        String content = "";
+        File output = new File(root.getAbsolutePath() + "\\output.json");
+        setProcessProperties("cc", root.getAbsolutePath(), output.getAbsolutePath());
+        ProcessBuilder builder = new ProcessBuilder(radonProcess);
         try {
             Process process = builder.start();
             process.waitFor();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                System.out.println(line);
+            }
             content = new String(Files.readAllBytes(output.toPath()));
         } catch (IOException | InterruptedException e) {
             Logger.error("Process to compute python cc failed.", e);
-            repo.setComplexity(-1);
+            repo.setCyclomaticComplexity(-1);
             return;
         }
 
-        int counter=0;
-        int cyclomaticComplexitySum=0;
+        int counter = 0;
+        int cyclomaticComplexitySum = 0;
         JSONObject jsonObject = new JSONObject(content);
         Iterator<String> keys = jsonObject.keys();
-        while(keys.hasNext()) {
+        while (keys.hasNext()) {
             String key = keys.next();
-            if(!(jsonObject.get(key) instanceof JSONArray))continue;
-            JSONArray fileObjects= jsonObject.getJSONArray(key);
-            for(int i=0; i< fileObjects.length();i++){
+            if (!(jsonObject.get(key) instanceof JSONArray)) continue;
+            JSONArray fileObjects = jsonObject.getJSONArray(key);
+            for (int i = 0; i < fileObjects.length(); i++) {
                 JSONObject object = fileObjects.getJSONObject(i);
-                if (object.getString("type").equals("class")){
+                if (object.getString("type").equals("class")) {
                     JSONArray classMethods = object.getJSONArray("methods");
-                    for(int j=0; j<classMethods.length(); j++){
+                    for (int j = 0; j < classMethods.length(); j++) {
                         JSONObject classMethod = classMethods.getJSONObject(j);
                         int complexity = classMethod.getInt("complexity");
-                        if (complexity<2) continue;
-                        cyclomaticComplexitySum+=complexity;
+                        if (complexity < 2) continue;
+                        cyclomaticComplexitySum += complexity;
                         counter++;
                     }
-                }else{
+                } else {
                     int complexity = object.getInt("complexity");
-                    if (complexity<2) continue;
-                    cyclomaticComplexitySum+=complexity;
+                    if (complexity < 2) continue;
+                    cyclomaticComplexitySum += complexity;
                     counter++;
                 }
             }
         }
 
-        double returnVal = counter==0?-1:(double)cyclomaticComplexitySum/counter;
-        repo.setComplexity((int)(returnVal*100)/100.0);
+        double returnVal = counter == 0 ? -1 : (double) cyclomaticComplexitySum / counter;
+        repo.setCyclomaticComplexity((int) (returnVal * 100) / 100.0);
     }
 
     @Override
-    public void setSloc() {
-        File output = new File(root.getAbsolutePath()+"\\output.json");
-        setProjectSloc(output);
-        setTestsSloc(output);
+    public void setSourceLinesOfCode() {
+        File output = new File(root.getAbsolutePath() + "\\output.json");
+        setProjectSourceLinesOfCode(output);
+        setTestDirectoriesSourceLinesOfCode(output);
     }
 
-    public void setProjectSloc(File output){
-        String contentProject = getSlocReport(root, output);
-        int sLoc= parseReportForSloc(contentProject);
-        repo.setsLoc(sLoc);
+    public void setProjectSourceLinesOfCode(File output) {
+        String reportContent = getSourceLinesOfCodeReport(root, output);
+        int sourceLinesOfCode = parseReportForSourceLinesOfCode(reportContent);
+        repo.setSourceLinesOfCode(sourceLinesOfCode);
     }
 
-    public void setTestsSloc(File output){
-        ArrayList<File> testRoots = getTestRoot();
-        int testsSloc=0;
-        for(File file: testRoots){
-            String contentTests = getSlocReport(file, output);
-           testsSloc += parseReportForSloc(contentTests);
+    public void setTestDirectoriesSourceLinesOfCode(File output) {
+        ArrayList<File> testDirectories = getTestDirectories();
+        int testFilesSourceLinesOfCode = 0;
+        for (File testFile : testDirectories) {
+            String testReport = getSourceLinesOfCodeReport(testFile, output);
+            testFilesSourceLinesOfCode += parseReportForSourceLinesOfCode(testReport);
         }
 
-        repo.setTestsSloc(testsSloc);
+        repo.setTestFilesSourceLinesOfCode(testFilesSourceLinesOfCode);
     }
 
-    public int parseReportForSloc(String content){
-        int sLoc=0;
-        JSONObject jsonObject = new JSONObject(content);
-        Iterator<String> keys = jsonObject.keys();
-        while(keys.hasNext()) {
+    public int parseReportForSourceLinesOfCode(String content) {
+        int sourceLinesOfCode = 0;
+        JSONObject reportContent = new JSONObject(content);
+        Iterator<String> keys = reportContent.keys();
+        while (keys.hasNext()) {
             String key = keys.next();
-            JSONObject file = jsonObject.getJSONObject(key);
-            sLoc+=file.getInt("sloc");
+            JSONObject file = reportContent.getJSONObject(key);
+            sourceLinesOfCode += file.getInt("sloc");
         }
-        return sLoc;
+        return sourceLinesOfCode;
     }
 
-    public String getSlocReport(File root, File output){
-        String content="";
-        ProcessBuilder builder = new ProcessBuilder("cmd", "/c", pythonAbsolute+"\\python", pythonAbsolute+"\\radon-master\\radon", "raw", root.getAbsolutePath(),"--json",">", output.getPath(), "&&", "echo done");
+    public String getSourceLinesOfCodeReport(File root, File output) {
+        String content = "";
+        setProcessProperties("raw", root.getAbsolutePath(), output.getAbsolutePath());
+        System.out.println(Arrays.toString(radonProcess));
+        for(String s: radonProcess)
+            System.out.print(s + " ");
+        System.out.println();
+        ProcessBuilder builder = new ProcessBuilder(radonProcess);
         try {
             Process process = builder.start();
             process.waitFor();
-            process.destroy();
             content = new String(Files.readAllBytes(output.toPath()));
         } catch (IOException | InterruptedException e) {
-            Logger.error("Process to compute python sloc failed.", e);
+            Logger.error("Process to compute source lines of code for python project " + repo.getFileName() + " failed.", e);
         }
+        System.out.println(content);
         return content;
     }
 
+    public void setProcessProperties(String command, String inputFile, String outputFile){
+        radonProcess[INDEX_RADON_COMMAND] = command;
+        radonProcess[INDEX_FILE_INPUT] = inputFile;
+        radonProcess[INDEX_FILE_OUTPUT] = outputFile;
+    }
 
 }

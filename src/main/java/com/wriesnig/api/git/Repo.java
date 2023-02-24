@@ -10,11 +10,11 @@ public class Repo {
     private ArrayList<String> presentTags;
     private double coverage;
     private BuildStatus buildStatus;
-    private double complexity;
+    private double cyclomaticComplexity;
     private double quality;
     private int stars;
-    private int sLoc;
-    private int testsSloc;
+    private int sourceLinesOfCode;
+    private int testFilesSourceLinesOfCode;
 
 
     public Repo(String name, String mainLanguage, int stars) {
@@ -69,12 +69,12 @@ public class Repo {
         this.buildStatus = buildStatus;
     }
 
-    public double getComplexity() {
-        return complexity;
+    public double getCyclomaticComplexity() {
+        return cyclomaticComplexity;
     }
 
-    public void setComplexity(double complexity) {
-        this.complexity = complexity;
+    public void setCyclomaticComplexity(double cyclomaticComplexity) {
+        this.cyclomaticComplexity = cyclomaticComplexity;
     }
 
     public double getQuality() {
@@ -85,29 +85,24 @@ public class Repo {
         this.quality = quality;
     }
 
-    public void setStars(int stars){this.stars=stars;}
+
 
     public int getStars(){return this.stars;}
 
     public boolean isHasTests(){
-        double ratio = testsSloc / (double)(sLoc-testsSloc);
+        double ratio = testFilesSourceLinesOfCode / (double)(sourceLinesOfCode - testFilesSourceLinesOfCode);
         return ratio>=2/3.0;
     }
 
-
-    public int getsLoc() {
-        return sLoc;
+    public int getSourceLinesOfCode() {
+        return sourceLinesOfCode;
     }
 
-    public void setsLoc(int sLoc) {
-        this.sLoc = sLoc;
+    public void setSourceLinesOfCode(int sourceLinesOfCode) {
+        this.sourceLinesOfCode = sourceLinesOfCode;
     }
 
-    public int getTestsSloc() {
-        return testsSloc;
-    }
-
-    public void setTestsSloc(int testsSloc) {
-        this.testsSloc = testsSloc;
+    public void setTestFilesSourceLinesOfCode(int testFilesSourceLinesOfCode) {
+        this.testFilesSourceLinesOfCode = testFilesSourceLinesOfCode;
     }
 }

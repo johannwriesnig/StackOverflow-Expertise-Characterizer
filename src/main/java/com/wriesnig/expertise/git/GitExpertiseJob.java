@@ -122,12 +122,12 @@ public class GitExpertiseJob implements Runnable {
 
 
 
-        GitClassifierBuilder.writeLine(repo.getComplexity() + "," + repo.isHasTests() + "," + repo.getsLoc() + "," + readMe.exists() + "," + (repo.getBuildStatus() != BuildStatus.FAILING) + "," + repo.getCoverage() + ",");
-        //classifier to add
-        Object[] classificationData = {repo.getComplexity(), readMe.exists() ? "1" : "0", "0", repo.getCoverage(), "1"};
+        GitClassifierBuilder.writeLine(repo.getCyclomaticComplexity() + "," + repo.isHasTests() + "," + repo.getSourceLinesOfCode() + "," + readMe.exists() + "," + (repo.getBuildStatus() != BuildStatus.FAILING) + "," + repo.getCoverage() + ",");
+
+        Object[] classificationData = {repo.getCyclomaticComplexity(), String.valueOf(repo.isHasTests()), repo.getSourceLinesOfCode(), String.valueOf(readMe.exists()), String.valueOf(repo.getBuildStatus() != BuildStatus.FAILING), repo.getCoverage()};
         double quality = Expertise.classifierOutput[(int) GitClassifier.classify(classificationData)];
         Logger.info(repo.getFileName() + " contains " + repo.getPresentTags() +
-                " with following stats: Expertise: " + quality + ";complexity-> " + repo.getComplexity() + "; hasReadMe-> "+readMe.exists() +"; BuildStatus-> " + repo.getBuildStatus() + "; hasTests-> " + repo.isHasTests() + "; Coverage: " + repo.getCoverage() +"; Sloc: " + repo.getsLoc());
+                " with following stats: Expertise: " + quality + ";complexity-> " + repo.getCyclomaticComplexity() + "; hasReadMe-> "+readMe.exists() +"; BuildStatus-> " + repo.getBuildStatus() + "; hasTests-> " + repo.isHasTests() + "; Coverage: " + repo.getCoverage() +"; Sloc: " + repo.getSourceLinesOfCode());
 
 
         repo.setQuality(quality);

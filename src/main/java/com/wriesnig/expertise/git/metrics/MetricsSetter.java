@@ -1,4 +1,5 @@
 package com.wriesnig.expertise.git.metrics;
+
 import com.wriesnig.api.git.Repo;
 import com.wriesnig.utils.Logger;
 
@@ -9,52 +10,48 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 
 public abstract class MetricsSetter {
     protected Repo repo;
     protected File root;
 
-    public MetricsSetter(Repo repo){
+    public MetricsSetter(Repo repo) {
         this.repo = repo;
         root = new File(repo.getFileName());
     }
 
-    public void setMetrics(){
-        setSloc();
-        setCC();
+    public void setMetrics() {
+        setSourceLinesOfCode();
+        setAvgCyclomaticComplexity();
     }
 
-    public abstract void setCC();
+    public abstract void setAvgCyclomaticComplexity();
 
-    public abstract void setSloc();
+    public abstract void setSourceLinesOfCode();
 
-    public ArrayList<File> getTestRoot(){
-        ArrayList<File> testRoots = new ArrayList<>();
-        try (Stream<Path> stream = Files.walk(Paths.get(repo.getFileName()).toAbsolutePath())) {
-            List<File> files = stream.filter(f -> f.toFile().isDirectory())
+    public ArrayList<File> getTestDirectories() {
+        ArrayList<File> testDirectories = new ArrayList<>();
+        try (Stream<Path> stream = Files.walk(Paths.get(repo.getFileName()))) {
+            List<File> foundTestDirectories = stream.filter(f -> f.toFile().isDirectory())
                     .filter(f -> f.getFileName().toString().matches("test(s)*"))
-                    .filter(this::containsTestFile)
-                    .map(f->f.toFile())
+                    .filter(this::containsTestDirectory)
+                    .map(Path::toFile)
+                    .map(File::getAbsoluteFile)
                     .toList();
-
-
-            testRoots.addAll(files);
+            testDirectories.addAll(foundTestDirectories);
         } catch (Exception e) {
-            Logger.error("Traversing project to find test files failed.", e);
+            Logger.error("Traversing " + repo.getFileName() + " to find test directories failed.", e);
         }
 
-        return testRoots;
+        return testDirectories;
     }
 
-    public boolean containsTestFile(Path testDir){
-        try (Stream<Path> walk = Files.walk(testDir)) {
+    public boolean containsTestDirectory(Path testDirectory) {
+        try (Stream<Path> walk = Files.walk(testDirectory)) {
             return walk.anyMatch(path -> path.getFileName().toString().matches("(.*\\.py)|(.*\\.java)"));
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.error("Traversing " + repo.getFileName() + " test directory failed.", e);
         }
         return false;
     }
