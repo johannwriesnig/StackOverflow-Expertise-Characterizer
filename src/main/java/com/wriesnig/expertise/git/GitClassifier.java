@@ -5,28 +5,39 @@ class GitClassifier {
     public static double classify(Object[] i) {
 
         double p = Double.NaN;
-        p = GitClassifier.N592d7e1e0(i);
+        p = GitClassifier.N56b562660(i);
         return p;
     }
-    static double N592d7e1e0(Object []i) {
+    static double N56b562660(Object []i) {
         double p = Double.NaN;
-        if (i[3] == null) {
-            p = 0;
-        } else if (((Double) i[3]).doubleValue() <= 1.0) {
-            p = 0;
-        } else if (((Double) i[3]).doubleValue() > 1.0) {
-            p = GitClassifier.N1402042a1(i);
+        if (i[1] == null) {
+            p = 3;
+        } else if (i[1].equals("false")) {
+            p = GitClassifier.N655bdf651(i);
+        } else if (i[1].equals("true")) {
+            p = GitClassifier.N217e98542(i);
         }
         return p;
     }
-    static double N1402042a1(Object []i) {
+    static double N655bdf651(Object []i) {
         double p = Double.NaN;
         if (i[3] == null) {
-            p = 4;
-        } else if (((Double) i[3]).doubleValue() <= 90.0) {
-            p = 4;
-        } else if (((Double) i[3]).doubleValue() > 90.0) {
+            p = 1;
+        } else if (i[3].equals("false")) {
+            p = 1;
+        } else if (i[3].equals("true")) {
             p = 3;
+        }
+        return p;
+    }
+    static double N217e98542(Object []i) {
+        double p = Double.NaN;
+        if (i[0] == null) {
+            p = 4;
+        } else if (((Double) i[0]).doubleValue() <= 6.0) {
+            p = 4;
+        } else if (((Double) i[0]).doubleValue() > 6.0) {
+            p = 2;
         }
         return p;
     }

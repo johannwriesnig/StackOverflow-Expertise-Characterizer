@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class PythonMetrics extends MetricsSetter{
@@ -28,7 +29,7 @@ public class PythonMetrics extends MetricsSetter{
     public void setCC() {
         String content="";
         File output = new File(root.getAbsolutePath()+"\\output.json");
-        ProcessBuilder builder = new ProcessBuilder("cmd", "/c", pythonAbsolute+"\\python", pythonAbsolute+"\\radon-master\\radon", "cc", root.getAbsolutePath(),"--json", "--average",">", output.getPath(), "&&", "echo done");
+        ProcessBuilder builder = new ProcessBuilder("cmd", "/c", pythonAbsolute+"\\python", pythonAbsolute+"\\radon-master\\radon", "cc", root.getAbsolutePath(),"--json" ,">", output.getPath(), "&&", "echo done");
         try {
             Process process = builder.start();
             process.waitFor();
@@ -53,11 +54,15 @@ public class PythonMetrics extends MetricsSetter{
                     JSONArray classMethods = object.getJSONArray("methods");
                     for(int j=0; j<classMethods.length(); j++){
                         JSONObject classMethod = classMethods.getJSONObject(j);
-                        cyclomaticComplexitySum+=classMethod.getInt("complexity");
+                        int complexity = classMethod.getInt("complexity");
+                        if (complexity<2) continue;
+                        cyclomaticComplexitySum+=complexity;
                         counter++;
                     }
                 }else{
-                    cyclomaticComplexitySum+=object.getInt("complexity");
+                    int complexity = object.getInt("complexity");
+                    if (complexity<2) continue;
+                    cyclomaticComplexitySum+=complexity;
                     counter++;
                 }
             }
@@ -81,13 +86,13 @@ public class PythonMetrics extends MetricsSetter{
     }
 
     public void setTestsSloc(File output){
-        File testRoot = getTestRoot();
-        if(!testRoot.exists()){
-            repo.setTestsSloc(0);
-            return;
+        ArrayList<File> testRoots = getTestRoot();
+        int testsSloc=0;
+        for(File file: testRoots){
+            String contentTests = getSlocReport(file, output);
+           testsSloc += parseReportForSloc(contentTests);
         }
-        String contentTests = getSlocReport(getTestRoot(), output);
-        int testsSloc = parseReportForSloc(contentTests);
+
         repo.setTestsSloc(testsSloc);
     }
 

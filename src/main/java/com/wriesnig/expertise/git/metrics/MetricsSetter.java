@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -29,19 +32,22 @@ public abstract class MetricsSetter {
 
     public abstract void setSloc();
 
-    public File getTestRoot(){
-        Path testDir = Path.of("");
+    public ArrayList<File> getTestRoot(){
+        ArrayList<File> testRoots = new ArrayList<>();
         try (Stream<Path> stream = Files.walk(Paths.get(repo.getFileName()).toAbsolutePath())) {
-            Optional<Path> path = stream.filter(f -> f.toFile().isDirectory())
-                    .filter(f->f.getFileName().toString().matches("test(s)*"))
+            List<File> files = stream.filter(f -> f.toFile().isDirectory())
+                    .filter(f -> f.getFileName().toString().matches("test(s)*"))
                     .filter(this::containsTestFile)
-                    .findFirst();
-            if(path.isPresent())testDir = path.get();
+                    .map(f->f.toFile())
+                    .toList();
+
+
+            testRoots.addAll(files);
         } catch (Exception e) {
             Logger.error("Traversing project to find test files failed.", e);
         }
 
-        return testDir.toFile();
+        return testRoots;
     }
 
     public boolean containsTestFile(Path testDir){

@@ -23,8 +23,9 @@ public class CharacterizerApplication {
         //ids = new ArrayList<>(Arrays.asList(22656, 1144035, 6309, 157882, 29407, 605744, 571407, 104349, 104349, 654031, 400617));
         ids = new ArrayList<>(Arrays.asList(605744, 654031, 400617, 1663352));
         ids = new ArrayList<>(Arrays.asList(1079354,2740539));
-        ids = new ArrayList<>(Arrays.asList(22656,157882,139985,57695,203907,571407,922184,70604,1221571,276052,829571,21234,100297));
         ids = new ArrayList<>(Arrays.asList(100297));//,571407));
+        ids = new ArrayList<>(Arrays.asList(22656,157882,139985,57695,203907,571407,922184,70604,1221571,276052,829571,21234,100297));
+        ids = new ArrayList<>(Arrays.asList(276052));
         accountsFetcher = new AccountsFetcher();
     }
 

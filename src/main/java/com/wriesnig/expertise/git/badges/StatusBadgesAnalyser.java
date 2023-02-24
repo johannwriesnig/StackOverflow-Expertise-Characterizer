@@ -64,7 +64,7 @@ public class StatusBadgesAnalyser {
         boolean isContainsBuildStatus=false;
         for(Element text: doc.select("svg g text")) {
             String textContent = text.text().toLowerCase();
-            if (textContent.matches("build")) {
+            if (textContent.contains("build")) {
                 isContainsBuildStatus=true;
             }
             if(isContainsBuildStatus){
@@ -89,10 +89,10 @@ public class StatusBadgesAnalyser {
         boolean isContainsTestCoverage=false;
         for(Element text: doc.select("svg g text")) {
             String textContent = text.text().toLowerCase();
-            if (textContent.matches("coverage|codecov")) {
+            if (textContent.contains("coverage") || textContent.contains("codecove")) {
                 isContainsTestCoverage=true;
             }
-            if(isContainsTestCoverage && textContent.matches("\\d+(?:\\.\\d+)?%")){
+            if(isContainsTestCoverage && textContent.matches("\\d+(?:\\.\\d+)?%")){;
                 coverage = Double.parseDouble(textContent.replace("%",""));
                 break;
             }

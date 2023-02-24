@@ -2,6 +2,7 @@ package com.wriesnig.expertise.git;
 
 import com.hankcs.hanlp.summary.TextRankKeyword;
 import com.wriesnig.api.git.FinishRepo;
+import com.wriesnig.expertise.Expertise;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
 import com.wriesnig.expertise.git.badges.BuildStatus;
@@ -46,6 +47,13 @@ public class GitExpertiseJob implements Runnable {
         HashMap<String, ArrayList<Double>> expertisePerTag = getExpertisePerTag(repos);
         storeExpertise(expertisePerTag, user);
 
+    }
+
+    public ArrayList<Repo> reposForClassifier(){
+        ArrayList<Repo> repos = new ArrayList<>();
+        repos.add(new Repo("", "java", 0));
+
+        return repos;
     }
 
     public HashMap<String, ArrayList<Double>> getExpertisePerTag(ArrayList<Repo> repos) {
@@ -113,41 +121,16 @@ public class GitExpertiseJob implements Runnable {
         repo.setCoverage(badgesAnalyser.getCoverage());
 
 
-        Logger.info(repo.getFileName() + " contains " + repo.getPresentTags() +
-                " with following stats: complexity-> " + repo.getComplexity() + "; hasReadMe-> "+readMe.exists() +"; BuildStatus-> " + repo.getBuildStatus() + "; hasTests-> " + repo.isHasTests() + "; Coverage: " + repo.getCoverage() +";");
 
-        GitClassifierBuilder.writeLine(repo.getComplexity() + "," + readMe.exists() + "," + (repo.getBuildStatus() != BuildStatus.FAILING) + "," + repo.isHasTests() + "," + repo.getCoverage() + ",");
+        GitClassifierBuilder.writeLine(repo.getComplexity() + "," + repo.isHasTests() + "," + repo.getsLoc() + "," + readMe.exists() + "," + (repo.getBuildStatus() != BuildStatus.FAILING) + "," + repo.getCoverage() + ",");
         //classifier to add
         Object[] classificationData = {repo.getComplexity(), readMe.exists() ? "1" : "0", "0", repo.getCoverage(), "1"};
-        double quality = GitClassifier.classify(classificationData);
+        double quality = Expertise.classifierOutput[(int) GitClassifier.classify(classificationData)];
+        Logger.info(repo.getFileName() + " contains " + repo.getPresentTags() +
+                " with following stats: Expertise: " + quality + ";complexity-> " + repo.getComplexity() + "; hasReadMe-> "+readMe.exists() +"; BuildStatus-> " + repo.getBuildStatus() + "; hasTests-> " + repo.isHasTests() + "; Coverage: " + repo.getCoverage() +"; Sloc: " + repo.getsLoc());
 
 
         repo.setQuality(quality);
-    }
-
-    public boolean hasRepoTests(Repo repo){
-        return findTestFiles(repo);
-    }
-
-    public boolean findTestFiles(Repo repo){
-        boolean hasTestFile = false;
-        try (Stream<Path> stream = Files.walk(Paths.get(repo.getFileName()))) {
-            hasTestFile = stream.filter(f -> f.toFile().isDirectory())
-                    .filter(f->f.getFileName().toString().matches("test(s)*"))
-                    .anyMatch(this::containsTestFile);
-        } catch (Exception e) {
-            Logger.error("Traversing project to find test files failed.", e);
-        }
-        return hasTestFile;
-    }
-
-    public boolean containsTestFile(Path testDir){
-        try (Stream<Path> walk = Files.walk(testDir)) {
-            return walk.anyMatch(path -> path.getFileName().toString().matches("(.*\\.py)|(.*\\.java)"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
     }
 
     public void deleteUsersReposWorkSpace(File workSpace){
@@ -160,7 +143,7 @@ public class GitExpertiseJob implements Runnable {
 
     public void storeExpertise(HashMap<String, ArrayList<Double>> scoresPerTag, User user){
         scoresPerTag.forEach((key, value) -> {
-            double score = value.size()!=0?value.stream().mapToDouble(Double::doubleValue).sum() / value.size():1.0;
+            double score = value.size()!=0?value.stream().mapToDouble(Double::doubleValue).sum()/value.size():1.0;
             user.getExpertise().getGitExpertise().put(key, score);
         });
     }

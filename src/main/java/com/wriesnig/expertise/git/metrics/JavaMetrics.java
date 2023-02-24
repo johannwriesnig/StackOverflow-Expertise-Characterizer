@@ -62,7 +62,7 @@ public class JavaMetrics extends MetricsSetter {
                 int parsedVal = Integer.parseInt(numbers[numbers.length-1]);
                 switch (rule){
                     case "NcssCount":
-                        if(description.startsWith("The class"))
+                        if(!description.startsWith("The class"))
                             sLoc+= parsedVal;
                         if(inTestDir)
                             testSloc+=parsedVal;
@@ -82,19 +82,20 @@ public class JavaMetrics extends MetricsSetter {
     }
 
     private ArrayList<String> getFilesInTestDir(){
-        File testRoot = getTestRoot();
+        ArrayList<File> testRoots = getTestRoot();
         ArrayList<String> files = new ArrayList<>();
-        try (Stream<Path> stream = Files.walk(testRoot.toPath())) {
-            List<String> collect = stream
-                    .map(Path::toAbsolutePath)
-                    .map(String::valueOf)
-                    .toList();
-
-
-            files.addAll(collect);
-        } catch (IOException e){
-            Logger.error("Traversing test dir failed.",e);
+        for(File file: testRoots){
+            try (Stream<Path> stream = Files.walk(file.toPath())) {
+                List<String> collect = stream
+                        .map(Path::toAbsolutePath)
+                        .map(String::valueOf)
+                        .toList();
+                files.addAll(collect);
+            } catch (IOException e){
+                Logger.error("Traversing test dir failed.",e);
+            }
         }
+
 
         return files;
     }
