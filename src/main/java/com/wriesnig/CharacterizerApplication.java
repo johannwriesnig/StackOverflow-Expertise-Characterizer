@@ -21,12 +21,7 @@ public class CharacterizerApplication implements Observable {
     private final AccountsFetcher accountsFetcher;
 
     public CharacterizerApplication(ArrayList<Integer> ids) {
-        //Jon Skeet, Gordon Linoff, Von C, BalusC, Darin Dimitrov, Tomasz Nuzrkie(spring), jb nizet(spring), daniel roseman(django), chris pratt(django), davidism(flusk)
-        //ids = new ArrayList<>(Arrays.asList(22656, 1144035, 6309, 157882, 29407, 605744, 571407, 104349, 104349, 654031, 400617));
-        //ids = new ArrayList<>(Arrays.asList(605744, 654031, 400617, 1663352));
-        //ids = new ArrayList<>(Arrays.asList(1079354,2740539));
-        //ids = new ArrayList<>(Arrays.asList(100297));//,571407));
-        //ids = new ArrayList<>(Arrays.asList(22656,157882,139985,57695,203907,571407));//,922184,70604,1221571,276052,829571,21234,100297));
+        //22656,157882,139985,57695,203907,571407,922184,70604,1221571,276052,829571,21234,100297
 
         this.ids = ids;
         accountsFetcher = new AccountsFetcher();
@@ -41,12 +36,22 @@ public class CharacterizerApplication implements Observable {
     }
 
     public void runExpertiseJobs(ArrayList<User> users){
-        runStackExpertiseJob(users);
-        runGitExpertiseJob(users);
+        Thread stack = new Thread(()->runStackExpertiseJobs(users));
+        Thread git = new Thread(()->runGitExpertiseJobs(users));
+
+        stack.start();
+        git.start();
+
+        try {
+            stack.join();
+            git.join();
+        } catch (InterruptedException e) {
+            Logger.error("Joining expertise job threads failed. ", e);
+        }
     }
 
 
-    private void runStackExpertiseJob(ArrayList<User> users) {
+    private void runStackExpertiseJobs(ArrayList<User> users) {
         Logger.info("Running stack-expertise job.");
         StackDatabase.initDB();
         for (User user : users) {
@@ -54,7 +59,7 @@ public class CharacterizerApplication implements Observable {
         }
     }
 
-    private void runGitExpertiseJob(ArrayList<User> users) {
+    private void runGitExpertiseJobs(ArrayList<User> users) {
         Logger.info("Running git-expertise job.");
         ExecutorService executorService = Executors.newFixedThreadPool(5);
         for (User user : users) {
