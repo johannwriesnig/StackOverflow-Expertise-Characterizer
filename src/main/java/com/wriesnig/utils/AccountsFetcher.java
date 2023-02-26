@@ -12,11 +12,6 @@ import java.util.HashMap;
 
 
 public class AccountsFetcher {
-    private final AccountsMatchScorer accountsMatchScorer;
-
-    public AccountsFetcher() {
-        accountsMatchScorer = new AccountsMatchScorer();
-    }
 
     public ArrayList<User> fetchMatchingAccounts(ArrayList<Integer> stackIds) {
         ArrayList<StackUser> stackUsers = StackApi.getUsers(stackIds);
@@ -80,7 +75,8 @@ public class AccountsFetcher {
         for (StackUser stackUser : potentiallyMatchingAccounts.keySet()) {
             Pair<GitUser, Double> highest_match = new Pair<>(null, -1.0);
             for (GitUser gitUser : potentiallyMatchingAccounts.get(stackUser)) {
-                double score = accountsMatchScorer.getMatchingScore(stackUser, gitUser);
+                AccountsMatchScorer accountsMatchScorer = new AccountsMatchScorer(stackUser, gitUser);
+                double score = accountsMatchScorer.getMatchingScore();
                 if (score > highest_match.getValue()) highest_match = new Pair<>(gitUser, score);
             }
             if (highest_match.getValue()-(AccountsMatchScorer.MATCHING_NAMES_SCORE+AccountsMatchScorer.MATCHING_LINKED_WEBSITES_SCORE) >= -0.001) {

@@ -1,8 +1,6 @@
 package com.wriesnig;
 
 import com.wriesnig.api.git.DefaultGitUser;
-import com.wriesnig.api.git.GitUser;
-import com.wriesnig.api.stack.StackUser;
 import com.wriesnig.db.expertise.ExpertiseDatabase;
 import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.expertise.User;
@@ -12,9 +10,7 @@ import com.wriesnig.utils.AccountsFetcher;
 import com.wriesnig.utils.Logger;
 import com.wriesnig.gui.Observable;
 import com.wriesnig.gui.Observer;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -38,29 +34,9 @@ public class CharacterizerApplication implements Observable {
 
     public void run() {
         Logger.info("Running characterizer application.");
-        //ArrayList<User> users = accountsFetcher.fetchMatchingAccounts(ids);
-        //runExpertiseJobs(users);
-        //storeUsersExpertise(users);
-        ArrayList<User> users = new ArrayList<>();
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-
+        ArrayList<User> users = accountsFetcher.fetchMatchingAccounts(ids);
+        runExpertiseJobs(users);
+        storeUsersExpertise(users);
         notifyObservers(users);
     }
 

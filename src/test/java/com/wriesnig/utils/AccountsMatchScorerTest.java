@@ -27,6 +27,7 @@ public class AccountsMatchScorerTest {
     private final String picture1DifferentHeight = "src/main/resources/test/profileImages/Picture1DifferentHeight.jpg";
     private final String picture1DifferentWidth = "src/main/resources/test/profileImages/Picture1DifferentWidth.jpg";
 
+    /*
     @BeforeAll
     public static void deactivateLogger() {
         Logger.deactivatePrinting();
@@ -39,7 +40,7 @@ public class AccountsMatchScorerTest {
         doReturn(ImageIO.read(new File(picture2))).when(accountsMatchScorer).getImageFromUrl("Picture2");
     }
 
-    /*
+
     @Test
     public void stackMatchesGitLogin() {
         GitUser gitUser = new GitUser("jondoe", "Picture1", "Jon Doe", "htmlUrl", "websiteUrl");

@@ -15,29 +15,37 @@ public class AccountsMatchScorer {
     public static final double MATCHING_LINKED_WEBSITES_SCORE = 0.2;
     public static final double NO_MATCH_SCORE = 0;
 
+    private StackUser stackUser;
+    private GitUser gitUser;
 
-    public double getMatchingScore(StackUser stackUser, GitUser gitUser) {
+    public AccountsMatchScorer(StackUser stackUser, GitUser gitUser){
+        this.gitUser = gitUser;
+        this.stackUser = stackUser;
+    }
+
+    public double getMatchingScore() {
         double score = 0;
-        score += getNameMatchingScore(stackUser.getDisplayName(), gitUser);
-        score += getImageMatchingScore(stackUser.getProfileImageUrl(), gitUser.getProfileImageUrl());
-        score += getLinkedWebsiteMatchingScore(stackUser, gitUser);
+        score += getNameMatchingScore();
+        score += getImageMatchingScore();
+        score += getLinkedWebsiteMatchingScore();
 
         return (double)((int)(score*100))/100.0;
     }
 
-    public double getNameMatchingScore(String soUserName, GitUser gitUser) {
-        return isNamesMatching(soUserName, gitUser) ? MATCHING_NAMES_SCORE : NO_MATCH_SCORE;
+    public double getNameMatchingScore() {
+        return isNamesMatching() ? MATCHING_NAMES_SCORE : NO_MATCH_SCORE;
     }
 
-    public boolean isNamesMatching(String soUserName, GitUser gitUser) {
-        return soUserName.equals(gitUser.getLogin()) || soUserName.equals(gitUser.getName());
+    public boolean isNamesMatching() {
+        return stackUser.getDisplayName().equals(gitUser.getLogin()) || stackUser.getDisplayName().equals(gitUser.getName());
     }
 
-    public double getImageMatchingScore(String so_user_image_url, String gh_user_image_url) {
-        BufferedImage so_user_image = getImageFromUrl(so_user_image_url);
-        BufferedImage gh_user_image = getImageFromUrl(gh_user_image_url);
+    public double getImageMatchingScore() {
+        BufferedImage stackUserImage = getImageFromUrl(stackUser.getProfileImageUrl());
+        BufferedImage gitUserImage = getImageFromUrl(gitUser.getProfileImageUrl());
 
-        double images_difference = getImagesDissimilarity(so_user_image, gh_user_image);
+        stackUser.setProfileImage(stackUserImage);
+        double images_difference = getImagesDissimilarity(stackUserImage, gitUserImage);
 
         return images_difference < 8 ? MATCHING_IMAGES_SCORE : NO_MATCH_SCORE;
     }
@@ -121,11 +129,11 @@ public class AccountsMatchScorer {
         return percentage;
     }
 
-    public double getLinkedWebsiteMatchingScore(StackUser stackUser, GitUser gitUser) {
-        return isWebsitesMatching(stackUser, gitUser) ? MATCHING_LINKED_WEBSITES_SCORE : NO_MATCH_SCORE;
+    public double getLinkedWebsiteMatchingScore() {
+        return isWebsitesMatching() ? MATCHING_LINKED_WEBSITES_SCORE : NO_MATCH_SCORE;
     }
 
-    public boolean isWebsitesMatching(StackUser stackUser, GitUser gitUser) {
+    public boolean isWebsitesMatching() {
         return !stackUser.getWebsiteUrl().isEmpty() && !gitUser.getWebsiteUrl().isEmpty() && stackUser.getWebsiteUrl().equals(gitUser.getWebsiteUrl());
     }
 
