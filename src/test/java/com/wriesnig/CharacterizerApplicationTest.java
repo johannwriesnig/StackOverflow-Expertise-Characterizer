@@ -7,6 +7,7 @@ import com.wriesnig.expertise.git.GitExpertiseJob;
 import com.wriesnig.expertise.stack.StackExpertiseJob;
 import com.wriesnig.utils.AccountsFetcher;
 import com.wriesnig.utils.Logger;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,9 @@ public class CharacterizerApplicationTest {
 
     @BeforeEach
     public void setUp() {
-        characterizerApplication = new CharacterizerApplication();
+        ArrayList<Integer> ids = new ArrayList<>();
+        ids.add(1);
+        characterizerApplication = new CharacterizerApplication(ids);
     }
 
     /*

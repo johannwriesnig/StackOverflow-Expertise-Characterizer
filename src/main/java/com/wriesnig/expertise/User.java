@@ -53,4 +53,12 @@ public class User {
     public GitUser getGitUser(){
         return gitUser;
     }
+
+    public String getStackLink(){
+        return stackUser.getLink();
+    }
+
+    public String getGitLink(){
+        return gitUser.getHtmlUrl();
+    }
 }

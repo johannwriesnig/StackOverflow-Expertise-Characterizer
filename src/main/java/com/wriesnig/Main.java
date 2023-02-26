@@ -5,6 +5,7 @@ import com.wriesnig.db.stack.stackdumpsconvert.ConvertApplication;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.api.git.GitApi;
 import com.wriesnig.db.stack.StackDatabase;
+import com.wriesnig.gui.CharacterizerApplicationGui;
 import com.wriesnig.utils.Logger;
 import java.io.*;
 import java.util.Properties;
@@ -28,8 +29,8 @@ public class Main {
         setGitApiToken(properties);
         setTags(properties);
         setDbCredentials(properties);
-        startApplication();
-        closeDbConnections();
+        startApp();
+        //closeDbConnections();
     }
 
     public static void setTags(Properties properties) {
@@ -40,11 +41,6 @@ public class Main {
     public static void setGitApiToken(Properties properties) {
         String gitToken = properties.getProperty("git.token");
         GitApi.setToken(gitToken);
-    }
-
-    public static void closeDbConnections() {
-        StackDatabase.closeConnection();
-        ExpertiseDatabase.closeConnection();
     }
 
     public static void setDbCredentials(Properties properties) {
@@ -83,8 +79,12 @@ public class Main {
         return properties;
     }
 
-    public static void startApplication(){
-        CharacterizerApplication application = new CharacterizerApplication();
-        application.run();
+    public static void startApp(){
+        CharacterizerApplicationGui characterizerApplicationGui = new CharacterizerApplicationGui();
+    }
+
+    public static void closeDbConnections(){
+        StackDatabase.closeConnection();
+        ExpertiseDatabase.closeConnection();
     }
 }

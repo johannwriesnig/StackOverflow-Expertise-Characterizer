@@ -4,6 +4,7 @@ import com.wriesnig.api.git.GitApi;
 import com.wriesnig.db.expertise.ExpertiseDatabase;
 import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.db.stack.stackdumpsconvert.ConvertApplication;
+import com.wriesnig.gui.CharacterizerApplicationGui;
 import com.wriesnig.utils.Logger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -26,13 +27,11 @@ public class MainTest {
 
     @Test
     public void isConfigPropertiesSet(){
-        try (MockedConstruction<CharacterizerApplication> mocked = mockConstruction(CharacterizerApplication.class,
-                (mock, context) -> {
-                    doNothing().when(mock).run();
-                })) {
+        try (MockedConstruction<CharacterizerApplicationGui> mocked = mockConstruction(CharacterizerApplicationGui.class)) {
             Main.main(new String[]{"src/main/resources/src/testConfig.properties"});
-            CharacterizerApplication app = mocked.constructed().get(0);
-            verify(app, times(1)).run();
+            CharacterizerApplicationGui app = mocked.constructed().get(0);
+
+            /////missing;
             assertEquals("testToken", GitApi.getToken());
             assertTrue(StackDatabase.isCredentialsSet());
             assertTrue(ExpertiseDatabase.isCredentialsSet());

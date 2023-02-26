@@ -1,6 +1,8 @@
 package com.wriesnig;
 
 import com.wriesnig.api.git.DefaultGitUser;
+import com.wriesnig.api.git.GitUser;
+import com.wriesnig.api.stack.StackUser;
 import com.wriesnig.db.expertise.ExpertiseDatabase;
 import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.expertise.User;
@@ -8,32 +10,41 @@ import com.wriesnig.expertise.git.GitExpertiseJob;
 import com.wriesnig.expertise.stack.StackExpertiseJob;
 import com.wriesnig.utils.AccountsFetcher;
 import com.wriesnig.utils.Logger;
+import com.wriesnig.gui.Observable;
+import com.wriesnig.gui.Observer;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class CharacterizerApplication {
+public class CharacterizerApplication implements Observable {
+    private ArrayList<Observer> observers = new ArrayList<>();
     private ArrayList<Integer> ids;
     private final AccountsFetcher accountsFetcher;
 
-    public CharacterizerApplication() {
+    public CharacterizerApplication(ArrayList<Integer> ids) {
         //Jon Skeet, Gordon Linoff, Von C, BalusC, Darin Dimitrov, Tomasz Nuzrkie(spring), jb nizet(spring), daniel roseman(django), chris pratt(django), davidism(flusk)
         //ids = new ArrayList<>(Arrays.asList(22656, 1144035, 6309, 157882, 29407, 605744, 571407, 104349, 104349, 654031, 400617));
-        ids = new ArrayList<>(Arrays.asList(605744, 654031, 400617, 1663352));
-        ids = new ArrayList<>(Arrays.asList(1079354,2740539));
-        ids = new ArrayList<>(Arrays.asList(22656,157882,139985,57695,203907,571407,922184,70604,1221571,276052,829571,21234,100297));
-        ids = new ArrayList<>(Arrays.asList(100297));//,571407));
+        //ids = new ArrayList<>(Arrays.asList(605744, 654031, 400617, 1663352));
+        //ids = new ArrayList<>(Arrays.asList(1079354,2740539));
+        //ids = new ArrayList<>(Arrays.asList(100297));//,571407));
+        //ids = new ArrayList<>(Arrays.asList(22656,157882,139985,57695,203907,571407));//,922184,70604,1221571,276052,829571,21234,100297));
 
+        this.ids = ids;
         accountsFetcher = new AccountsFetcher();
     }
 
     public void run() {
         Logger.info("Running characterizer application.");
-        ArrayList<User> users = accountsFetcher.fetchMatchingAccounts(ids);
-        runExpertiseJobs(users);
-        storeUsersExpertise(users);
+        //ArrayList<User> users = accountsFetcher.fetchMatchingAccounts(ids);
+        //runExpertiseJobs(users);
+        //storeUsersExpertise(users);
+        ArrayList<User> users = new ArrayList<>();
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+   
+        notifyObservers(users);
     }
 
     public void runExpertiseJobs(ArrayList<User> users){
@@ -72,4 +83,15 @@ public class CharacterizerApplication {
         }
     }
 
+    @Override
+    public void addObserver(Observer observer) {
+        this.observers.add(observer);
+    }
+
+    private void notifyObservers(ArrayList<User> users){
+        for (Observer observer : this.observers) {
+            observer.notifyUpdate(users);
+        }
+
+    }
 }

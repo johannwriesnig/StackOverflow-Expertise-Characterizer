@@ -1,5 +1,6 @@
 package com.wriesnig.api.stack;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class StackUser {
@@ -11,6 +12,7 @@ public class StackUser {
     private final String profileImageUrl;
     private final int accountId;
     private ArrayList<String> mainTags;
+    private BufferedImage profileImage;
 
     public StackUser(int id, int reputation, String displayName, String websiteUrl, String link, String profileImageUrl, int accountId) {
         this.id = id;
@@ -57,5 +59,13 @@ public class StackUser {
 
     public ArrayList<String> getMainTags() {
         return mainTags;
+    }
+
+    public BufferedImage getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(BufferedImage profileImage) {
+        this.profileImage = profileImage;
     }
 }

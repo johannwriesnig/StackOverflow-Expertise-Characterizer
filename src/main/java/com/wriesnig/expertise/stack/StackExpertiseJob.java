@@ -32,6 +32,7 @@ public class StackExpertiseJob implements Runnable {
                 String tagsOfCurrentPost = postResults.getString("tags");
                 if (tagsOfCurrentPost == null || !postTagsContainTagsToCharacterize(tagsOfCurrentPost)) continue;
                 int postId = postResults.getInt("id");
+
                 ResultSet votesOfCurrentPost = StackDatabase.getVotesOfPost(postId);
 
                 double upVotes = 0;
@@ -71,11 +72,12 @@ public class StackExpertiseJob implements Runnable {
                 user.getExpertise().getStackExpertise().put(key, score);
             });
         } catch (SQLException e) {
-            Logger.error("");
+            Logger.error("Posts information retrieval failed due to sql exception.", e);
         }
 
         Logger.info("Stack expertise for " + user.getStackDisplayName() + ": " + user.getExpertise().getStackExpertise().toString()+".");
     }
+
 
     private boolean postTagsContainTagsToCharacterize(String inputStr) {
         return Arrays.stream(Tags.tagsToCharacterize).map(s -> "<" + s + ">").anyMatch(inputStr::contains);
