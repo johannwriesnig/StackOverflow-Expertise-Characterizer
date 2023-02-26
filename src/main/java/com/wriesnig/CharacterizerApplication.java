@@ -43,7 +43,24 @@ public class CharacterizerApplication implements Observable {
         //storeUsersExpertise(users);
         ArrayList<User> users = new ArrayList<>();
         users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
-   
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+        users.add(new User(new StackUser(123, 1, "Name1", "","","",1),new GitUser("","","","","")));
+
         notifyObservers(users);
     }
 

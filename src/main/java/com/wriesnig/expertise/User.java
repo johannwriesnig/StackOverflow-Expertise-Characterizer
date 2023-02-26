@@ -4,6 +4,7 @@ import com.wriesnig.api.git.DefaultGitUser;
 import com.wriesnig.api.git.GitUser;
 import com.wriesnig.api.stack.StackUser;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class User {
@@ -61,4 +62,6 @@ public class User {
     public String getGitLink(){
         return gitUser.getHtmlUrl();
     }
+
+    public BufferedImage getProfileImage(){return stackUser.getProfileImage();}
 }

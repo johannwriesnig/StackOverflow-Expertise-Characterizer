@@ -1,14 +1,10 @@
 package com.wriesnig.gui;
 
-
 import com.wriesnig.CharacterizerApplication;
 import com.wriesnig.api.git.DefaultGitUser;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
-import com.wriesnig.utils.AccountsMatchScorer;
 import com.wriesnig.utils.Logger;
-
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
@@ -16,23 +12,21 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CharacterizerApplicationGui extends JFrame implements Observer {
     private final JPanel welcomeScreen;
     private JScrollPane usersExpertisesScreen;
-    private final JPanel waitScreen;
+    private JPanel waitScreen;
     private final JPanel pane;
     private final Color backGroundColor = Color.decode("#fcfcfc");
 
-    private ArrayList<Integer> ids;
     private JTextField idsInput;
     private JButton appStartBtn;
+    private JButton backToStartBtn;
 
     public CharacterizerApplicationGui(){
         super("Characterizer");
@@ -43,13 +37,11 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         this.setLocationRelativeTo(null);
         this.setResizable(false);
 
-
         pane = new JPanel();
-        pane.setLayout(new GridLayout(0,1));
+        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+        pane.setBackground(backGroundColor);
         welcomeScreen = getWelcomeScreen();
         waitScreen = getWaitScreen();
-        usersExpertisesScreen = new JScrollPane();
-
         pane.add(welcomeScreen);
 
         this.getContentPane().add(pane);
@@ -61,17 +53,13 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         welcomeScreen.setLayout(new GridBagLayout());
         welcomeScreen.setBackground(backGroundColor);
 
-
         GridBagConstraints constraints = new GridBagConstraints();
-
 
         JLabel headLbl = new JLabel("Welcome");
         headLbl.setFont(new Font(headLbl.getFont().getName(), Font.PLAIN , 45));
-
         constraints.gridy=0;
         constraints.weighty=0.3;
         welcomeScreen.add(headLbl, constraints);
-
 
         JLabel infoLbl = new JLabel("Please provide some stackoverflow-ids separated by commas");
         infoLbl.setFont(new Font(infoLbl.getFont().getName(), Font.PLAIN , 16));
@@ -87,12 +75,10 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         welcomeScreen.add(idsInput, constraints);
 
         appStartBtn = new JButton("Start");
-
         appStartBtn.addActionListener(e -> startButtonPressed());
         constraints.ipadx = 0;
         constraints.gridy=3;
         welcomeScreen.add(appStartBtn, constraints);
-
 
         JLabel footerLbl = new JLabel("By Johann Wriesnig");
         footerLbl.setFont(new Font(footerLbl.getFont().getName(), Font.PLAIN , 11));
@@ -108,16 +94,19 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
 
     public void startButtonPressed(){
         boolean isInputCorrect = idsInput.getText().matches("\\d+(,\\d+)*");
-        if(!isInputCorrect){
+        if(!isInputCorrect)return;
 
-            return;
-        }
-        //appStartBtn.setEnabled(false);
-        pane.remove(welcomeScreen);
+        appStartBtn.setEnabled(false);
+        pane.removeAll();
         waitScreen.setVisible(true);
         pane.add(waitScreen);
-        SwingUtilities.updateComponentTreeUI(pane);
+        revalidate();
+        repaint();
 
+        startApp();
+    }
+
+    public void startApp(){
         String[] inputIdsSplit = idsInput.getText().split(",");
         ArrayList<Integer> ids = new ArrayList<>();
         for(String id: inputIdsSplit)
@@ -128,22 +117,18 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
             characterizerApplication.addObserver(this);
             characterizerApplication.run();
         });
-
         thread.start();
     }
-
 
 
     public JPanel getWaitScreen(){
         JPanel waitScreen = new JPanel();
         waitScreen.setBackground(backGroundColor);
 
-
         ImageIcon spinner = new ImageIcon(new ImageIcon("src/main/resources/src/gui/Spinner.gif").getImage().getScaledInstance(40,40, Image.SCALE_DEFAULT));
         JLabel infoLbl = new JLabel("this could take some time...", spinner,JLabel.CENTER);
         infoLbl.setFont(new Font(infoLbl.getFont().getName(), Font.PLAIN , 17));
         waitScreen.add(infoLbl);
-
 
         return waitScreen;
     }
@@ -155,44 +140,62 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         usersPanel.setLayout(new BoxLayout(usersPanel, BoxLayout.Y_AXIS));
         usersPanel.setBackground(backGroundColor);
 
-
-        GridBagConstraints constraints = new GridBagConstraints();
         for(User user: users){
             JPanel userPanel = getUserPanel(user);
             usersPanel.add(userPanel);
-            constraints.gridy++;
-
         }
-
         usersExpertisesScreen = new JScrollPane(usersPanel,  ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         usersExpertisesScreen.getVerticalScrollBar().setUnitIncrement(10);
-        pane.removeAll();
+        usersExpertisesScreen.setBorder(BorderFactory.createEmptyBorder());
         usersExpertisesScreen.setVisible(true);
+
+        JPanel btnPanel = new JPanel();
+        btnPanel.setLayout(new GridBagLayout());
+        btnPanel.setBackground(backGroundColor);
+        backToStartBtn = new JButton("Back to start");
+        backToStartBtn.addActionListener(e->backBtnPressed());
+        backToStartBtn.setMaximumSize(backToStartBtn.getPreferredSize());
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(10,0,10,0);
+        btnPanel.add(backToStartBtn, constraints);
+        btnPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) btnPanel.getPreferredSize().getHeight()));
+
+        pane.removeAll();
         pane.add(usersExpertisesScreen);
+        pane.add(btnPanel);
+        revalidate();
+        repaint();
+    }
+
+    public void backBtnPressed(){
+        pane.removeAll();
+        pane.add(welcomeScreen);
+        appStartBtn.setEnabled(true);
         revalidate();
         repaint();
     }
 
     public JPanel getUserPanel(User user){
-        JPanel userPanel = new JPanel(new GridBagLayout());
         Color borderColor = Color.decode("#DADCE0");
+        Color linkColor = Color.decode("#4287f5");
+        Color noLinkColor = Color.decode("#d41313");
+
+        JPanel userPanel = new JPanel(new GridBagLayout());
         userPanel.setBackground(backGroundColor);
         userPanel.setBorder(BorderFactory.createMatteBorder(0,0,1,0,borderColor));
-        AccountsMatchScorer accountsMatchScorer = new AccountsMatchScorer();
-        //BufferedImage image = accountsMatchScorer.getImageFromUrl(user.getProfileImageUrl());
+        BufferedImage image = user.getProfileImage();
+        ImageIcon profileImageIcon = image!=null?new ImageIcon(image):new ImageIcon("src/main/resources/src/gui/BrokenImageUrl.png");
         String displayName = user.getStackDisplayName();
         String stackLink = user.getStackLink();
         String gitLink = user.getGitLink();
 
-        Color linkColor = Color.decode("#4287f5");
-        Color noLinkColor = Color.decode("#d41313");
-        JLabel imageLbl = new JLabel(new ImageIcon(new ImageIcon("src/main/resources/src/gui/StackIcon.png").getImage().getScaledInstance(50,50, Image.SCALE_DEFAULT)));
+
+        JLabel imageLbl = new JLabel(new ImageIcon(profileImageIcon.getImage().getScaledInstance(50,50, Image.SCALE_DEFAULT)));
         JLabel nameLbl = new JLabel(displayName + "("+user.getStackId()+")");
         nameLbl.setFont(new Font(nameLbl.getFont().getName(), Font.PLAIN , 15));
 
         ImageIcon stackImage = new ImageIcon(new ImageIcon("src/main/resources/src/gui/StackIcon.png").getImage().getScaledInstance(25,25, Image.SCALE_DEFAULT));
-
-
         JLabel stackLinkLbl = new JLabel("StackOverflow ", stackImage, JLabel.CENTER);
         stackLinkLbl.setForeground(linkColor);
         stackLinkLbl.setFont(new Font(stackLinkLbl.getFont().getName(), Font.PLAIN , 13));
@@ -204,7 +207,7 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
-                    Desktop.getDesktop().browse(new URI(user.getStackLink()));
+                    Desktop.getDesktop().browse(new URI(stackLink));
 
                 } catch (IOException | URISyntaxException exception) {
                     Logger.error("Failed to open stackoverflow link in browser. ", exception);
@@ -226,7 +229,7 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     try {
-                        Desktop.getDesktop().browse(new URI(user.getGitLink()));
+                        Desktop.getDesktop().browse(new URI(gitLink));
 
                     } catch (IOException | URISyntaxException exception) {
                         Logger.error("Failed to open github link in browser. ", exception);
@@ -264,8 +267,6 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         constraints.anchor = GridBagConstraints.CENTER;
 
         HashMap<String, Double> expertise = user.getExpertise().getOverAllExpertise();
-
-
         for(String tag: Tags.tagsToCharacterize){
             constraints.insets = new Insets(8,0,0,20);
             JLabel tagLbl = new JLabel(tag);
@@ -289,6 +290,7 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         userPanel.add(filler,constraints);
 
         userPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) userPanel.getPreferredSize().getHeight()));
+
         return userPanel;
     }
 }
