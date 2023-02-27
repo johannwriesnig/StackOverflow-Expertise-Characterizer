@@ -95,7 +95,19 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
 
             public void updateStartBtn(){
                 boolean isInputCorrect = idsInput.getText().matches("\\d+(,\\d+)*");
-                appStartBtn.setEnabled(isInputCorrect);
+                if(!isInputCorrect){
+                    appStartBtn.setEnabled(false);
+                    return;
+                }
+                String[] ids = idsInput.getText().split(",");
+                String lastId = ids[ids.length-1];
+                boolean isInteger=true;
+                try{
+                    Integer.parseInt(lastId);
+                } catch(NumberFormatException e){
+                    isInteger=false;
+                }
+                appStartBtn.setEnabled(isInteger);
             }
         });
         welcomeScreen.add(idsInput, constraints);

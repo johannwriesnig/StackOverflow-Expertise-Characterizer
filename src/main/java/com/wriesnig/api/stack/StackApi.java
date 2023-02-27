@@ -12,6 +12,10 @@ import java.util.zip.GZIPInputStream;
 
 public class StackApi {
     private static final String apiUrl = "https://api.stackexchange.com/2.3/";
+    private static final int CODE_OK = 200;
+    private static final int CODE_INTERNAL_ERROR = 500;
+    private static final int CODE_THROTTLE_VIOLATION = 502;
+    private static final int CODE_TEMPORARILY_UNAVAILABLE = 503;
     private static final StackApiResponseParser responseParser = new StackApiResponseParser();
 
     private StackApi(){}
@@ -43,7 +47,17 @@ public class StackApi {
             URL getUrl = new URL(apiUrl + path);
             HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
             connection.setRequestMethod("GET");
-            return getGzipInputStream(connection);
+            int status = connection.getResponseCode();
+            if(status==CODE_OK)return new GZIPInputStream(connection.getInputStream());
+            String errorMessage = getStringFromStream(new GZIPInputStream(connection.getErrorStream()));
+            if(status == CODE_THROTTLE_VIOLATION)
+                Logger.error("Stack api throttle violation occurred. Maybe the rate limit per day is reached.");
+            else if(status == CODE_INTERNAL_ERROR)
+                Logger.error("Stack api had an internal error.");
+            else if(status == CODE_TEMPORARILY_UNAVAILABLE)
+                Logger.error("Stack api is currently unavailable.");
+                
+            throw new RuntimeException(errorMessage);
         } catch (MalformedURLException e) {
             Logger.error("Url for requesting stack-api is malformed -> " + url, e);
         } catch (IOException e) {
@@ -52,9 +66,6 @@ public class StackApi {
         return null;
     }
 
-    public static GZIPInputStream getGzipInputStream(HttpURLConnection connection) throws IOException {
-        return new GZIPInputStream(connection.getInputStream());
-    }
 
     public static String getStringFromStream(GZIPInputStream inputStream) {
         if(inputStream==null)return "";
