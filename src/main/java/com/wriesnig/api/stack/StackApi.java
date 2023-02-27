@@ -1,5 +1,6 @@
 package com.wriesnig.api.stack;
 
+import com.wriesnig.expertise.User;
 import com.wriesnig.utils.Logger;
 import org.json.JSONObject;
 import java.io.*;
@@ -7,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
@@ -21,15 +23,26 @@ public class StackApi {
     private StackApi(){}
 
     public static ArrayList<StackUser> getUsers(ArrayList<Integer> ids) {
-        String idsList = ids.stream().map(Object::toString)
-                .collect(Collectors.joining(";"));
-
-        String path = "users/" + idsList + "?site=stackoverflow";
-        GZIPInputStream apiStream = getStreamFromAPICall(path);
-        String stream = getStringFromStream(apiStream);
-        JSONObject usersAsJson = new JSONObject(stream);
-
-        return responseParser.parseUsersResponse(usersAsJson);
+        ArrayList<StackUser> users = new ArrayList<>();
+        int maxIdsPerRequest = 100;
+        for(int i=1; i<=(ids.size()/maxIdsPerRequest)+1;i++){
+            ArrayList<Integer> partOfIds = new ArrayList<>();
+            Iterator<Integer> iterator = ids.iterator();
+            int counter=1;
+            while(iterator.hasNext() && counter++ <= maxIdsPerRequest){
+                partOfIds.add(iterator.next());
+                iterator.remove();
+            }
+            String idsList = partOfIds.stream().map(Object::toString)
+                    .collect(Collectors.joining(";"));
+            String path = "users/" + idsList + "?site=stackoverflow&pagesize="+maxIdsPerRequest;
+            GZIPInputStream apiStream = getStreamFromAPICall(path);
+            String stream = getStringFromStream(apiStream);
+            JSONObject usersAsJson = new JSONObject(stream);
+            users.addAll(responseParser.parseUsersResponse(usersAsJson));
+        }
+       
+        return users;
     }
 
     public static ArrayList<String> getMainTags(int id) {
