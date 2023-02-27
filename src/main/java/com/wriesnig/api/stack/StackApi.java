@@ -19,6 +19,7 @@ public class StackApi {
     private static final int CODE_THROTTLE_VIOLATION = 502;
     private static final int CODE_TEMPORARILY_UNAVAILABLE = 503;
     private static final StackApiResponseParser responseParser = new StackApiResponseParser();
+    public static String key = "";
 
     private StackApi(){}
 
@@ -41,7 +42,6 @@ public class StackApi {
             JSONObject usersAsJson = new JSONObject(stream);
             users.addAll(responseParser.parseUsersResponse(usersAsJson));
         }
-       
         return users;
     }
 
@@ -55,21 +55,22 @@ public class StackApi {
     }
 
     public static GZIPInputStream getStreamFromAPICall(String path) {
-        String url = apiUrl + path;
+        String url = apiUrl + path + "&key="+key;
         try {
-            URL getUrl = new URL(apiUrl + path);
+            URL getUrl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
             connection.setRequestMethod("GET");
             int status = connection.getResponseCode();
             if(status==CODE_OK)return new GZIPInputStream(connection.getInputStream());
             String errorMessage = getStringFromStream(new GZIPInputStream(connection.getErrorStream()));
+            JSONObject errorMessageJson = new JSONObject(errorMessage);
+            status = errorMessageJson.getInt("error_id");
             if(status == CODE_THROTTLE_VIOLATION)
                 Logger.error("Stack api throttle violation occurred. Maybe the rate limit per day is reached.");
             else if(status == CODE_INTERNAL_ERROR)
                 Logger.error("Stack api had an internal error.");
             else if(status == CODE_TEMPORARILY_UNAVAILABLE)
                 Logger.error("Stack api is currently unavailable.");
-
             throw new RuntimeException(errorMessage);
         } catch (MalformedURLException e) {
             Logger.error("Url for requesting stack-api is malformed -> " + url, e);
@@ -95,6 +96,8 @@ public class StackApi {
         return stringBuilder.toString();
     }
 
-
+    public static void setKey(String key){
+        StackApi.key = key;
+    }
 
 }

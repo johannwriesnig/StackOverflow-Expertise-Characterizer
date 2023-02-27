@@ -1,5 +1,6 @@
 package com.wriesnig;
 
+import com.wriesnig.api.stack.StackApi;
 import com.wriesnig.db.expertise.ExpertiseDatabase;
 import com.wriesnig.db.stack.stackdumpsconvert.ConvertApplication;
 import com.wriesnig.expertise.Tags;
@@ -27,6 +28,7 @@ public class Main {
         Logger.info("Setting properties.");
         Properties properties = getPropertiesFromConfigFile(args[0]);
         setGitApiToken(properties);
+        setStackApiKey(properties);
         setTags(properties);
         setDbCredentials(properties);
         startApp();
@@ -41,6 +43,11 @@ public class Main {
     public static void setGitApiToken(Properties properties) {
         String gitToken = properties.getProperty("git.token");
         GitApi.setToken(gitToken);
+    }
+
+    public static void setStackApiKey(Properties properties){
+        String stackKey = properties.getProperty("stack.key");
+        StackApi.setKey(stackKey);
     }
 
     public static void setDbCredentials(Properties properties) {
