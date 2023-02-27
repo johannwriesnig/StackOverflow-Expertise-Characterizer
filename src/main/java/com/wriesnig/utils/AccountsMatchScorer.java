@@ -26,7 +26,7 @@ public class AccountsMatchScorer {
     public double getMatchingScore() {
         double score = 0;
         score += getNameMatchingScore();
-        score += getImageMatchingScore();
+        score += getImageMatchingScore(stackUser, gitUser);
         score += getLinkedWebsiteMatchingScore();
 
         return (double)((int)(score*100))/100.0;
@@ -40,23 +40,21 @@ public class AccountsMatchScorer {
         return stackUser.getDisplayName().equals(gitUser.getLogin()) || stackUser.getDisplayName().equals(gitUser.getName());
     }
 
-    public double getImageMatchingScore() {
+    public double getImageMatchingScore(StackUser stackUser, GitUser gitUser) {
         BufferedImage stackUserImage = getImageFromUrl(stackUser.getProfileImageUrl());
         BufferedImage gitUserImage = getImageFromUrl(gitUser.getProfileImageUrl());
 
-        stackUser.setProfileImage(stackUserImage);
         double images_difference = getImagesDissimilarity(stackUserImage, gitUserImage);
 
         return images_difference < 8 ? MATCHING_IMAGES_SCORE : NO_MATCH_SCORE;
     }
 
-    public BufferedImage getImageFromUrl(String imageUrl) {
+    public static BufferedImage getImageFromUrl(String imageUrl) {
         imageUrl = adaptUrlForStandardImageSize(imageUrl);
         return readImageFromUrl(imageUrl);
     }
 
-    public BufferedImage readImageFromUrl(String imageUrl){
-        System.out.println(imageUrl);
+    public static BufferedImage readImageFromUrl(String imageUrl){
         BufferedImage image = null;
         try {
             URL url = new URL(imageUrl);
@@ -69,7 +67,7 @@ public class AccountsMatchScorer {
         return image;
     }
 
-    public String adaptUrlForStandardImageSize(String imageUrl){
+    public static String adaptUrlForStandardImageSize(String imageUrl){
         if (imageUrl.contains("google"))
             imageUrl = imageUrl.replaceAll("=k-s\\d*", "=k-s256");
         else {
