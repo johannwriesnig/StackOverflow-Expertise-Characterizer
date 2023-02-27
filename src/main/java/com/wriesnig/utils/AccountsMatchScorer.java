@@ -56,6 +56,7 @@ public class AccountsMatchScorer {
     }
 
     public BufferedImage readImageFromUrl(String imageUrl){
+        System.out.println(imageUrl);
         BufferedImage image = null;
         try {
             URL url = new URL(imageUrl);

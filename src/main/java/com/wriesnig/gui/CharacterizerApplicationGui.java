@@ -7,6 +7,8 @@ import com.wriesnig.expertise.User;
 import com.wriesnig.utils.Logger;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -68,13 +70,38 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         constraints.insets = new Insets(0,0,10,0);
         welcomeScreen.add(infoLbl, constraints);
 
+
         idsInput = new JTextField();
         idsInput.setFont(new Font(idsInput.getFont().getName(), Font.PLAIN , 13));
         constraints.gridy=2;
-        constraints.ipadx = 200;
+        idsInput.setPreferredSize(new Dimension(250,22));
+        idsInput.setMaximumSize(idsInput.getPreferredSize());
+        idsInput.setMinimumSize(idsInput.getPreferredSize());
+        idsInput.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateStartBtn();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateStartBtn();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateStartBtn();
+            }
+
+            public void updateStartBtn(){
+                boolean isInputCorrect = idsInput.getText().matches("\\d+(,\\d+)*");
+                appStartBtn.setEnabled(isInputCorrect);
+            }
+        });
         welcomeScreen.add(idsInput, constraints);
 
         appStartBtn = new JButton("Start");
+        appStartBtn.setEnabled(false);
         appStartBtn.addActionListener(e -> startButtonPressed());
         constraints.ipadx = 0;
         constraints.gridy=3;
@@ -93,9 +120,6 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
     }
 
     public void startButtonPressed(){
-        boolean isInputCorrect = idsInput.getText().matches("\\d+(,\\d+)*");
-        if(!isInputCorrect)return;
-
         appStartBtn.setEnabled(false);
         pane.removeAll();
         waitScreen.setVisible(true);
