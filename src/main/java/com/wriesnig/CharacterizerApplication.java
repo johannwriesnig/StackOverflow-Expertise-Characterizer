@@ -11,6 +11,9 @@ import com.wriesnig.utils.Logger;
 import com.wriesnig.gui.Observable;
 import com.wriesnig.gui.Observer;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -29,11 +32,13 @@ public class CharacterizerApplication implements Observable {
 
     public void run() {
         Logger.info("Running characterizer application.");
+        StackDatabase.initDB();
         ArrayList<User> users = accountsFetcher.fetchMatchingAccounts(ids);
         runExpertiseJobs(users);
         storeUsersExpertise(users);
         notifyObservers(users);
     }
+
 
     public void runExpertiseJobs(ArrayList<User> users){
         Thread stack = new Thread(()->runStackExpertiseJobs(users));
@@ -53,7 +58,6 @@ public class CharacterizerApplication implements Observable {
 
     private void runStackExpertiseJobs(ArrayList<User> users) {
         Logger.info("Running stack-expertise job.");
-        StackDatabase.initDB();
         for (User user : users) {
             new StackExpertiseJob(user).run();
         }

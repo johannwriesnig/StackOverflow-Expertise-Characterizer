@@ -13,6 +13,7 @@ public class StackDatabase {
     private static Connection connection;
     private static PreparedStatement selectPosts;
     private static PreparedStatement selectPostVotes;
+    private static PreparedStatement selectUsersExisting;
 
 
     private StackDatabase(){}
@@ -33,6 +34,8 @@ public class StackDatabase {
                     "where v3.PostId=p.id and v3.VoteTypeId=1) as isAccepted " +
                     "from posts p  " +
                     "where id=?");
+            selectUsersExisting = connection.prepareStatement("SELECT " +
+                    "1 FROM Users WHERE id=?");
         } catch (SQLException e) {
             Logger.error("Accessing stack-database failed.", e);
             throw new RuntimeException();
@@ -63,7 +66,8 @@ public class StackDatabase {
             selectPosts.setInt(1, userId);
             resultSet = selectPosts.executeQuery();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            Logger.error("Querying stack-database for posts from user failed.", e);
+            throw new RuntimeException();
         }
 
         return resultSet;
@@ -75,10 +79,25 @@ public class StackDatabase {
             selectPostVotes.setInt(1, postId);
             resultSet = selectPostVotes.executeQuery();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            Logger.error("Querying stack-database for votes of post failed.", e);
+            throw new RuntimeException();
         }
 
         return resultSet;
+    }
+
+    public static boolean isIdExisting(int id){
+        boolean isUserExisting;
+        try {
+            selectUsersExisting.setInt(1, id);
+            ResultSet resultSet = selectUsersExisting.executeQuery();
+            isUserExisting = resultSet.isBeforeFirst();
+        } catch (SQLException e) {
+            Logger.error("Querying stack-database for isUserExisting failed.", e);
+            throw new RuntimeException();
+        }
+
+        return isUserExisting;
     }
 
     public static boolean isCredentialsSet(){

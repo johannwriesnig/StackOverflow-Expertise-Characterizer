@@ -16,8 +16,9 @@ import java.util.zip.ZipInputStream;
 
 public class GitApi {
     private final static String apiUrl = "https://api.github.com/";
-    private final static GitApiResponseParser responseParser = new GitApiResponseParser();
+    private static final int CODE_RESOURCE_NOT_FOUND = 404;
     private static String token;
+    private final static GitApiResponseParser responseParser = new GitApiResponseParser();
 
 
     private GitApi() {
@@ -60,7 +61,10 @@ public class GitApi {
             HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
-            return getInputStream(connection);
+            if(connection.getResponseCode() == CODE_RESOURCE_NOT_FOUND)
+                return connection.getErrorStream();
+
+            return connection.getInputStream();
         } catch (MalformedURLException e) {
             Logger.error("Url for requesting git-api is malformed -> " + url, e);
         } catch (IOException e) {
@@ -69,10 +73,6 @@ public class GitApi {
         return InputStream.nullInputStream();
     }
 
-    //Since cannot mock UrlConnection
-    public static InputStream getInputStream(HttpURLConnection connection) throws IOException {
-        return connection.getInputStream();
-    }
 
     public static String getStringFromStream(InputStream inputStream) {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));

@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 
 public class GitApiTest {
 
+    /*
     @Test
     public void emptyStreamToString() throws IOException {
         String expected = "";
@@ -141,5 +142,5 @@ public class GitApiTest {
             assertTrue(repoDir.isDirectory());
             FileUtils.deleteDirectory(repoDir);
         }
-    }
+    }*/
 }

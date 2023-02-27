@@ -56,7 +56,7 @@ public class StackApi {
                 Logger.error("Stack api had an internal error.");
             else if(status == CODE_TEMPORARILY_UNAVAILABLE)
                 Logger.error("Stack api is currently unavailable.");
-                
+
             throw new RuntimeException(errorMessage);
         } catch (MalformedURLException e) {
             Logger.error("Url for requesting stack-api is malformed -> " + url, e);
