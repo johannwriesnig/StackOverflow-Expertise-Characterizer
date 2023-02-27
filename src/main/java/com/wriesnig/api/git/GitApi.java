@@ -47,11 +47,21 @@ public class GitApi {
     }
 
     public static ArrayList<Repo> getReposByLogin(String login) {
-        String path = "users/" + login + "/repos?type=all";
-        InputStream apiStream = getStreamFromAPICall(path);
-        JSONArray repos = new JSONArray(getStringFromStream(apiStream));
+        int reposPerPage=100;
+        int pageCounter=1;
 
-        return responseParser.parseReposByLogin(repos);
+        ArrayList<Repo> repos = new ArrayList<>();
+        ArrayList<Repo> reposLimitedByPageSize;
+
+        do{
+            String path = "users/" + login + "/repos?type=all&per_page="+reposPerPage+"&page="+ pageCounter++;
+            InputStream apiStream = getStreamFromAPICall(path);
+            JSONArray reposJson = new JSONArray(getStringFromStream(apiStream));
+            reposLimitedByPageSize = responseParser.parseReposByLogin(reposJson);
+            repos.addAll(reposLimitedByPageSize);
+        } while(reposLimitedByPageSize.size()==reposPerPage);
+
+        return repos;
     }
 
     public static InputStream getStreamFromAPICall(String path) {

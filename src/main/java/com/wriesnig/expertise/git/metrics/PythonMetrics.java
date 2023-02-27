@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 public class PythonMetrics extends MetricsSetter {
     private static final int INDEX_RADON_TOOL = 3;
@@ -37,7 +38,13 @@ public class PythonMetrics extends MetricsSetter {
         ProcessBuilder builder = new ProcessBuilder(radonProcess);
         try {
             Process process = builder.start();
-            process.waitFor();
+            Logger.info("Process started " + root.getAbsolutePath());
+            boolean processPassed = process.waitFor(1, TimeUnit.MINUTES);
+            if(!processPassed){
+                repo.setCyclomaticComplexity(-1);
+                process.destroy();
+                return;
+            }
             content = new String(Files.readAllBytes(output.toPath()));
         } catch (IOException | InterruptedException e) {
             Logger.error("Process to compute python cc failed.", e);
@@ -108,7 +115,7 @@ public class PythonMetrics extends MetricsSetter {
         while (keys.hasNext()) {
             String key = keys.next();
             JSONObject file = reportContent.getJSONObject(key);
-            sourceLinesOfCode += file.getInt("sloc");
+            sourceLinesOfCode += file.has("sloc")?file.getInt("sloc"):0;
         }
         return sourceLinesOfCode;
     }
@@ -119,7 +126,11 @@ public class PythonMetrics extends MetricsSetter {
         ProcessBuilder builder = new ProcessBuilder(radonProcess);
         try {
             Process process = builder.start();
-            process.waitFor();
+            boolean processPassed = process.waitFor(1, TimeUnit.MINUTES);
+            if(!processPassed){
+                process.destroy();
+                return "";
+            }
             content = new String(Files.readAllBytes(output.toPath()));
         } catch (IOException | InterruptedException e) {
             Logger.error("Process to compute source lines of code for python project " + repo.getFileName() + " failed.", e);

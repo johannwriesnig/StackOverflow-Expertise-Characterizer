@@ -1,6 +1,7 @@
 package com.wriesnig.expertise.git;
 
 import com.hankcs.hanlp.summary.TextRankKeyword;
+import com.wriesnig.api.git.DefaultGitUser;
 import com.wriesnig.api.git.FinishRepo;
 import com.wriesnig.expertise.Expertise;
 import com.wriesnig.expertise.Tags;
@@ -21,8 +22,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 import java.util.stream.Stream;
 
 public class GitExpertiseJob implements Runnable {
@@ -44,6 +44,7 @@ public class GitExpertiseJob implements Runnable {
         downloadReposInNewThread(repos, userReposPath, downloadedRepos);
         determineReposExpertise(downloadedRepos, userReposPath);
         deleteUsersReposWorkSpace(new File(userReposPath));
+        repos.removeIf(repo-> repo.getCyclomaticComplexity()==-1 || repo.getSourceLinesOfCode()==0);
         HashMap<String, ArrayList<Double>> expertisePerTag = getExpertisePerTag(repos);
         storeExpertise(expertisePerTag, user);
 
@@ -69,7 +70,7 @@ public class GitExpertiseJob implements Runnable {
     }
 
     public void cleanseRepos(ArrayList<Repo> repos) {
-        repos.removeIf(repo -> !Arrays.asList(Tags.tagsToCharacterize).contains(repo.getMainLanguage()));
+        repos.removeIf(repo -> repo.isForked() || !Arrays.asList(Tags.tagsToCharacterize).contains(repo.getMainLanguage()));
     }
 
     public void downloadReposInNewThread(ArrayList<Repo> repos, String userReposPath, BlockingQueue<Repo> downloadedRepos){
@@ -90,11 +91,19 @@ public class GitExpertiseJob implements Runnable {
     }
 
     public void tryDetermineReposExpertise(BlockingQueue<Repo> downloadedRepos, String userReposPath) throws IOException, InterruptedException {
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+
         Repo currentRepo;
         while (!((currentRepo = downloadedRepos.take()) instanceof FinishRepo)) {
             currentRepo.setFileName(userReposPath + currentRepo.getFileName());
-            determineExpertise(currentRepo);
-            FileUtils.deleteDirectory(new File(currentRepo.getFileName()));
+            executorService.execute(new RepoExpertiseJob(currentRepo));
+        }
+
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(24, TimeUnit.HOURS);
+        } catch (InterruptedException e) {
+            Logger.error("Expertise thread was interrupted.", e);
         }
     }
 
@@ -266,4 +275,23 @@ public class GitExpertiseJob implements Runnable {
         }
         return (ArrayList<String>) TextRankKeyword.getKeywordList(document, 1000);
     }
+
+    class RepoExpertiseJob extends Thread{
+        private Repo repo;
+
+        public RepoExpertiseJob(Repo repo){
+            this.repo=repo;
+        }
+
+        @Override
+        public void run() {
+            determineExpertise(repo);
+            try {
+                FileUtils.deleteDirectory(new File(repo.getFileName()));
+            } catch (IOException e) {
+                Logger.error("Could not delete repo directory -> "+ repo.getFileName(), e);
+            }
+        }
+    }
 }
+

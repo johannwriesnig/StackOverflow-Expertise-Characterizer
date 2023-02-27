@@ -15,6 +15,7 @@ public class Repo {
     private int stars;
     private int sourceLinesOfCode;
     private int testFilesSourceLinesOfCode;
+    private boolean isForked;
 
 
     public Repo(String name, String mainLanguage, int stars) {
@@ -86,7 +87,6 @@ public class Repo {
     }
 
 
-
     public int getStars(){return this.stars;}
 
     public boolean isHasTests(){
@@ -104,5 +104,13 @@ public class Repo {
 
     public void setTestFilesSourceLinesOfCode(int testFilesSourceLinesOfCode) {
         this.testFilesSourceLinesOfCode = testFilesSourceLinesOfCode;
+    }
+
+    public boolean isForked() {
+        return isForked;
+    }
+
+    public void setForked(boolean forked) {
+        isForked = forked;
     }
 }
