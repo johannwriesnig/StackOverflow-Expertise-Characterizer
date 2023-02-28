@@ -88,11 +88,12 @@ public class AccountsFetcher {
             }
         }
 
+        AccountsMatchScorer accountsMatchScorer = new AccountsMatchScorer(null, null);
         ArrayList<User> users = new ArrayList<>();
         for (Pair<StackUser, GitUser> matching_accounts : linkedAccounts) {
             StackUser stackUser = matching_accounts.getKey();
             GitUser gitUser = matching_accounts.getValue();
-            stackUser.setProfileImage(AccountsMatchScorer.getImageFromUrl(stackUser.getProfileImageUrl()));
+            stackUser.setProfileImage(accountsMatchScorer.getImageFromUrl(stackUser.getProfileImageUrl()));
             users.add(new User(stackUser, gitUser));
         }
 

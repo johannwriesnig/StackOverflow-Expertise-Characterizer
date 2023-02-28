@@ -1,11 +1,11 @@
 package com.wriesnig.api.git;
 
 public class GitUser {
-    private final String login;
-    private final String profileImageUrl;
-    private final String name;
-    private final String htmlUrl;
-    private final String websiteUrl;
+    private String login;
+    private String profileImageUrl;
+    private String name;
+    private String htmlUrl;
+    private String websiteUrl;
 
     public GitUser(String login, String profileImageUrl, String name, String htmlUrl, String websiteUrl) {
         this.login = login;
@@ -33,5 +33,25 @@ public class GitUser {
 
     public String getWebsiteUrl() {
         return websiteUrl;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setHtmlUrl(String htmlUrl) {
+        this.htmlUrl = htmlUrl;
+    }
+
+    public void setWebsiteUrl(String websiteUrl) {
+        this.websiteUrl = websiteUrl;
     }
 }

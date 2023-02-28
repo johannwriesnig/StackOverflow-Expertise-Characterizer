@@ -6,11 +6,11 @@ import java.util.ArrayList;
 public class StackUser {
     private final int id;
     private final int reputation;
-    private final String displayName;
-    private final String websiteUrl;
-    private final String link;
-    private final String profileImageUrl;
     private final int accountId;
+    private String displayName;
+    private String websiteUrl;
+    private String link;
+    private String profileImageUrl;
     private ArrayList<String> mainTags;
     private BufferedImage profileImage;
 
@@ -67,5 +67,21 @@ public class StackUser {
 
     public void setProfileImage(BufferedImage profileImage) {
         this.profileImage = profileImage;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public void setWebsiteUrl(String websiteUrl) {
+        this.websiteUrl = websiteUrl;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }

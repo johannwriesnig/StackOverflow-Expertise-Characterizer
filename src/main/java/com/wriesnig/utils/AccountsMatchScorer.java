@@ -15,8 +15,8 @@ public class AccountsMatchScorer {
     public static final double MATCHING_LINKED_WEBSITES_SCORE = 0.2;
     public static final double NO_MATCH_SCORE = 0;
 
-    private StackUser stackUser;
-    private GitUser gitUser;
+    private final StackUser stackUser;
+    private final GitUser gitUser;
 
     public AccountsMatchScorer(StackUser stackUser, GitUser gitUser){
         this.gitUser = gitUser;
@@ -49,12 +49,12 @@ public class AccountsMatchScorer {
         return images_difference < 8 ? MATCHING_IMAGES_SCORE : NO_MATCH_SCORE;
     }
 
-    public static BufferedImage getImageFromUrl(String imageUrl) {
+    public BufferedImage getImageFromUrl(String imageUrl) {
         imageUrl = adaptUrlForStandardImageSize(imageUrl);
         return readImageFromUrl(imageUrl);
     }
 
-    public static BufferedImage readImageFromUrl(String imageUrl){
+    public BufferedImage readImageFromUrl(String imageUrl){
         BufferedImage image = null;
         try {
             URL url = new URL(imageUrl);
@@ -67,7 +67,7 @@ public class AccountsMatchScorer {
         return image;
     }
 
-    public static String adaptUrlForStandardImageSize(String imageUrl){
+    public String adaptUrlForStandardImageSize(String imageUrl){
         if (imageUrl.contains("google"))
             imageUrl = imageUrl.replaceAll("=k-s\\d*", "=k-s256");
         else {

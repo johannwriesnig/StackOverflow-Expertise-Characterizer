@@ -2,18 +2,15 @@ package com.wriesnig;
 
 import com.wriesnig.api.git.DefaultGitUser;
 import com.wriesnig.db.expertise.ExpertiseDatabase;
-import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.expertise.User;
 import com.wriesnig.expertise.git.GitExpertiseJob;
 import com.wriesnig.expertise.stack.StackExpertiseJob;
-import com.wriesnig.utils.AccountsFetcher;
-import com.wriesnig.utils.Logger;
 import com.wriesnig.gui.Observable;
 import com.wriesnig.gui.Observer;
+import com.wriesnig.utils.AccountsFetcher;
+import com.wriesnig.utils.Logger;
+
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -21,18 +18,16 @@ import java.util.concurrent.TimeUnit;
 public class CharacterizerApplication implements Observable {
     private ArrayList<Observer> observers = new ArrayList<>();
     private ArrayList<Integer> ids;
-    private final AccountsFetcher accountsFetcher;
+
 
     public CharacterizerApplication(ArrayList<Integer> ids) {
         //22656,157882,139985,57695,203907,571407,922184,70604,1221571,276052,829571,21234,100297
-
         this.ids = ids;
-        accountsFetcher = new AccountsFetcher();
     }
 
     public void run() {
         Logger.info("Running characterizer application.");
-        StackDatabase.initDB();
+        AccountsFetcher accountsFetcher = new AccountsFetcher();
         ArrayList<User> users = accountsFetcher.fetchMatchingAccounts(ids);
         runExpertiseJobs(users);
         storeUsersExpertise(users);
@@ -52,18 +47,19 @@ public class CharacterizerApplication implements Observable {
             git.join();
         } catch (InterruptedException e) {
             Logger.error("Joining expertise job threads failed. ", e);
+            throw new RuntimeException();
         }
     }
 
 
-    private void runStackExpertiseJobs(ArrayList<User> users) {
+    public void runStackExpertiseJobs(ArrayList<User> users) {
         Logger.info("Running stack-expertise job.");
         for (User user : users) {
             new StackExpertiseJob(user).run();
         }
     }
 
-    private void runGitExpertiseJobs(ArrayList<User> users) {
+    public void runGitExpertiseJobs(ArrayList<User> users) {
         Logger.info("Running git-expertise job.");
         ExecutorService executorService = Executors.newFixedThreadPool(5);
         for (User user : users) {
@@ -71,15 +67,15 @@ public class CharacterizerApplication implements Observable {
         }
         executorService.shutdown();
         try {
-            executorService.awaitTermination(1, TimeUnit.HOURS);
+            executorService.awaitTermination(24L, TimeUnit.HOURS);
         } catch (InterruptedException e) {
-            Logger.error("Expertise thread was interrupted.", e);
+            Logger.error("Git expertise thread was interrupted.", e);
+            throw new RuntimeException();
         }
     }
 
 
     public void storeUsersExpertise(ArrayList<User> users){
-        ExpertiseDatabase.initDB();
         for(User user: users){
             ExpertiseDatabase.insertUser(user);
         }
@@ -90,10 +86,9 @@ public class CharacterizerApplication implements Observable {
         this.observers.add(observer);
     }
 
-    private void notifyObservers(ArrayList<User> users){
+    public void notifyObservers(ArrayList<User> users){
         for (Observer observer : this.observers) {
             observer.notifyUpdate(users);
         }
-
     }
 }
