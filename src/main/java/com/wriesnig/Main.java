@@ -24,7 +24,6 @@ public class Main {
             convertApplication.run();
             return;
         }
-
         Logger.info("Setting properties.");
         Properties properties = getPropertiesFromConfigFile(args[0]);
         setGitApiToken(properties);
@@ -32,7 +31,6 @@ public class Main {
         setTags(properties);
         setDbCredentials(properties);
         startApp();
-        //closeDbConnections();
     }
 
     public static void setTags(Properties properties) {
@@ -87,11 +85,6 @@ public class Main {
     }
 
     public static void startApp(){
-        CharacterizerApplicationGui characterizerApplicationGui = new CharacterizerApplicationGui();
-    }
-
-    public static void closeDbConnections(){
-        StackDatabase.closeConnection();
-        ExpertiseDatabase.closeConnection();
+        new CharacterizerApplicationGui();
     }
 }

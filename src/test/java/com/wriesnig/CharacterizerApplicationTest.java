@@ -1,26 +1,15 @@
 package com.wriesnig;
 
-import com.wriesnig.db.expertise.ExpertiseDatabase;
-import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.expertise.User;
 import com.wriesnig.expertise.git.GitExpertiseJob;
 import com.wriesnig.expertise.stack.StackExpertiseJob;
 import com.wriesnig.utils.AccountsFetcher;
-import com.wriesnig.utils.Logger;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
-import org.mockito.MockedStatic;
-
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 public class CharacterizerApplicationTest {
     private CharacterizerApplication characterizerApplication;
