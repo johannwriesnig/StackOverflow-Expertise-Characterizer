@@ -133,8 +133,9 @@ public class AccountsMatchScorer {
     }
 
     public boolean isWebsitesMatching() {
-        return !stackUser.getWebsiteUrl().isEmpty() && !gitUser.getWebsiteUrl().isEmpty() && (stackUser.getWebsiteUrl().equals(gitUser.getWebsiteUrl())
-                || stackUser.getLink().equals(gitUser.getWebsiteUrl())) || stackUser.getWebsiteUrl().equals(gitUser.getHtmlUrl());
+        return !stackUser.getWebsiteUrl().isEmpty() && stackUser.getWebsiteUrl().equals(gitUser.getWebsiteUrl())
+                || !stackUser.getLink().isEmpty() && stackUser.getLink().equals(gitUser.getWebsiteUrl())
+                || !stackUser.getWebsiteUrl().isEmpty() && stackUser.getWebsiteUrl().equals(gitUser.getHtmlUrl());
     }
 
 }

@@ -56,7 +56,7 @@ public class AccountsMatchScorerTest {
         double actualScore = accountsMatchScorer.getMatchingScore();
         double expectedScore = AccountsMatchScorer.MATCHING_NAMES_SCORE;
 
-        assertEquals(expectedScore, actualScore);
+        assertEquals(expectedScore, actualScore, 0.001);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class AccountsMatchScorerTest {
         double actualScore = accountsMatchScorer.getMatchingScore();
         double expectedScore = AccountsMatchScorer.MATCHING_NAMES_SCORE;
 
-        assertEquals(expectedScore, actualScore);
+        assertEquals(expectedScore, actualScore, 0.001);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class AccountsMatchScorerTest {
         double actualScore = accountsMatchScorer.getMatchingScore();
         double expectedScore = AccountsMatchScorer.MATCHING_NAMES_SCORE + AccountsMatchScorer.MATCHING_IMAGES_SCORE;
 
-        assertEquals(expectedScore, actualScore);
+        assertEquals(expectedScore, actualScore, 0.001);
     }
 
     @Test
