@@ -29,15 +29,14 @@ public class PythonMetrics extends MetricsSetter {
     }
 
     public void callRadonProcess(String command, File input, File output) throws InterruptedException, IOException {
-        System.out.println("hallo");
         setProcessProperties(command, input.getAbsolutePath(), output.getAbsolutePath());
         ProcessBuilder builder = new ProcessBuilder(radonProcess);
 
         Process process = builder.start();
         Logger.info("Radon Process started for " + root.getAbsolutePath());
-        boolean processPassed = process.waitFor(1, TimeUnit.SECONDS);
+        boolean processPassed = process.waitFor(1, TimeUnit.MINUTES);
+        process.destroy();
         if (!processPassed) {
-            process.destroy();
             throw new InterruptedException();
         }
     }

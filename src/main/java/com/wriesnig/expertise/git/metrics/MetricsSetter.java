@@ -44,7 +44,6 @@ public abstract class MetricsSetter {
             Logger.error("Traversing " + repo.getFileName() + " to find test directories failed.", e);
         }
 
-        System.out.println(testDirectories);
         return testDirectories;
     }
 
