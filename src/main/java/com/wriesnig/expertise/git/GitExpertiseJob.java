@@ -1,8 +1,9 @@
 package com.wriesnig.expertise.git;
 
 import com.hankcs.hanlp.summary.TextRankKeyword;
-import com.wriesnig.api.git.DefaultGitUser;
 import com.wriesnig.api.git.FinishRepo;
+import com.wriesnig.api.git.GitApi;
+import com.wriesnig.api.git.Repo;
 import com.wriesnig.expertise.Expertise;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
@@ -10,12 +11,14 @@ import com.wriesnig.expertise.git.badges.BuildStatus;
 import com.wriesnig.expertise.git.badges.StatusBadgesAnalyser;
 import com.wriesnig.expertise.git.metrics.JavaMetrics;
 import com.wriesnig.expertise.git.metrics.PythonMetrics;
-import com.wriesnig.api.git.GitApi;
-import com.wriesnig.api.git.Repo;
 import com.wriesnig.utils.GitClassifierBuilder;
 import com.wriesnig.utils.Logger;
 import org.apache.commons.io.FileUtils;
-import java.io.*;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,7 +50,6 @@ public class GitExpertiseJob implements Runnable {
         repos.removeIf(repo-> repo.getCyclomaticComplexity()==-1 || repo.getSourceLinesOfCode()==0);
         HashMap<String, ArrayList<Double>> expertisePerTag = getExpertisePerTag(repos);
         storeExpertise(expertisePerTag, user);
-
     }
 
     public ArrayList<Repo> reposForClassifier(){
@@ -153,6 +155,7 @@ public class GitExpertiseJob implements Runnable {
     public void storeExpertise(HashMap<String, ArrayList<Double>> scoresPerTag, User user){
         scoresPerTag.forEach((key, value) -> {
             double score = value.size()!=0?value.stream().mapToDouble(Double::doubleValue).sum()/value.size():1.0;
+            score = (double)((int)(score*100))/100.0;
             user.getExpertise().getGitExpertise().put(key, score);
         });
     }
@@ -195,7 +198,7 @@ public class GitExpertiseJob implements Runnable {
     public void findTagsInImportLines(Repo repo) {
         StringBuilder builder = new StringBuilder();
         try (Stream<Path> stream = Files.walk(Paths.get(repo.getFileName()))){
-            stream.filter(f -> f.getFileName().toString().matches(".*\\.py | .*\\.java"))
+            stream.filter(f -> f.getFileName().toString().matches(".*\\.py|.*\\.java"))
                     .forEach(f -> {
                         builder.append(getImportLines(f));
                     });
@@ -204,7 +207,6 @@ public class GitExpertiseJob implements Runnable {
         }
 
         addTagsFromImportsFile(repo, builder.toString());
-
     }
 
     private static synchronized void addTagsFromImportsFile(Repo repo, String imports){
