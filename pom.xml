@@ -41,7 +41,7 @@
                     <excludes>
                         <exclude>com/wriesnig/expertise/stack/StackClassifier.class</exclude>
                         <exclude>com/wriesnig/expertise/git/GitClassifier.class</exclude>
-                        <exclude>com/wriesnig/expertise/git/metrics/**</exclude>
+                        <exclude>com/wriesnig/gui/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
