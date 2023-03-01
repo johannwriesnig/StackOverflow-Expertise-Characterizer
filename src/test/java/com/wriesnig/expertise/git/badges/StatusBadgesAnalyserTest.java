@@ -1,6 +1,5 @@
 package com.wriesnig.expertise.git.badges;
 
-import com.wriesnig.expertise.stack.StackExpertiseJob;
 import com.wriesnig.utils.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +10,6 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

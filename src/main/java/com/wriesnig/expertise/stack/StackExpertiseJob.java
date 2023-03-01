@@ -85,7 +85,7 @@ public class StackExpertiseJob implements Runnable {
     }
 
 
-    private boolean postTagsContainTagsToCharacterize(String inputStr) {
+    public boolean postTagsContainTagsToCharacterize(String inputStr) {
         return Arrays.stream(Tags.tagsToCharacterize).map(s -> "<" + s + ">").anyMatch(inputStr::contains);
     }
 }
