@@ -80,7 +80,7 @@ public class GitApiTest {
             verify(bufferedReader, times(1)).read();
         }
     }
-    
+
 
 
     @Test

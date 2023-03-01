@@ -1,9 +1,11 @@
 package com.wriesnig.api.stack;
 
-import com.wriesnig.expertise.User;
 import com.wriesnig.utils.Logger;
 import org.json.JSONObject;
-import java.io.*;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,15 +15,15 @@ import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 public class StackApi {
-    private static final String apiUrl = "https://api.stackexchange.com/2.3/";
-    private static final int CODE_OK = 200;
-    private static final int CODE_INTERNAL_ERROR = 500;
-    private static final int CODE_THROTTLE_VIOLATION = 502;
-    private static final int CODE_TEMPORARILY_UNAVAILABLE = 503;
+    public static final String apiUrl = "https://api.stackexchange.com/2.3/";
+    public static final int CODE_OK = 200;
+    public static final int CODE_BAD_REQUEST = 400;
+    public static final int CODE_INTERNAL_ERROR = 500;
+    public static final int CODE_THROTTLE_VIOLATION = 502;
+    public static final int CODE_TEMPORARILY_UNAVAILABLE = 503;
     private static final StackApiResponseParser responseParser = new StackApiResponseParser();
     public static String key = "";
 
-    private StackApi(){}
 
     public static ArrayList<StackUser> getUsers(ArrayList<Integer> ids) {
         ArrayList<StackUser> users = new ArrayList<>();
@@ -57,7 +59,7 @@ public class StackApi {
     public static GZIPInputStream getStreamFromAPICall(String path) {
         String url = apiUrl + path + "&key="+key;
         try {
-            URL getUrl = new URL(url);
+            URL getUrl = getUrl(url);
             HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
             connection.setRequestMethod("GET");
             int status = connection.getResponseCode();
@@ -78,6 +80,10 @@ public class StackApi {
             Logger.error("Processing stack-api input stream failed.", e);
         }
         return null;
+    }
+
+    public static URL getUrl(String url) throws MalformedURLException {
+        return new URL(url);
     }
 
 
