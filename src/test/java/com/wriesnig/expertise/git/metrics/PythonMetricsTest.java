@@ -36,7 +36,7 @@ public class PythonMetricsTest {
     @Test
     public void ccIsSetAfterExecution() throws IOException, InterruptedException {
         doNothing().when(spyPythonMetrics).callRadonProcess(anyString(),any(),any());
-        Path path = Path.of(repo.getFileName() + "\\ccOutput.json");
+        Path path = Path.of(repo.getFileName() + "/ccOutput.json");
         byte[] content = Files.readAllBytes(path);
 
         try(MockedStatic<Files> mockedFiles = mockStatic(Files.class)){
@@ -48,7 +48,7 @@ public class PythonMetricsTest {
     @Test
     public void slocIsSetAfterExecution() throws IOException, InterruptedException {
         doNothing().when(spyPythonMetrics).callRadonProcess(anyString(),any(),any());
-        Path path = Path.of(repo.getFileName() + "\\slocOutput.json");
+        Path path = Path.of(repo.getFileName() + "/slocOutput.json");
         byte[] content = Files.readAllBytes(path);
 
         try(MockedStatic<Files> mockedFiles = mockStatic(Files.class)){
@@ -61,10 +61,10 @@ public class PythonMetricsTest {
     public void testDirsSlocIsSetAfterExecution() throws IOException, InterruptedException {
         doNothing().when(spyPythonMetrics).callRadonProcess(anyString(),any(),any());
         ArrayList<File> testDirs = new ArrayList<>();
-        testDirs.add(new File(repo.getFileName()+"\\module1\\tests"));
-        testDirs.add(new File(repo.getFileName()+"\\module2\\tests"));
+        testDirs.add(new File(repo.getFileName()+"/module1/tests"));
+        testDirs.add(new File(repo.getFileName()+"/module2/tests"));
         doReturn(testDirs).when(spyPythonMetrics).getTestDirectories();
-        Path path = Path.of(repo.getFileName() + "\\testsSlocOutput.json");
+        Path path = Path.of(repo.getFileName() + "/testsSlocOutput.json");
         byte[] content = Files.readAllBytes(path);
 
         try(MockedStatic<Files> mockedFiles = mockStatic(Files.class)){
