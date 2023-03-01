@@ -113,4 +113,8 @@ public class Repo {
     public void setForked(boolean forked) {
         isForked = forked;
     }
+
+    public int getTestFilesSourceLinesOfCode() {
+        return testFilesSourceLinesOfCode;
+    }
 }

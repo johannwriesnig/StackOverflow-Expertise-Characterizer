@@ -1,0 +1,29 @@
+{
+    "C:\\Users\\43664\\Desktop\\Uni\\Bachelor\\7.Semester-\u00dcbergang\\Softwarepraktikum\\SO_User_Expertise_Characterizer\\src\\main\\resources\\test\\metrics\\pythonRepo\\module1\\__init__.py": {
+        "loc": 32,
+        "lloc": 10,
+        "sloc": 10,
+        "comments": 13,
+        "multi": 0,
+        "blank": 9,
+        "single_comments": 13
+    },
+    "C:\\Users\\43664\\Desktop\\Uni\\Bachelor\\7.Semester-\u00dcbergang\\Softwarepraktikum\\SO_User_Expertise_Characterizer\\src\\main\\resources\\test\\metrics\\pythonRepo\\module1\\tests\\test.py": {
+        "loc": 20,
+        "lloc": 14,
+        "sloc": 14,
+        "comments": 1,
+        "multi": 0,
+        "blank": 5,
+        "single_comments": 1
+    },
+    "C:\\Users\\43664\\Desktop\\Uni\\Bachelor\\7.Semester-\u00dcbergang\\Softwarepraktikum\\SO_User_Expertise_Characterizer\\src\\main\\resources\\test\\metrics\\pythonRepo\\module2\\tests\\test.py": {
+        "loc": 14,
+        "lloc": 9,
+        "sloc": 11,
+        "comments": 0,
+        "multi": 0,
+        "blank": 3,
+        "single_comments": 0
+    }
+}

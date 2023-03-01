@@ -1,0 +1,172 @@
+{
+    "C:\\Users\\43664\\Desktop\\Uni\\Bachelor\\7.Semester-\u00dcbergang\\Softwarepraktikum\\SO_User_Expertise_Characterizer\\src\\main\\resources\\test\\metrics\\pythonRepo\\module1\\__init__.py": [
+        {
+            "type": "function",
+            "rank": "A",
+            "endline": 18,
+            "lineno": 4,
+            "complexity": 2,
+            "col_offset": 0,
+            "name": "_sum",
+            "closures": []
+        }
+    ],
+    "C:\\Users\\43664\\Desktop\\Uni\\Bachelor\\7.Semester-\u00dcbergang\\Softwarepraktikum\\SO_User_Expertise_Characterizer\\src\\main\\resources\\test\\metrics\\pythonRepo\\module1\\tests\\test.py": [
+        {
+            "type": "class",
+            "rank": "A",
+            "endline": 17,
+            "lineno": 3,
+            "complexity": 2,
+            "col_offset": 0,
+            "name": "TestStringMethods",
+            "methods": [
+                {
+                    "type": "method",
+                    "rank": "A",
+                    "endline": 6,
+                    "classname": "TestStringMethods",
+                    "lineno": 5,
+                    "complexity": 1,
+                    "col_offset": 4,
+                    "name": "test_upper",
+                    "closures": []
+                },
+                {
+                    "type": "method",
+                    "rank": "A",
+                    "endline": 10,
+                    "classname": "TestStringMethods",
+                    "lineno": 8,
+                    "complexity": 1,
+                    "col_offset": 4,
+                    "name": "test_isupper",
+                    "closures": []
+                },
+                {
+                    "type": "method",
+                    "rank": "A",
+                    "endline": 17,
+                    "classname": "TestStringMethods",
+                    "lineno": 12,
+                    "complexity": 1,
+                    "col_offset": 4,
+                    "name": "test_split",
+                    "closures": []
+                }
+            ]
+        },
+        {
+            "type": "method",
+            "rank": "A",
+            "endline": 6,
+            "classname": "TestStringMethods",
+            "lineno": 5,
+            "complexity": 1,
+            "col_offset": 4,
+            "name": "test_upper",
+            "closures": []
+        },
+        {
+            "type": "method",
+            "rank": "A",
+            "endline": 10,
+            "classname": "TestStringMethods",
+            "lineno": 8,
+            "complexity": 1,
+            "col_offset": 4,
+            "name": "test_isupper",
+            "closures": []
+        },
+        {
+            "type": "method",
+            "rank": "A",
+            "endline": 17,
+            "classname": "TestStringMethods",
+            "lineno": 12,
+            "complexity": 1,
+            "col_offset": 4,
+            "name": "test_split",
+            "closures": []
+        }
+    ],
+    "C:\\Users\\43664\\Desktop\\Uni\\Bachelor\\7.Semester-\u00dcbergang\\Softwarepraktikum\\SO_User_Expertise_Characterizer\\src\\main\\resources\\test\\metrics\\pythonRepo\\module2\\tests\\test.py": [
+        {
+            "type": "class",
+            "rank": "A",
+            "endline": 14,
+            "lineno": 3,
+            "complexity": 2,
+            "col_offset": 0,
+            "name": "WidgetTestCase",
+            "methods": [
+                {
+                    "type": "method",
+                    "rank": "A",
+                    "endline": 5,
+                    "classname": "WidgetTestCase",
+                    "lineno": 4,
+                    "complexity": 1,
+                    "col_offset": 4,
+                    "name": "setUp",
+                    "closures": []
+                },
+                {
+                    "type": "method",
+                    "rank": "A",
+                    "endline": 9,
+                    "classname": "WidgetTestCase",
+                    "lineno": 7,
+                    "complexity": 1,
+                    "col_offset": 4,
+                    "name": "test_default_widget_size",
+                    "closures": []
+                },
+                {
+                    "type": "method",
+                    "rank": "A",
+                    "endline": 14,
+                    "classname": "WidgetTestCase",
+                    "lineno": 11,
+                    "complexity": 1,
+                    "col_offset": 4,
+                    "name": "test_widget_resize",
+                    "closures": []
+                }
+            ]
+        },
+        {
+            "type": "method",
+            "rank": "A",
+            "endline": 5,
+            "classname": "WidgetTestCase",
+            "lineno": 4,
+            "complexity": 1,
+            "col_offset": 4,
+            "name": "setUp",
+            "closures": []
+        },
+        {
+            "type": "method",
+            "rank": "A",
+            "endline": 9,
+            "classname": "WidgetTestCase",
+            "lineno": 7,
+            "complexity": 1,
+            "col_offset": 4,
+            "name": "test_default_widget_size",
+            "closures": []
+        },
+        {
+            "type": "method",
+            "rank": "A",
+            "endline": 14,
+            "classname": "WidgetTestCase",
+            "lineno": 11,
+            "complexity": 1,
+            "col_offset": 4,
+            "name": "test_widget_resize",
+            "closures": []
+        }
+    ]
+}

@@ -2,6 +2,7 @@ package com.wriesnig;
 
 import com.wriesnig.api.git.DefaultGitUser;
 import com.wriesnig.db.expertise.ExpertiseDatabase;
+import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.expertise.User;
 import com.wriesnig.expertise.git.GitExpertiseJob;
 import com.wriesnig.expertise.stack.StackExpertiseJob;
@@ -27,6 +28,7 @@ public class CharacterizerApplication implements Observable {
 
     public void run() {
         Logger.info("Running characterizer application.");
+        StackDatabase.initDB();
         AccountsFetcher accountsFetcher = new AccountsFetcher();
         ArrayList<User> users = accountsFetcher.fetchMatchingAccounts(ids);
         runExpertiseJobs(users);
@@ -76,6 +78,7 @@ public class CharacterizerApplication implements Observable {
 
 
     public void storeUsersExpertise(ArrayList<User> users){
+        ExpertiseDatabase.initDB();
         for(User user: users){
             ExpertiseDatabase.insertUser(user);
         }

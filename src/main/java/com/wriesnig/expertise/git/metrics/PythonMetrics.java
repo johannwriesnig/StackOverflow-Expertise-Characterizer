@@ -4,24 +4,22 @@ import com.wriesnig.api.git.Repo;
 import com.wriesnig.utils.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 public class PythonMetrics extends MetricsSetter {
+    private static final String RADON_CYCLOMATIC_COMPLEXITY = "cc";
+    private static final String RADON_SOURCE_LINES_OF_CODE = "raw";
     private static final int INDEX_RADON_TOOL = 3;
     private static final int INDEX_RADON_COMMAND = 4;
     private static final int INDEX_FILE_INPUT = 5;
     private static final int INDEX_FILE_OUTPUT = 8;
-    private final String[] radonProcess = new String[]{"cmd", "/c", "python", "", "cc", "", "--json", ">", "", "&&", "echo","done"};
+    private final String[] radonProcess = new String[]{"cmd", "/c", "python", "", "cc", "", "--json", ">", "", "&&", "echo", "done"};
 
 
     public PythonMetrics(Repo repo) {
@@ -30,25 +28,30 @@ public class PythonMetrics extends MetricsSetter {
         radonProcess[INDEX_RADON_TOOL] = radonAbsolutePath;
     }
 
+    public void callRadonProcess(String command, File input, File output) throws InterruptedException, IOException {
+        System.out.println("hallo");
+        setProcessProperties(command, input.getAbsolutePath(), output.getAbsolutePath());
+        ProcessBuilder builder = new ProcessBuilder(radonProcess);
+
+        Process process = builder.start();
+        Logger.info("Radon Process started for " + root.getAbsolutePath());
+        boolean processPassed = process.waitFor(1, TimeUnit.SECONDS);
+        if (!processPassed) {
+            process.destroy();
+            throw new InterruptedException();
+        }
+    }
+
     @Override
     public void setAvgCyclomaticComplexity() {
-        String content = "";
+        String content;
         File output = new File(root.getAbsolutePath() + "\\output.json");
-        setProcessProperties("cc", root.getAbsolutePath(), output.getAbsolutePath());
-        ProcessBuilder builder = new ProcessBuilder(radonProcess);
-        try {
-            Process process = builder.start();
-            Logger.info("Process started " + root.getAbsolutePath());
-            boolean processPassed = process.waitFor(1, TimeUnit.MINUTES);
-            if(!processPassed){
-                repo.setCyclomaticComplexity(-1);
-                process.destroy();
-                return;
-            }
+        try{
+            callRadonProcess(RADON_CYCLOMATIC_COMPLEXITY, root, output);
             content = new String(Files.readAllBytes(output.toPath()));
-        } catch (IOException | InterruptedException e) {
-            Logger.error("Process to compute python cc failed.", e);
+        } catch (IOException|InterruptedException e){
             repo.setCyclomaticComplexity(-1);
+            Logger.error("Radon Process for " + root.getAbsolutePath() + " failed.", e);
             return;
         }
 
@@ -115,30 +118,25 @@ public class PythonMetrics extends MetricsSetter {
         while (keys.hasNext()) {
             String key = keys.next();
             JSONObject file = reportContent.getJSONObject(key);
-            sourceLinesOfCode += file.has("sloc")?file.getInt("sloc"):0;
+            sourceLinesOfCode += file.has("sloc") ? file.getInt("sloc") : 0;
         }
         return sourceLinesOfCode;
     }
 
     public String getSourceLinesOfCodeReport(File root, File output) {
-        String content = "";
-        setProcessProperties("raw", root.getAbsolutePath(), output.getAbsolutePath());
-        ProcessBuilder builder = new ProcessBuilder(radonProcess);
-        try {
-            Process process = builder.start();
-            boolean processPassed = process.waitFor(1, TimeUnit.MINUTES);
-            if(!processPassed){
-                process.destroy();
-                return "";
-            }
+        String content;
+        try{
+            callRadonProcess(RADON_SOURCE_LINES_OF_CODE, root, output);
             content = new String(Files.readAllBytes(output.toPath()));
-        } catch (IOException | InterruptedException e) {
-            Logger.error("Process to compute source lines of code for python project " + repo.getFileName() + " failed.", e);
+        } catch (IOException|InterruptedException e){
+            Logger.error("Radon Process raw failed for " + root.getAbsolutePath() + ".", e);
+            return "";
         }
+
         return content;
     }
 
-    public void setProcessProperties(String command, String inputFile, String outputFile){
+    public void setProcessProperties(String command, String inputFile, String outputFile) {
         radonProcess[INDEX_RADON_COMMAND] = command;
         radonProcess[INDEX_FILE_INPUT] = inputFile;
         radonProcess[INDEX_FILE_OUTPUT] = outputFile;

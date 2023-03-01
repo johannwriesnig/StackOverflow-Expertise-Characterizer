@@ -4,6 +4,7 @@ import com.wriesnig.api.git.DefaultGitUser;
 import com.wriesnig.api.git.GitUser;
 import com.wriesnig.api.stack.StackUser;
 import com.wriesnig.db.expertise.ExpertiseDatabase;
+import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.expertise.User;
 import com.wriesnig.expertise.git.GitExpertiseJob;
 import com.wriesnig.expertise.stack.StackExpertiseJob;
@@ -40,7 +41,8 @@ public class CharacterizerApplicationTest {
 
     @Test
     public void runIsCallingHelper(){
-        try (MockedConstruction<AccountsFetcher> mockedAccountsFetcher = mockConstruction(AccountsFetcher.class);
+        try (MockedStatic<StackDatabase> mockedDb = mockStatic(StackDatabase.class);
+             MockedConstruction<AccountsFetcher> mockedAccountsFetcher = mockConstruction(AccountsFetcher.class);
              MockedConstruction<CharacterizerApplication> mockedApp = mockConstruction(CharacterizerApplication.class,
                      (mock,context)->{
                         doCallRealMethod().when(mock).run();
