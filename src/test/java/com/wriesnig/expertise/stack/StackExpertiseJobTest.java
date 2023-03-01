@@ -7,12 +7,16 @@ import com.wriesnig.expertise.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 public class StackExpertiseJobTest {
     private StackExpertiseJob stackExpertiseJob;
@@ -40,6 +44,24 @@ public class StackExpertiseJobTest {
         Tags.tagsToCharacterize = new String[]{"java","ruby"};
         String postTags = "<java><c#><python>";
         assertTrue(stackExpertiseJob.postTagsContainTagsToCharacterize(postTags));
+    }
+
+    @Test
+    public void getScoresPerTagFromPosts() throws SQLException {
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.next()).thenReturn(true).thenReturn(false);
+        when(resultSet.getInt("upVotes")).thenReturn(5);
+        when(resultSet.getInt("downVotes")).thenReturn(0);
+        when(resultSet.getString("isAccepted")).thenReturn("1");
+        when(resultSet.getString("tags")).thenReturn("<java>");
+        Tags.tagsToCharacterize = new String[]{"java"};
+
+        try(MockedStatic<StackClassifier> mockedClassifier = mockStatic(StackClassifier.class)){
+            HashMap<String, ArrayList<Double>> scoresPerTag = stackExpertiseJob.getScoresPerTagFromPosts(resultSet);
+            assertEquals(1, scoresPerTag.keySet().size());
+            assertTrue(scoresPerTag.containsKey("java"));
+            mockedClassifier.verify(()->StackClassifier.classify(any()), times(1));
+        }
     }
 
     @Test

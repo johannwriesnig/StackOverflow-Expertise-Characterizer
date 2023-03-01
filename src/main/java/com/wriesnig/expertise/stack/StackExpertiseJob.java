@@ -24,7 +24,7 @@ public class StackExpertiseJob implements Runnable {
         HashMap<String, ArrayList<Double>> scoresPerTag;
 
         try {
-            scoresPerTag = getScoresPerTag(postResults);
+            scoresPerTag = getScoresPerTagFromPosts(postResults);
         } catch (SQLException e) {
             Logger.error("Posts information retrieval failed due to sql exception.", e);
             throw new RuntimeException();
@@ -33,7 +33,7 @@ public class StackExpertiseJob implements Runnable {
         Logger.info("Stack expertise for " + user.getStackDisplayName() + ": " + user.getExpertise().getStackExpertise().toString()+".");
     }
 
-    public HashMap<String, ArrayList<Double>> getScoresPerTag(ResultSet postResults) throws SQLException {
+    public HashMap<String, ArrayList<Double>> getScoresPerTagFromPosts(ResultSet postResults) throws SQLException {
         HashMap<String, ArrayList<Double>> scoresPerTag = getEmptyScoresPerTag();
         Object[] postToClassify;
         String userIsEstablished = String.valueOf(user.getIsEstablishedOnStack());
