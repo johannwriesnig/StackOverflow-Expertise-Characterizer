@@ -15,10 +15,7 @@ import com.wriesnig.utils.GitClassifierBuilder;
 import com.wriesnig.utils.Logger;
 import org.apache.commons.io.FileUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -94,7 +91,6 @@ public class GitExpertiseJob implements Runnable {
 
     public void tryDetermineReposExpertise(BlockingQueue<Repo> downloadedRepos, String userReposPath) throws IOException, InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(3);
-
         Repo currentRepo;
         while (!((currentRepo = downloadedRepos.take()) instanceof FinishRepo)) {
             currentRepo.setFileName(userReposPath + currentRepo.getFileName());
@@ -130,8 +126,6 @@ public class GitExpertiseJob implements Runnable {
         badgesAnalyser.initBadges();
         repo.setBuildStatus(badgesAnalyser.getBuildStatus());
         repo.setCoverage(badgesAnalyser.getCoverage());
-
-
 
         GitClassifierBuilder.writeLine(repo.getCyclomaticComplexity() + "," + repo.isHasTests() + "," + repo.getSourceLinesOfCode() + "," + readMe.exists() + "," + (repo.getBuildStatus() != BuildStatus.FAILING) + "," + repo.getCoverage() + ",");
 
@@ -202,6 +196,7 @@ public class GitExpertiseJob implements Runnable {
                     .forEach(f -> {
                         builder.append(getImportLines(f));
                     });
+
         } catch (IOException e) {
             Logger.error("Traversing project files to find tags in imports failed.", e);
         }
@@ -223,10 +218,8 @@ public class GitExpertiseJob implements Runnable {
     }
 
 
-
     private String getImportLines(Path f){
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(f.toFile()));
+        try(BufferedReader bufferedReader = new BufferedReader(new FileReader(f.toFile()))) {
             String line = bufferedReader.readLine();
             StringBuilder importsBuilder = new StringBuilder();
             while (line != null && isInImportSection(line)) {
@@ -236,9 +229,10 @@ public class GitExpertiseJob implements Runnable {
                 line = bufferedReader.readLine();
             }
             return importsBuilder.toString();
-        } catch (IOException e){
-            Logger.error("Reading imports from file failed.", e);
+        } catch (IOException e) {
+            Logger.error("Failed to read imports.", e);
         }
+
         return "";
     }
 
@@ -288,6 +282,7 @@ public class GitExpertiseJob implements Runnable {
         @Override
         public void run() {
             determineExpertise(repo);
+
             try {
                 FileUtils.deleteDirectory(new File(repo.getFileName()));
             } catch (IOException e) {

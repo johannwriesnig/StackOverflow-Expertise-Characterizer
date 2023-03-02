@@ -33,7 +33,7 @@ public class PythonMetrics extends MetricsSetter {
         ProcessBuilder builder = new ProcessBuilder(radonProcess);
 
         Process process = builder.start();
-        Logger.info("Radon Process started for " + root.getAbsolutePath());
+        Logger.info("Radon "+command+" process started for " + root.getAbsolutePath());
         boolean processPassed = process.waitFor(1, TimeUnit.MINUTES);
         process.destroy();
         if (!processPassed) {
