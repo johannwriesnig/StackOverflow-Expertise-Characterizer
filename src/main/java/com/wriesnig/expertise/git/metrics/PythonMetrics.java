@@ -33,7 +33,7 @@ public class PythonMetrics extends MetricsSetter {
         ProcessBuilder builder = new ProcessBuilder(radonProcess);
 
         Process process = builder.start();
-        Logger.info("Radon "+command+" process started for " + root.getAbsolutePath());
+        Logger.info("Radon "+command+" process started for " + root.getAbsolutePath()+".");
         boolean processPassed = process.waitFor(1, TimeUnit.MINUTES);
         process.destroy();
         if (!processPassed) {
@@ -43,15 +43,17 @@ public class PythonMetrics extends MetricsSetter {
 
     @Override
     public void setAvgCyclomaticComplexity() {
-        String content;
+        String content="{}";
         File output = new File(root.getAbsolutePath() + "\\output.json");
         try{
             callRadonProcess(RADON_CYCLOMATIC_COMPLEXITY, root, output);
             content = new String(Files.readAllBytes(output.toPath()));
-        } catch (IOException|InterruptedException e){
+        } catch (InterruptedException e){
             repo.setCyclomaticComplexity(-1);
-            Logger.error("Radon Process for " + root.getAbsolutePath() + " failed.", e);
+            Logger.error("Radon process for " + root.getAbsolutePath() + " timed out.");
             return;
+        } catch (IOException e) {
+            Logger.error("Creating report for " + repo.getFileName() +" failed.", e);
         }
 
         int counter = 0;
@@ -123,13 +125,14 @@ public class PythonMetrics extends MetricsSetter {
     }
 
     public String getSourceLinesOfCodeReport(File root, File output) {
-        String content;
+        String content="{}";
         try{
             callRadonProcess(RADON_SOURCE_LINES_OF_CODE, root, output);
             content = new String(Files.readAllBytes(output.toPath()));
-        } catch (IOException|InterruptedException e){
-            Logger.error("Radon Process raw failed for " + root.getAbsolutePath() + ".", e);
-            return "";
+        } catch (InterruptedException e){
+            Logger.error("Radon process for " + root.getAbsolutePath() + " timed out.");
+        } catch (IOException e) {
+           Logger.error("Creating report for " + repo.getFileName() +" failed.", e);
         }
 
         return content;

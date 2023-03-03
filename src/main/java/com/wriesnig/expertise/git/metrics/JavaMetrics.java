@@ -31,8 +31,8 @@ public class JavaMetrics extends MetricsSetter {
         try {
             runPMDTool(report);
             reportContent = getReportAsJson(report);
-        } catch (InterruptedException | JSONException e) {
-            Logger.error("Metrics tool failed to run on -> " + repo.getFileName(), e);
+        } catch (InterruptedException e) {
+            Logger.error("PMD tool for " + repo.getFileName() + " timed out.");
             repo.setCyclomaticComplexity(-1);
             repo.setSourceLinesOfCode(0);
             repo.setTestFilesSourceLinesOfCode(0);
