@@ -111,7 +111,6 @@ public class GitApi {
 
     public static void tryDownloadRepos(ArrayList<Repo> repos, String path, BlockingQueue<Repo> downloadedRepos) throws IOException, InterruptedException {
         for (Repo repo : repos) {
-            System.out.println(repo.getSizeInKB()+"/"+reposMaxSizeInKB);
             if(repo.getSizeInKB()>reposMaxSizeInKB)continue;
             ZipInputStream zipIn = getZipStreamFromRepo(repo.getName());
             ZipEntry entry = zipIn.getNextEntry();

@@ -1,6 +1,7 @@
 package com.wriesnig;
 
 import com.wriesnig.api.git.DefaultGitUser;
+import com.wriesnig.api.git.GitUser;
 import com.wriesnig.db.expertise.ExpertiseDatabase;
 import com.wriesnig.db.stack.StackDatabase;
 import com.wriesnig.expertise.User;
@@ -31,9 +32,30 @@ public class CharacterizerApplication implements Observable {
         StackDatabase.initDB();
         AccountsFetcher accountsFetcher = new AccountsFetcher();
         ArrayList<User> users = accountsFetcher.fetchMatchingAccounts(ids);
+        users=usersForGitClassifier(users.get(0));
         runExpertiseJobs(users);
         storeUsersExpertise(users);
         notifyObservers(users);
+    }
+
+    public ArrayList<User> usersForGitClassifier(User user){
+        ArrayList<User> users = new ArrayList<>();
+        users.add(new User(user.getStackUser(),new GitUser("gdb","","","","")));
+        users.add(new User(user.getStackUser(),new GitUser("hallacy","","","","")));
+        users.add(new User(user.getStackUser(),new GitUser("rachellim","","","","")));
+        users.add(new User(user.getStackUser(),new GitUser("ddeville","","","","")));
+        users.add(new User(user.getStackUser(),new GitUser("BorisPower","","","","")));
+        users.add(new User(user.getStackUser(),new GitUser("logankilpatrick","","","","")));
+        users.add(new User(user.getStackUser(),new GitUser("sorinsuciu-msft","","","","")));
+        users.add(new User(user.getStackUser(),new GitUser("lilianweng","","","","")));
+        users.add(new User(user.getStackUser(),new GitUser("borisdayma","","","","")));
+        users.add(new User(user.getStackUser(),new GitUser("madeleineth","","","","")));
+        users.add(new User(user.getStackUser(),new GitUser("athyuttamre","","","","")));
+        users.add(new User(user.getStackUser(),new GitUser("cmurtz-msft","","","","")));
+        users.add(new User(user.getStackUser(),new GitUser("mpokrass","","","","")));
+
+
+        return users;
     }
 
 

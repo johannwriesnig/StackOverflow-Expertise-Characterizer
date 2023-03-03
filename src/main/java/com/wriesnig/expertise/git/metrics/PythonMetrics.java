@@ -2,15 +2,17 @@ package com.wriesnig.expertise.git.metrics;
 
 import com.wriesnig.api.git.Repo;
 import com.wriesnig.utils.Logger;
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class PythonMetrics extends MetricsSetter {
     private static final String RADON_CYCLOMATIC_COMPLEXITY = "cc";
@@ -28,13 +30,30 @@ public class PythonMetrics extends MetricsSetter {
         radonProcess[INDEX_RADON_TOOL] = radonAbsolutePath;
     }
 
-    public void callRadonProcess(String command, File input, File output) throws InterruptedException, IOException {
+    public String getToolReport(String command, File input){
+        String report="{}";
+        if(output.exists())
+            output.delete();
+        try{
+            callRadonProcess(command, input);
+            report = FileUtils.readLines(output, Charsets.UTF_8).stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining());
+        } catch (IOException e) {
+            Logger.error("Radon report for " + command + " command could not be created for " + input.getPath());
+        } catch (InterruptedException e) {
+            Logger.error("Radon " + command + " process for " + input.getPath() + " timed out.");
+        }
+        return report;
+    }
+
+    public void callRadonProcess(String command, File input) throws InterruptedException, IOException {
         setProcessProperties(command, input.getAbsolutePath(), output.getAbsolutePath());
         ProcessBuilder builder = new ProcessBuilder(radonProcess);
-
         Process process = builder.start();
-        Logger.info("Radon "+command+" process started for " + root.getAbsolutePath()+".");
+        Logger.info("Radon "+command+" process started for " + input.getPath()+".");
         boolean processPassed = process.waitFor(1, TimeUnit.MINUTES);
+        process.children().forEach(ProcessHandle::destroy);
         process.destroy();
         if (!processPassed) {
             throw new InterruptedException();
@@ -43,19 +62,7 @@ public class PythonMetrics extends MetricsSetter {
 
     @Override
     public void setAvgCyclomaticComplexity() {
-        String content="{}";
-        File output = new File(root.getAbsolutePath() + "\\output.json");
-        try{
-            callRadonProcess(RADON_CYCLOMATIC_COMPLEXITY, root, output);
-            content = new String(Files.readAllBytes(output.toPath()));
-        } catch (InterruptedException e){
-            repo.setCyclomaticComplexity(-1);
-            Logger.error("Radon process for " + root.getAbsolutePath() + " timed out.");
-            return;
-        } catch (IOException e) {
-            Logger.error("Creating report for " + repo.getFileName() +" failed.", e);
-        }
-
+        String content= getToolReport(RADON_CYCLOMATIC_COMPLEXITY, root);
         int counter = 0;
         int cyclomaticComplexitySum = 0;
         JSONObject jsonObject = new JSONObject(content);
@@ -90,22 +97,21 @@ public class PythonMetrics extends MetricsSetter {
 
     @Override
     public void setSourceLinesOfCode() {
-        File output = new File(root.getAbsolutePath() + "\\output.json");
-        setProjectSourceLinesOfCode(output);
-        setTestDirectoriesSourceLinesOfCode(output);
+        setProjectSourceLinesOfCode();
+        setTestDirectoriesSourceLinesOfCode();
     }
 
-    public void setProjectSourceLinesOfCode(File output) {
-        String reportContent = getSourceLinesOfCodeReport(root, output);
+    public void setProjectSourceLinesOfCode() {
+        String reportContent = getSourceLinesOfCodeReport(root);
         int sourceLinesOfCode = parseReportForSourceLinesOfCode(reportContent);
         repo.setSourceLinesOfCode(sourceLinesOfCode);
     }
 
-    public void setTestDirectoriesSourceLinesOfCode(File output) {
+    public void setTestDirectoriesSourceLinesOfCode() {
         ArrayList<File> testDirectories = getTestDirectories();
         int testFilesSourceLinesOfCode = 0;
         for (File testFile : testDirectories) {
-            String testReport = getSourceLinesOfCodeReport(testFile, output);
+            String testReport = getSourceLinesOfCodeReport(testFile);
             testFilesSourceLinesOfCode += parseReportForSourceLinesOfCode(testReport);
         }
 
@@ -124,18 +130,8 @@ public class PythonMetrics extends MetricsSetter {
         return sourceLinesOfCode;
     }
 
-    public String getSourceLinesOfCodeReport(File root, File output) {
-        String content="{}";
-        try{
-            callRadonProcess(RADON_SOURCE_LINES_OF_CODE, root, output);
-            content = new String(Files.readAllBytes(output.toPath()));
-        } catch (InterruptedException e){
-            Logger.error("Radon process for " + root.getAbsolutePath() + " timed out.");
-        } catch (IOException e) {
-           Logger.error("Creating report for " + repo.getFileName() +" failed.", e);
-        }
-
-        return content;
+    public String getSourceLinesOfCodeReport(File root) {
+        return getToolReport(RADON_SOURCE_LINES_OF_CODE, root);
     }
 
     public void setProcessProperties(String command, String inputFile, String outputFile) {

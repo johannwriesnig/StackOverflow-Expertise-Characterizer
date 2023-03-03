@@ -15,10 +15,12 @@ import java.util.stream.Stream;
 public abstract class MetricsSetter {
     protected Repo repo;
     protected File root;
+    protected File output;
 
     public MetricsSetter(Repo repo) {
         this.repo = repo;
-        root = new File(repo.getFileName());
+        root = new File(repo.getFileName()).getAbsoluteFile();
+        output = new File(repo.getFileName()+"\\output.json").getAbsoluteFile();
     }
 
     public void setMetrics() {

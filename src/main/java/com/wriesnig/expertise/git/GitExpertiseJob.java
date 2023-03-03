@@ -164,7 +164,7 @@ public class GitExpertiseJob implements Runnable {
         }
         boolean isReadMeExists = readMeContent.length()>repo.getName().length()+20;
 
-        if(repo.getCyclomaticComplexity()!=-1)
+        if(repo.getSourceLinesOfCode()!=0)
             GitClassifierBuilder.writeLine(repo.getCyclomaticComplexity() + "," + repo.isHasTests() + "," + repo.getSourceLinesOfCode() + "," + isReadMeExists + "," + (repo.getBuildStatus() != BuildStatus.FAILING) + "," + repo.getCoverage() + ",");
 
         Object[] classificationData = {repo.getCyclomaticComplexity(), String.valueOf(repo.isHasTests()), repo.getSourceLinesOfCode(), String.valueOf(isReadMeExists), String.valueOf(repo.getBuildStatus() != BuildStatus.FAILING), repo.getCoverage()};
