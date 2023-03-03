@@ -26,7 +26,7 @@ public class Main {
         }
         Logger.info("Setting properties.");
         Properties properties = getPropertiesFromConfigFile(args[0]);
-        setGitApiToken(properties);
+        setGitApiProperties(properties);
         setStackApiKey(properties);
         setTags(properties);
         setDbCredentials(properties);
@@ -38,8 +38,11 @@ public class Main {
         Tags.tagsToCharacterize = tags.split(",");
     }
 
-    public static void setGitApiToken(Properties properties) {
+    public static void setGitApiProperties(Properties properties) {
         String gitToken = properties.getProperty("git.token");
+        String repoMaxMBSize = properties.getProperty("git.max.repo.size.mb");
+
+        GitApi.setReposMaxSizeInMB(Integer.parseInt(repoMaxMBSize));
         GitApi.setToken(gitToken);
     }
 

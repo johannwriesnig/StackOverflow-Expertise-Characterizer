@@ -18,6 +18,7 @@ public class GitApi {
     private final static String apiUrl = "https://api.github.com/";
     private static final int CODE_RESOURCE_NOT_FOUND = 404;
     private static String token;
+    private static int reposMaxSizeInKB;
     private final static GitApiResponseParser responseParser = new GitApiResponseParser();
 
 
@@ -110,6 +111,8 @@ public class GitApi {
 
     public static void tryDownloadRepos(ArrayList<Repo> repos, String path, BlockingQueue<Repo> downloadedRepos) throws IOException, InterruptedException {
         for (Repo repo : repos) {
+            System.out.println(repo.getSizeInKB()+"/"+reposMaxSizeInKB);
+            if(repo.getSizeInKB()>reposMaxSizeInKB)continue;
             ZipInputStream zipIn = getZipStreamFromRepo(repo.getName());
             ZipEntry entry = zipIn.getNextEntry();
             String root = entry == null ? "" : entry.getName();
@@ -152,4 +155,7 @@ public class GitApi {
 
     public static String getToken(){return token;}
 
+    public static void setReposMaxSizeInMB(int reposMaxSizeInMB) {
+        GitApi.reposMaxSizeInKB = reposMaxSizeInMB*1000;
+    }
 }

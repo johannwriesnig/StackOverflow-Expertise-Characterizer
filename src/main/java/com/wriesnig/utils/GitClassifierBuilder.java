@@ -1,26 +1,17 @@
 package com.wriesnig.utils;
 
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 public class GitClassifierBuilder {
-    private static FileWriter writer;
-
-    static {
-        try {
-            writer = new FileWriter("gitClassifierData.txt");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 
     public static synchronized void writeLine(String string){
         try {
-            writer.write(string+"\n");
-            writer.flush();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            Files.write(Paths.get("gitClassifierData.txt"), (string+"\n").getBytes(), StandardOpenOption.APPEND);
+        }catch (IOException e) {
+            //exception handling left as an exercise for the reader
         }
     }
 }

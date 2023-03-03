@@ -16,6 +16,7 @@ public class Repo {
     private int sourceLinesOfCode;
     private int testFilesSourceLinesOfCode;
     private boolean isForked;
+    private int sizeInKB;
 
 
     public Repo(String name, String mainLanguage, int stars) {
@@ -117,4 +118,10 @@ public class Repo {
     public int getTestFilesSourceLinesOfCode() {
         return testFilesSourceLinesOfCode;
     }
+
+    public void setSizeInKB(int sizeInKB){
+        this.sizeInKB = sizeInKB;
+    }
+
+    public int getSizeInKB(){return sizeInKB;}
 }

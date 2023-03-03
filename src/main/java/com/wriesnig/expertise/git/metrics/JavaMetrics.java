@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.*;
 import java.util.stream.Stream;
 
 public class JavaMetrics extends MetricsSetter {
@@ -25,12 +26,13 @@ public class JavaMetrics extends MetricsSetter {
     @Override
     public void setMetrics() {
         File report = new File(root.getPath() + "/output.json");
-        runPMDTool(report);
         JSONObject reportContent;
 
         try {
+            runPMDTool(report);
             reportContent = getReportAsJson(report);
-        } catch (JSONException e) {
+        } catch (InterruptedException | JSONException e) {
+            Logger.error("Metrics tool failed to run on -> " + repo.getFileName(), e);
             repo.setCyclomaticComplexity(-1);
             repo.setSourceLinesOfCode(0);
             repo.setTestFilesSourceLinesOfCode(0);
@@ -78,14 +80,25 @@ public class JavaMetrics extends MetricsSetter {
         repo.setTestFilesSourceLinesOfCode(testFilesSourceLinesOfCode);
     }
 
-    public void runPMDTool(File report) {
+    public void runPMDTool(File report) throws InterruptedException {
         PMDConfiguration configuration = new PMDConfiguration();
         configuration.setInputPaths(root.getPath());
         configuration.addRuleSet("src/main/resources/src/pmdTool/rules.xml");
         configuration.setReportFormat("json");
         configuration.setReportProperties(new Properties());
         configuration.setReportFile(report.getPath());
-        PMD.runPmd(configuration);
+
+        ExecutorService executor = Executors.newCachedThreadPool();
+        Callable<Object> task = () -> PMD.runPmd(configuration);
+        Logger.info("Running pmd on " + repo.getFileName());
+        Future<Object> future = executor.submit(task);
+        try {
+            Object result = future.get(1, TimeUnit.MINUTES);
+        } catch (Exception e){
+            future.cancel(true);
+            throw new InterruptedException();
+        }
+        future.cancel(true);
     }
 
     public JSONObject getReportAsJson(File report) throws JSONException {

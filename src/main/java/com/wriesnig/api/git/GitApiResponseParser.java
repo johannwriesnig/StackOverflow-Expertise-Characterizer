@@ -40,8 +40,10 @@ public class GitApiResponseParser {
             String repoName = currentRepo.getString("full_name");
             String repoMainLanguage = currentRepo.isNull("language") ? "" : currentRepo.getString("language").toLowerCase();
             int stars = currentRepo.getInt("stargazers_count");
+            int size = currentRepo.getInt("size");
             Repo repo = new Repo(repoName, repoMainLanguage,stars);
             repo.setForked(isFork);
+            repo.setSizeInKB(size);
             repos.add(repo);
         }
 
