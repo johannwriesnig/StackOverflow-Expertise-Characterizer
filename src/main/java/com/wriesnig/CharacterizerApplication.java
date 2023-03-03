@@ -32,7 +32,7 @@ public class CharacterizerApplication implements Observable {
         StackDatabase.initDB();
         AccountsFetcher accountsFetcher = new AccountsFetcher();
         ArrayList<User> users = accountsFetcher.fetchMatchingAccounts(ids);
-        users=usersForGitClassifier(users.get(0));
+        //users=usersForGitClassifier(users.get(0));
         runExpertiseJobs(users);
         storeUsersExpertise(users);
         notifyObservers(users);

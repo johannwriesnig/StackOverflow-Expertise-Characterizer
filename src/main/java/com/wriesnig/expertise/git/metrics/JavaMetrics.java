@@ -90,7 +90,6 @@ public class JavaMetrics extends MetricsSetter {
 
         ExecutorService executor = Executors.newCachedThreadPool();
         Callable<Object> task = () -> PMD.runPmd(configuration);
-        Logger.info("Running pmd on " + repo.getFileName());
         Future<Object> future = executor.submit(task);
         try {
             Object result = future.get(1, TimeUnit.MINUTES);
