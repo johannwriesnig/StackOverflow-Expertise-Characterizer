@@ -15,7 +15,7 @@ import java.util.zip.ZipInputStream;
 
 
 public class GitApi {
-    private final static String apiUrl = "https://api.github.com/";
+    private final static String API_URL = "https://api.github.com/";
     private static final int CODE_RESOURCE_NOT_FOUND = 404;
     private static final int CODE_BAD_CREDENTIALS=401;
     private static String token;
@@ -67,7 +67,7 @@ public class GitApi {
     }
 
     public static InputStream getStreamFromAPICall(String path) {
-        String url = apiUrl + path;
+        String url = API_URL + path;
         try {
             URL getUrl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();

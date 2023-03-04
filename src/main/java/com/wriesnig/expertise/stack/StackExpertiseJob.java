@@ -20,7 +20,7 @@ public class StackExpertiseJob implements Runnable {
 
     @Override
     public void run() {
-        ResultSet postResults = StackDatabase.getPostssFromUser(user.getStackId());
+        ResultSet postResults = StackDatabase.getPostsFromUser(user.getStackId());
         HashMap<String, ArrayList<Double>> scoresPerTag;
 
         try {
@@ -59,7 +59,7 @@ public class StackExpertiseJob implements Runnable {
                     double score = upVotes / (upVotes + downVotes);
                     double s = (double)((int)(score*100))/100.0;
                     postToClassify = new Object[]{upVotes, downVotes, s, isAccepted, isActiveOnTag?"1":"0"};
-                    double expertise = Expertise.classifierOutput[(int) StackClassifier.classify(postToClassify)];
+                    double expertise = Expertise.CLASSIFIER_OUTPUT[(int) StackClassifier.classify(postToClassify)];
                     scoresPerTag.get(tag).add(expertise);
                 }
             }

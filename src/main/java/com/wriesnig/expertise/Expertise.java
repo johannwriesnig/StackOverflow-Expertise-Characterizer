@@ -3,8 +3,7 @@ package com.wriesnig.expertise;
 import java.util.HashMap;
 
 public class Expertise {
-    public final static int[] classifierOutput = new int[]{1,2,3,4,5};
-
+    public final static int[] CLASSIFIER_OUTPUT = new int[]{1,2,3,4,5};
     private final static double STACK_WEIGHT = 2/3.0;
     private final static double GIT_WEIGHT = 1/3.0;
 

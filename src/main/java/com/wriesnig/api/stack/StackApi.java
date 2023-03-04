@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 public class StackApi {
-    public static final String apiUrl = "https://api.stackexchange.com/2.3/";
+    public static final String API_URL = "https://api.stackexchange.com/2.3/";
     public static final int CODE_OK = 200;
     public static final int CODE_BAD_REQUEST = 400;
     public static final int CODE_INTERNAL_ERROR = 500;
@@ -23,6 +23,8 @@ public class StackApi {
     public static final int CODE_TEMPORARILY_UNAVAILABLE = 503;
     private static final StackApiResponseParser responseParser = new StackApiResponseParser();
     public static String key = "";
+
+
 
 
     public static ArrayList<StackUser> getUsers(ArrayList<Integer> ids) {
@@ -57,7 +59,7 @@ public class StackApi {
     }
 
     public static GZIPInputStream getStreamFromAPICall(String path) {
-        String url = apiUrl + path + "&key="+key;
+        String url = API_URL + path + "&key="+key;
         try {
             URL getUrl = getUrl(url);
             HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();

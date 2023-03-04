@@ -8,15 +8,15 @@ public class Repo {
     private String mainLanguage;
     private String name;
     private ArrayList<String> presentTags;
-    private double coverage;
     private BuildStatus buildStatus;
+    private double coverage;
     private double cyclomaticComplexity;
     private double quality;
     private int stars;
     private int sourceLinesOfCode;
     private int testFilesSourceLinesOfCode;
-    private boolean isForked;
     private int sizeInKB;
+    private boolean isForked;
 
 
     public Repo(String name, String mainLanguage, int stars) {

@@ -126,7 +126,7 @@ public class GitExpertiseJobTest {
             double classifierOutput = 3.0;
             mockedClassifier.when(()->GitClassifier.classify(any())).thenReturn(classifierOutput);
             gitExpertiseJob.determineExpertise(repo);
-            assertEquals(Expertise.classifierOutput[(int) classifierOutput],repo.getQuality());
+            assertEquals(Expertise.CLASSIFIER_OUTPUT[(int) classifierOutput],repo.getQuality());
 
         }
     }

@@ -20,15 +20,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CharacterizerApplicationGui extends JFrame implements Observer {
-    private final JPanel welcomeScreen;
-    private JScrollPane usersExpertisesScreen;
-    private JPanel waitScreen;
     private final JPanel pane;
-    private final Color backGroundColor = Color.decode("#fcfcfc");
+    private final JPanel welcomeScreen;
+    private JPanel waitScreen;
+    private JScrollPane usersExpertisesScreen;
 
-    private JTextField idsInput;
     private JButton appStartBtn;
     private JButton backToStartBtn;
+    private JTextField idsInput;
+    private final Color backGroundColor = Color.decode("#fcfcfc");
 
     public CharacterizerApplicationGui(){
         super("Characterizer");

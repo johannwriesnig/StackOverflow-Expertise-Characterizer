@@ -26,7 +26,7 @@ import java.util.concurrent.*;
 import java.util.stream.Stream;
 
 public class GitExpertiseJob implements Runnable {
-    private static final String reposWorkspace = "src/main/resources/src/workspace/repos";
+    private static final String REPOS_WORKSPACE = "src/main/resources/src/workspace/repos";
 
     private final User user;
 
@@ -36,7 +36,7 @@ public class GitExpertiseJob implements Runnable {
 
     @Override
     public void run() {
-        String userReposPath = reposWorkspace + "/" + user.getGitLogin() + "/";
+        String userReposPath = REPOS_WORKSPACE + "/" + user.getGitLogin() + "/";
 
         ArrayList<Repo> repos = GitApi.getReposByLogin(user.getGitLogin());
         cleanseRepos(repos);
@@ -130,7 +130,7 @@ public class GitExpertiseJob implements Runnable {
 
         Object[] classificationData = {repo.getCyclomaticComplexity(), String.valueOf(repo.isHasTests()), (double)repo.getSourceLinesOfCode(), String.valueOf(isReadMeExists), String.valueOf(repo.getBuildStatus() != BuildStatus.FAILING), repo.getCoverage()};
 
-        double quality = Expertise.classifierOutput[(int) GitClassifier.classify(classificationData)];
+        double quality = Expertise.CLASSIFIER_OUTPUT[(int) GitClassifier.classify(classificationData)];
         Logger.info(repo.getFileName() + " contains " + repo.getPresentTags() +
                 " with following stats: Expertise: " + quality + ";complexity-> " + repo.getCyclomaticComplexity() + "; hasReadMe-> "+readMe.exists() +"; BuildStatus-> " + repo.getBuildStatus() + "; hasTests-> " + repo.isHasTests() + "; Coverage: " + repo.getCoverage() +"; Sloc: " + repo.getSourceLinesOfCode());
 
