@@ -7,8 +7,10 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
@@ -52,6 +54,16 @@ public class PythonMetrics extends MetricsSetter {
         ProcessBuilder builder = new ProcessBuilder(radonProcess);
         Process process = builder.start();
         boolean processPassed = process.waitFor(1, TimeUnit.MINUTES);
+        final BufferedReader reader = new BufferedReader(
+                new InputStreamReader(process.getErrorStream()));
+        StringBuilder errorMessage = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            errorMessage.append(line);
+        }
+        if(!errorMessage.isEmpty())
+            Logger.error(errorMessage.toString());
+
         process.children().forEach(ProcessHandle::destroy);
         process.destroy();
         if (!processPassed) {
