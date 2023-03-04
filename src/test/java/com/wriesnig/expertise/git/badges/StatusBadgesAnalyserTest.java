@@ -78,7 +78,7 @@ public class StatusBadgesAnalyserTest {
             MockedConstruction<URL> mockedUrl = getMockedUrl()){
             StatusBadgesAnalyser statusBadgesAnalyser = new StatusBadgesAnalyser(new File(buildPassingAndCodeCove84ReadMePath));
             statusBadgesAnalyser.initBadges();
-            mockedLogger.verify(()-> Logger.error(any(), any()),times(2));
+            mockedLogger.verify(()-> Logger.error(any()),times(2));
         }
     }
 

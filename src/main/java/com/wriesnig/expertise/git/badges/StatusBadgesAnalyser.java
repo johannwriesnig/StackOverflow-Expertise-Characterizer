@@ -39,7 +39,7 @@ public class StatusBadgesAnalyser {
             try (InputStream in = getInputStreamFromBadge(badges.group(1))) {
                 html = new String(in.readAllBytes(), StandardCharsets.UTF_8);
             } catch (IOException e){
-                Logger.error("Reading status badge from url failed -> " + badges.group(1), e);
+                Logger.error("Reading status badge from url failed -> " + badges.group(1));
             }
 
             badgesHtml.add(Jsoup.parse(html));
@@ -69,7 +69,7 @@ public class StatusBadgesAnalyser {
             }
             if(isContainsBuildStatus){
                 if(textContent.matches("passing|passed")) buildStatus = BuildStatus.PASSING;
-                if(textContent.matches("failing|failed")) buildStatus = BuildStatus.FAILING;
+                if(textContent.matches("failing|failed|error")) buildStatus = BuildStatus.FAILING;
             }
         }
         return buildStatus;

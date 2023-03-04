@@ -11,7 +11,6 @@ import com.wriesnig.expertise.git.badges.BuildStatus;
 import com.wriesnig.expertise.git.badges.StatusBadgesAnalyser;
 import com.wriesnig.expertise.git.metrics.JavaMetrics;
 import com.wriesnig.expertise.git.metrics.PythonMetrics;
-import com.wriesnig.utils.GitClassifierBuilder;
 import com.wriesnig.utils.Logger;
 import org.apache.commons.io.FileUtils;
 
@@ -41,7 +40,6 @@ public class GitExpertiseJob implements Runnable {
 
         ArrayList<Repo> repos = GitApi.getReposByLogin(user.getGitLogin());
         cleanseRepos(repos);
-        //repos = reposForClassifier();
         BlockingQueue<Repo> downloadedRepos = new LinkedBlockingQueue<>();
         downloadReposInNewThread(repos, userReposPath, downloadedRepos);
         determineReposExpertise(downloadedRepos, userReposPath);
@@ -49,40 +47,6 @@ public class GitExpertiseJob implements Runnable {
         repos.removeIf(repo-> repo.getCyclomaticComplexity()==-1 || repo.getSourceLinesOfCode()==0);
         HashMap<String, ArrayList<Double>> expertisePerTag = getExpertisePerTag(repos);
         storeExpertise(expertisePerTag, user);
-    }
-
-    public ArrayList<Repo> reposForClassifier(){
-        ArrayList<Repo> repos = new ArrayList<>();
-        /*repos.add(new Repo("ariahendrawan713/python", "python", 0));
-        repos.add(new Repo("mujacm/Python", "python", 0));
-        repos.add(new Repo("csse120-201920/01-IntroductionToPython", "python", 0));
-        repos.add(new Repo("AnTi-anti/damai_ticket", "python", 0));
-        repos.add(new Repo("donnemartin/system-design-primer", "python", 0));
-        repos.add(new Repo("openai/openai-python", "python", 0));
-        repos.add(new Repo("521xueweihan/HelloGitHub", "python", 0));
-        repos.add(new Repo("tiangolo/fastapi", "python", 0));
-        repos.add(new Repo("ridgerchu/SpikeGPT", "python", 0));
-        repos.add(new Repo("mukulpatnaik/researchgpt", "python", 0));
-        repos.add(new Repo("pre-commit/pre-commit", "python", 0));
-        repos.add(new Repo("TychoBrouwer/ac-controller-api-socket-python", "python", 0));
-        repos.add(new Repo("PauloPSAS/Exercicios-de-Python", "python", 0));
-        repos.add(new Repo("NoriahM/Python-Codes", "python", 0));
-        repos.add(new Repo("rodrigoazs/python-pokemon-firered-battle-simulator", "python", 0));
-        repos.add(new Repo("davidfantasy/mybatis-plus-generator-ui", "java", 0));
-        repos.add(new Repo("seata/seata", "java", 0));
-        repos.add(new Repo("dbeaver/dbeaver", "java", 0));
-        repos.add(new Repo("prestodb/presto", "java", 0));
-        repos.add(new Repo("apache/doris", "java", 0));
-        repos.add(new Repo("Snailclimb/JavaGuide", "java", 0));
-        repos.add(new Repo("micrometer-metrics/micrometer", "java", 0));
-        repos.add(new Repo("prometheus/jmx_exporter", "java", 0));
-        repos.add(new Repo("SPLWare/esProc", "java", 0));
-        repos.add(new Repo("ZhongFuCheng3y/austin", "java", 0));
-        repos.add(new Repo("xuxueli/xxl-job", "java", 0));*/
-        repos.add(new Repo("Azure/azure-sdk-for-java", "java", 0));
-
-
-        return repos;
     }
 
     public HashMap<String, ArrayList<Double>> getExpertisePerTag(ArrayList<Repo> repos) {
@@ -162,12 +126,9 @@ public class GitExpertiseJob implements Runnable {
         } catch (IOException e) {
             Logger.error("Readme content for -> "+ repo.getFileName() + " couldnt be read.",e);
         }
-        boolean isReadMeExists = readMeContent.length()>repo.getName().length()+20;
+        boolean isReadMeExists = readMeContent.length()>repo.getName().length()+50;
 
-        if(repo.getSourceLinesOfCode()!=0)
-            GitClassifierBuilder.writeLine(repo.getCyclomaticComplexity() + "," + repo.isHasTests() + "," + repo.getSourceLinesOfCode() + "," + isReadMeExists + "," + (repo.getBuildStatus() != BuildStatus.FAILING) + "," + repo.getCoverage() + ",");
-
-        Object[] classificationData = {repo.getCyclomaticComplexity(), String.valueOf(repo.isHasTests()), repo.getSourceLinesOfCode(), String.valueOf(isReadMeExists), String.valueOf(repo.getBuildStatus() != BuildStatus.FAILING), repo.getCoverage()};
+        Object[] classificationData = {repo.getCyclomaticComplexity(), String.valueOf(repo.isHasTests()), (double)repo.getSourceLinesOfCode(), String.valueOf(isReadMeExists), String.valueOf(repo.getBuildStatus() != BuildStatus.FAILING), repo.getCoverage()};
 
         double quality = Expertise.classifierOutput[(int) GitClassifier.classify(classificationData)];
         Logger.info(repo.getFileName() + " contains " + repo.getPresentTags() +
@@ -324,7 +285,7 @@ public class GitExpertiseJob implements Runnable {
         } catch (IOException e) {
             Logger.error("Reading file failed.", e);
         }
-        return (ArrayList<String>) TextRankKeyword.getKeywordList(document, 1000);
+        return (ArrayList<String>) TextRankKeyword.getKeywordList(document, 15);
     }
 
     class RepoExpertiseJob extends Thread{
