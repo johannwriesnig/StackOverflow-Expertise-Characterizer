@@ -26,7 +26,7 @@ public class PythonMetrics extends MetricsSetter {
 
     public PythonMetrics(Repo repo) {
         super(repo);
-        String radonAbsolutePath = new File("tools/Python311/radon-master/radon").getAbsolutePath();
+        String radonAbsolutePath = new File("tools/radon-master/radon").getAbsolutePath();
         radonProcess[INDEX_RADON_TOOL] = radonAbsolutePath;
     }
 
