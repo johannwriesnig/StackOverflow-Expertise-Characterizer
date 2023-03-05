@@ -14,7 +14,7 @@ public class User {
 
     public User(StackUser stackUser, GitUser gitUser) {
         this.gitUser = gitUser;
-        this.stackUser =stackUser;
+        this.stackUser = stackUser;
         this.expertise = new Expertise();
     }
 

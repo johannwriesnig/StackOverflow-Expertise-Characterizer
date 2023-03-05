@@ -149,7 +149,7 @@ public class GitExpertiseJob implements Runnable {
     public void storeExpertise(HashMap<String, ArrayList<Double>> scoresPerTag, User user){
         scoresPerTag.forEach((key, value) -> {
             double score = value.size()!=0?value.stream().mapToDouble(Double::doubleValue).sum()/value.size():1.0;
-            score = (double)((int)(score*100))/100.0;
+            score = (double)((int)(score*100))/100.0;//double with 2 decimals
             user.getExpertise().getGitExpertise().put(key, score);
         });
     }

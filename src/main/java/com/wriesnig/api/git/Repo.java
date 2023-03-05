@@ -4,26 +4,26 @@ import com.wriesnig.expertise.git.badges.BuildStatus;
 import java.util.ArrayList;
 
 public class Repo {
-    private String fileName;
-    private String mainLanguage;
-    private String name;
-    private ArrayList<String> presentTags;
+    private final String mainLanguage;
+    private final String name;
+    private final boolean isForked;
+    private final int sizeInKB;
+    private final ArrayList<String> presentTags;
     private BuildStatus buildStatus;
+    private String fileName;
     private double coverage;
     private double cyclomaticComplexity;
     private double quality;
-    private int stars;
     private int sourceLinesOfCode;
     private int testFilesSourceLinesOfCode;
-    private int sizeInKB;
-    private boolean isForked;
 
 
-    public Repo(String name, String mainLanguage, int stars) {
+    public Repo(String name, String mainLanguage, boolean isForked, int sizeInKB) {
         this.name = name;
         this.mainLanguage = mainLanguage;
+        this.isForked = isForked;
+        this.sizeInKB = sizeInKB;
         this.presentTags = new ArrayList<>();
-        this.stars=stars;
     }
 
     public String getName() {
@@ -88,8 +88,6 @@ public class Repo {
     }
 
 
-    public int getStars(){return this.stars;}
-
     public boolean isHasTests(){
         double ratio = testFilesSourceLinesOfCode / (double)(sourceLinesOfCode - testFilesSourceLinesOfCode);
         return ratio>=2/3.0;
@@ -111,16 +109,8 @@ public class Repo {
         return isForked;
     }
 
-    public void setForked(boolean forked) {
-        isForked = forked;
-    }
-
     public int getTestFilesSourceLinesOfCode() {
         return testFilesSourceLinesOfCode;
-    }
-
-    public void setSizeInKB(int sizeInKB){
-        this.sizeInKB = sizeInKB;
     }
 
     public int getSizeInKB(){return sizeInKB;}

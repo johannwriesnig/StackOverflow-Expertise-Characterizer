@@ -23,6 +23,7 @@ public class StackApi {
     public static final int CODE_TEMPORARILY_UNAVAILABLE = 503;
     private static final StackApiResponseParser responseParser = new StackApiResponseParser();
     public static String key = "";
+    public static int backOffParameterInSecs;
 
 
 
@@ -30,6 +31,7 @@ public class StackApi {
     public static ArrayList<StackUser> getUsers(ArrayList<Integer> ids) {
         ArrayList<StackUser> users = new ArrayList<>();
         int maxIdsPerRequest = 100;
+        //Request only allows 100 ids at once, so we split the input if size()>100
         for(int i=1; i<=(ids.size()/maxIdsPerRequest)+1;i++){
             ArrayList<Integer> partOfIds = new ArrayList<>();
             Iterator<Integer> iterator = ids.iterator();
@@ -54,7 +56,7 @@ public class StackApi {
         GZIPInputStream apiStream = getStreamFromAPICall(path);
         String stream = getStringFromStream(apiStream);
         JSONObject tags = new JSONObject(stream);
-
+        backOffParameterInSecs = tags.has("backoff")?tags.getInt("backoff"):0;
         return responseParser.parseTagsResponse(tags);
     }
 
@@ -62,6 +64,8 @@ public class StackApi {
         String url = API_URL + path + "&key="+key;
         try {
             URL getUrl = getUrl(url);
+            if(backOffParameterInSecs !=0)
+                waitBackOffTime();
             HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
             connection.setRequestMethod("GET");
             int status = connection.getResponseCode();
@@ -82,6 +86,15 @@ public class StackApi {
             Logger.error("Processing stack-api input stream failed.", e);
         }
         return null;
+    }
+
+    private static void waitBackOffTime(){
+        try{
+            Thread.sleep(backOffParameterInSecs* 1000L);
+        } catch (InterruptedException e) {
+            Logger.error("Waiting backoff time for Stack-API failed.", e);
+            throw new RuntimeException();
+        }
     }
 
     public static URL getUrl(String url) throws MalformedURLException {

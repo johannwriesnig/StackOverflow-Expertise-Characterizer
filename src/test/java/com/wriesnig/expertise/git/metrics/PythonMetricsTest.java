@@ -25,7 +25,7 @@ public class PythonMetricsTest {
 
     @BeforeEach
     public void setUp(){
-        repo = new Repo("","",1);
+        repo = new Repo("","",false, 0);
         repo.setFileName(repoPath);
         pythonMetrics = new PythonMetrics(repo);
         spyPythonMetrics = spy(pythonMetrics);

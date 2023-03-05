@@ -15,7 +15,7 @@ public class MetricsSetterTest {
 
     @Test
     public void getProjectTestDirectories(){
-        Repo repo = new Repo("","", 1);
+        Repo repo = new Repo("","", false, 0);
         repo.setFileName(repoPath);
         File testDir1 = new File(repoPath + "module1/src/tests").getAbsoluteFile();
         File testDir2 = new File(repoPath + "module2/src/tests").getAbsoluteFile();

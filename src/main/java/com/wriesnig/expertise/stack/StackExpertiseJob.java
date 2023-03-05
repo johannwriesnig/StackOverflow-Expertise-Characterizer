@@ -33,9 +33,9 @@ public class StackExpertiseJob implements Runnable {
         Logger.info("Stack expertise for " + user.getStackDisplayName() + ": " + user.getExpertise().getStackExpertise().toString()+".");
     }
 
+
     public HashMap<String, ArrayList<Double>> getScoresPerTagFromPosts(ResultSet postResults) throws SQLException {
         HashMap<String, ArrayList<Double>> scoresPerTag = getEmptyScoresPerTag();
-        Object[] postToClassify;
         String userIsEstablished = String.valueOf(user.getIsEstablishedOnStack());
 
         while (postResults.next()) {
@@ -57,8 +57,8 @@ public class StackExpertiseJob implements Runnable {
                     else isMainTag = "0";
                     boolean isActiveOnTag = (isMainTag.equals("1")) && userIsEstablished.equals("1");
                     double score = upVotes / (upVotes + downVotes);
-                    double s = (double)((int)(score*100))/100.0;
-                    postToClassify = new Object[]{upVotes, downVotes, s, isAccepted, isActiveOnTag?"1":"0"};
+                    score = (double)((int)(score*100))/100.0; //double with only 2 decimals
+                    Object[] postToClassify = new Object[]{upVotes, downVotes, score, isAccepted, isActiveOnTag?"1":"0"};
                     double expertise = Expertise.CLASSIFIER_OUTPUT[(int) StackClassifier.classify(postToClassify)];
                     scoresPerTag.get(tag).add(expertise);
                 }

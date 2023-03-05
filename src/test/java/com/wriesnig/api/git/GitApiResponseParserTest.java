@@ -63,12 +63,10 @@ public class GitApiResponseParserTest {
         Repo runner = repos.get(0);
         assertEquals("johannwriesnig/Runner", runner.getName());
         assertEquals("assembly", runner.getMainLanguage());
-        assertEquals(0, runner.getStars());
 
         Repo se2_Einzelbeispiel = repos.get(1);
         assertEquals("johannwriesnig/SE2_Einzelbeispiel", se2_Einzelbeispiel.getName());
         assertEquals("", se2_Einzelbeispiel.getMainLanguage());
-        assertEquals(0, se2_Einzelbeispiel.getStars());
     }
 
     @Test

@@ -117,7 +117,7 @@ public class GitApiTest {
 
             String path = "src/main/resources/test/apiResponses/git/zip/";
             String repoName = "Runner";
-            Repo repo = new Repo(repoName, "java", 0);
+            Repo repo = new Repo(repoName, "java", false, 0);
             ArrayList<Repo> repos = new ArrayList<>();
             repos.add(repo);
             BlockingQueue<Repo> downloadedRepos = new LinkedBlockingQueue<>();

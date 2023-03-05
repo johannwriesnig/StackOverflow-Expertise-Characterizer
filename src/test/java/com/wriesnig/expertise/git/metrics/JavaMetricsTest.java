@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class JavaMetricsTest {
     @Test
     public void repoMetricsSetAfterExecution() throws FileNotFoundException {
-        Repo repo = new Repo("", "", 1);
+        Repo repo = new Repo("", "", false, 0);
         repo.setFileName("src/main/resources/test/metrics/javaRepo");
         JavaMetrics javaMetrics = new JavaMetrics(repo);
         javaMetrics.setMetrics();

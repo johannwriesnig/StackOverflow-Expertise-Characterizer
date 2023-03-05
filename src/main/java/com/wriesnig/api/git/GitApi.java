@@ -48,6 +48,7 @@ public class GitApi {
         return responseParser.parseUsersByFullName(usersAsJson);
     }
 
+    //Git-Api would return 100 repos max for one request, so we iterate over pages to get all
     public static ArrayList<Repo> getReposByLogin(String login) {
         int reposPerPage=100;
         int pageCounter=1;

@@ -15,9 +15,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StatusBadgesAnalyser {
+    private final File readMe;
     private final String link = "https://([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])";
     private ArrayList<Document> badgesHtml;
-    private File readMe;
 
 
     public StatusBadgesAnalyser(File readMe){

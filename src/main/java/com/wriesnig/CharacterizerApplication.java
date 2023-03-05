@@ -17,9 +17,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class CharacterizerApplication implements Observable {
-    private ArrayList<Observer> observers = new ArrayList<>();
-    private ArrayList<Integer> ids;
-
+    private final ArrayList<Observer> observers = new ArrayList<>();
+    private final ArrayList<Integer> ids;
 
     public CharacterizerApplication(ArrayList<Integer> ids) {
         this.ids = ids;
@@ -27,11 +26,12 @@ public class CharacterizerApplication implements Observable {
 
     public void run() {
         Logger.info("Running characterizer application.");
-        StackDatabase.initDB();
+        initDBs();
         AccountsFetcher accountsFetcher = new AccountsFetcher();
         ArrayList<User> users = accountsFetcher.fetchMatchingAccounts(ids);
-        runExpertiseJobs(users);
-        storeUsersExpertise(users);
+        //runExpertiseJobs(users);
+        //storeUsersExpertise(users);
+        closeDBs();
         notifyObservers(users);
     }
 
@@ -46,7 +46,7 @@ public class CharacterizerApplication implements Observable {
             stack.join();
             git.join();
         } catch (InterruptedException e) {
-            Logger.error("Joining expertise job threads failed. ", e);
+            Logger.error("Expertise job was interrupted. ", e);
             throw new RuntimeException();
         }
     }
@@ -76,10 +76,19 @@ public class CharacterizerApplication implements Observable {
 
 
     public void storeUsersExpertise(ArrayList<User> users){
-        ExpertiseDatabase.initDB();
         for(User user: users){
             ExpertiseDatabase.insertUser(user);
         }
+    }
+
+    public void initDBs(){
+        StackDatabase.initDB();
+        ExpertiseDatabase.initDB();
+    }
+
+    public void closeDBs(){
+        StackDatabase.closeConnection();
+        ExpertiseDatabase.closeConnection();
     }
 
     @Override

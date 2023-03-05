@@ -67,6 +67,7 @@ public class AccountsMatchScorer {
         return image;
     }
 
+    //Resetting image size parameter in urls to 256
     public String adaptUrlForStandardImageSize(String imageUrl){
         if (imageUrl.contains("google"))
             imageUrl = imageUrl.replaceAll("=k-s\\d*", "=k-s256");
@@ -132,10 +133,19 @@ public class AccountsMatchScorer {
         return isWebsitesMatching() ? MATCHING_LINKED_WEBSITES_SCORE : NO_MATCH_SCORE;
     }
 
+
     public boolean isWebsitesMatching() {
         return !stackUser.getWebsiteUrl().isEmpty() && stackUser.getWebsiteUrl().equals(gitUser.getWebsiteUrl())
-                || !stackUser.getLink().isEmpty() && stackUser.getLink().equals(gitUser.getWebsiteUrl())
-                || !stackUser.getWebsiteUrl().isEmpty() && stackUser.getWebsiteUrl().equals(gitUser.getHtmlUrl());
+                || isStackWebsiteLinkingGitAccount()
+                || isGitAccountLinkingStackAccount();
+    }
+
+    private boolean isStackWebsiteLinkingGitAccount(){
+        return !stackUser.getLink().isEmpty() && stackUser.getLink().equals(gitUser.getWebsiteUrl());
+    }
+
+    private boolean isGitAccountLinkingStackAccount(){
+        return !stackUser.getWebsiteUrl().isEmpty() && stackUser.getWebsiteUrl().equals(gitUser.getHtmlUrl());
     }
 
 }

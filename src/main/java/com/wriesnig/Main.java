@@ -87,11 +87,6 @@ public class Main {
         return properties;
     }
 
-    public void closeDbConnections(){
-        StackDatabase.closeConnection();
-        ExpertiseDatabase.closeConnection();
-    }
-
     public static void startApp(){
         new CharacterizerApplicationGui();
     }

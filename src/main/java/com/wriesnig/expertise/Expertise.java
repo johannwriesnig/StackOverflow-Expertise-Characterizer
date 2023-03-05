@@ -7,8 +7,8 @@ public class Expertise {
     private final static double STACK_WEIGHT = 2/3.0;
     private final static double GIT_WEIGHT = 1/3.0;
 
-    private HashMap<String, Double> gitExpertise;
-    private HashMap<String, Double> stackExpertise;
+    private final HashMap<String, Double> gitExpertise;
+    private final HashMap<String, Double> stackExpertise;
 
     public Expertise(){
         gitExpertise = new HashMap<>();
@@ -34,8 +34,7 @@ public class Expertise {
             double stackTagExpertise = stackExpertise.get(tag);
             double gitTagExpertise = gitExpertise.get(tag);
             double avgExpertise = (Expertise.STACK_WEIGHT * stackTagExpertise+gitTagExpertise * Expertise.GIT_WEIGHT);
-            int cutOffExpertise = (int) (avgExpertise * 100);
-            avgExpertise = cutOffExpertise/100.0;
+            avgExpertise = (double)((int)(avgExpertise*100))/100.0;
             overAllExpertise.put(tag, avgExpertise);
         }
         return overAllExpertise;

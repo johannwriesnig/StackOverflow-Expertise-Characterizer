@@ -38,7 +38,7 @@ public class GitExpertiseJobTest {
     public void findTagInMavenProject() {
         String tag = "spring";
         Tags.tagsToCharacterize = new String[]{tag};
-        Repo repo = new Repo("", "", 0);
+        Repo repo = new Repo("", "", false, 0);
         repo.setFileName("src/main/resources/test/projects/java/maven");
         gitExpertiseJob.findTagsForJavaProject(repo);
         assertTrue(repo.getPresentTags().contains(tag));
@@ -49,7 +49,7 @@ public class GitExpertiseJobTest {
         String tag1 = "hibernate";
         String tag2 = "junit";
         Tags.tagsToCharacterize = new String[]{tag1, tag2};
-        Repo repo = new Repo("", "", 0);
+        Repo repo = new Repo("", "", false, 0);
         repo.setFileName("src/main/resources/test/projects/java/gradle");
         gitExpertiseJob.findTagsForJavaProject(repo);
         assertTrue(repo.getPresentTags().contains(tag1));
@@ -58,7 +58,7 @@ public class GitExpertiseJobTest {
 
     @Test
     public void findTagsInJavaProjectByImports(){
-        Repo repo = new Repo("", "", 0);
+        Repo repo = new Repo("", "", false, 0);
         repo.setFileName("src/main/resources/test/projects/java/standard");
         String tag = "hibernate";
         Tags.tagsToCharacterize = new String[]{tag};
@@ -73,7 +73,7 @@ public class GitExpertiseJobTest {
         String tag1 = "django";
         String tag2 = "flask";
         Tags.tagsToCharacterize = new String[]{tag1, tag2};
-        Repo repo = new Repo("repo", "", 0);
+        Repo repo = new Repo("repo", "", false, 0);
         repo.setFileName("src/main/resources/test/projects/python");
         gitExpertiseJob.findTagsInImportLines(repo);
         assertTrue(repo.getPresentTags().contains(tag1));
@@ -84,13 +84,13 @@ public class GitExpertiseJobTest {
     public void computeAndStoreReposExpertise(){
         String tagJava = "java";
         String tagSpring = "spring";
-        Repo javaExpertise3 = new Repo("", "java", 1);
+        Repo javaExpertise3 = new Repo("", "java", false, 0);
         javaExpertise3.addTag(tagJava);
         javaExpertise3.setQuality(3);
-        Repo javaExpertise4 = new Repo("", "java", 1);
+        Repo javaExpertise4 = new Repo("", "java", false, 0);
         javaExpertise4.addTag(tagJava);
         javaExpertise4.setQuality(4);
-        Repo springAndJavaExpertise5 = new Repo("", "java", 1);
+        Repo springAndJavaExpertise5 = new Repo("", "java", false, 0);
         springAndJavaExpertise5.addTag(tagJava);
         springAndJavaExpertise5.addTag(tagSpring);
         springAndJavaExpertise5.setQuality(5);
@@ -115,7 +115,7 @@ public class GitExpertiseJobTest {
     @Test
     public void determineExpertise(){
         Logger.deactivatePrinting();
-        Repo repo = new Repo("repo", "java", 0);
+        Repo repo = new Repo("repo", "java", false, 0);
         repo.setFileName("src/main/resources/test/projects/java/standard");
         String tag = "hibernate";
         Tags.tagsToCharacterize = new String[]{tag};
@@ -134,7 +134,7 @@ public class GitExpertiseJobTest {
 
     @Test
     public void getReadMe(){
-        Repo repo = new Repo("repo", "", 0);
+        Repo repo = new Repo("repo", "", false, 0);
         repo.setFileName("src/main/resources/test/projects");
         File readMe = gitExpertiseJob.getReadMeFile(repo);
         File expectedFile = new File("src/main/resources/test/projects/readme.adoc");
@@ -144,12 +144,9 @@ public class GitExpertiseJobTest {
     @Test
     public void cleanseRepos(){
         Tags.tagsToCharacterize = new String[]{"java"};
-        Repo repo1 = new Repo("repo1", "java", 1);
-        repo1.setForked(false);
-        Repo repo2 = new Repo("repo2", "java", 1);
-        repo2.setForked(true);
-        Repo repo3 = new Repo("repo3", "", 1);
-        repo3.setForked(false);
+        Repo repo1 = new Repo("repo1", "java", false, 0);
+        Repo repo2 = new Repo("repo2", "java", true, 0);
+        Repo repo3 = new Repo("repo3", "", false, 0);
 
         ArrayList<Repo> repos = new ArrayList<>();
         repos.add(repo1);

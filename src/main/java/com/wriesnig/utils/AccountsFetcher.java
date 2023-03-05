@@ -79,6 +79,7 @@ public class AccountsFetcher {
                 double score = accountsMatchScorer.getMatchingScore();
                 if (score > highest_match.getValue()) highest_match = new Pair<>(gitUser, score);
             }
+            //only add git account to stack user if the score is higher than 0.6
             if (highest_match.getValue()-(AccountsMatchScorer.MATCHING_NAMES_SCORE+AccountsMatchScorer.MATCHING_LINKED_WEBSITES_SCORE) >= -0.001) {
                 linkedAccounts.add(new Pair<>(stackUser, highest_match.getKey()));
                 Logger.info("Matched " + stackUser.getDisplayName() + "/" + highest_match.getKey().getLogin() + " with score " + highest_match.getValue()+".");
@@ -90,6 +91,7 @@ public class AccountsFetcher {
 
         AccountsMatchScorer accountsMatchScorer = new AccountsMatchScorer(null, null);
         ArrayList<User> users = new ArrayList<>();
+        //Creating users from the matching accounts
         for (Pair<StackUser, GitUser> matching_accounts : linkedAccounts) {
             StackUser stackUser = matching_accounts.getKey();
             GitUser gitUser = matching_accounts.getValue();
