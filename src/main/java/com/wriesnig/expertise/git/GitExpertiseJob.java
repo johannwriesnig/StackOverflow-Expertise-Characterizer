@@ -43,7 +43,7 @@ public class GitExpertiseJob implements Runnable {
         BlockingQueue<Repo> downloadedRepos = new LinkedBlockingQueue<>();
         downloadReposInNewThread(repos, userReposPath, downloadedRepos);
         determineReposExpertise(downloadedRepos, userReposPath);
-        deleteUsersReposWorkSpace(new File(userReposPath));
+        deleteDirectory(new File(userReposPath));
         repos.removeIf(repo-> repo.getCyclomaticComplexity()==-1 || repo.getSourceLinesOfCode()==0);
         HashMap<String, ArrayList<Double>> expertisePerTag = getExpertisePerTag(repos);
         storeExpertise(expertisePerTag, user);
@@ -138,11 +138,11 @@ public class GitExpertiseJob implements Runnable {
         repo.setQuality(quality);
     }
 
-    public void deleteUsersReposWorkSpace(File workSpace){
+    public void deleteDirectory(File directory){
         try {
-            FileUtils.deleteDirectory(workSpace);
+            FileUtils.deleteDirectory(directory);
         } catch (IOException e) {
-            Logger.error("Deleting repo workspace failed -> " + workSpace.getPath(), e);
+            Logger.error("Deleting directory failed -> " + directory.getPath(), e);
         }
     }
 
@@ -238,20 +238,6 @@ public class GitExpertiseJob implements Runnable {
         return tags;
     }
 
-    private static synchronized void addTagsFromImportsFile(Repo repo, String imports){
-        String importsFilePath = "src/main/resources/src/workspace/imports.txt";
-        File importsFile = new File("src/main/resources/src/workspace/imports.txt");
-
-        try {
-            Files.writeString(Path.of(importsFilePath),imports);
-        } catch (IOException e) {
-            Logger.error("Writing to imports.txt failed.", e);
-        }
-
-        repo.addTags(getTagsFromFile(importsFile));
-    }
-
-
     public boolean isInImportSection(String line){
         return line.startsWith("import") || line.startsWith("from") || line.startsWith(" ") || line.startsWith("package")
                 || line.startsWith("#") || line.startsWith("//") || line.startsWith("/*") || line.startsWith("*/");
@@ -298,12 +284,7 @@ public class GitExpertiseJob implements Runnable {
         @Override
         public void run() {
             determineExpertise(repo);
-
-            try {
-                FileUtils.deleteDirectory(new File(repo.getFileName()));
-            } catch (IOException e) {
-                Logger.error("Could not delete repo directory -> "+ repo.getFileName(), e);
-            }
+            deleteDirectory(new File(repo.getFileName()));
         }
     }
 }

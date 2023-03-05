@@ -141,6 +141,27 @@ public class GitExpertiseJobTest {
         assertEquals(expectedFile.getPath(), readMe.getPath());
     }
 
+    @Test
+    public void cleanseRepos(){
+        Tags.tagsToCharacterize = new String[]{"java"};
+        Repo repo1 = new Repo("repo1", "java", 1);
+        repo1.setForked(false);
+        Repo repo2 = new Repo("repo2", "java", 1);
+        repo2.setForked(true);
+        Repo repo3 = new Repo("repo3", "", 1);
+        repo3.setForked(false);
+
+        ArrayList<Repo> repos = new ArrayList<>();
+        repos.add(repo1);
+        repos.add(repo2);
+        repos.add(repo3);
+
+        gitExpertiseJob.cleanseRepos(repos);
+
+        assertEquals(1, repos.size());
+        assertEquals(repo1, repos.get(0));
+    }
+
     @AfterEach
     public void tearDown() {
         gitExpertiseJob = null;
