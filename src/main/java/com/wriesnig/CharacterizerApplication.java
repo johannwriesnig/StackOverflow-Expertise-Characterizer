@@ -29,8 +29,8 @@ public class CharacterizerApplication implements Observable {
         initDBs();
         AccountsFetcher accountsFetcher = new AccountsFetcher();
         ArrayList<User> users = accountsFetcher.fetchMatchingAccounts(ids);
-        //runExpertiseJobs(users);
-        //storeUsersExpertise(users);
+        runExpertiseJobs(users);
+        storeUsersExpertise(users);
         closeDBs();
         notifyObservers(users);
     }
