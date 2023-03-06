@@ -89,7 +89,7 @@ public class Repo {
 
 
     public boolean isHasTests(){
-        double ratio = testFilesSourceLinesOfCode / (double)(sourceLinesOfCode - testFilesSourceLinesOfCode);
+        double ratio = testFilesSourceLinesOfCode / ((double)(sourceLinesOfCode - testFilesSourceLinesOfCode));
         return ratio>=2/3.0;
     }
 

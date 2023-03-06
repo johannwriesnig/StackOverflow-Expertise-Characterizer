@@ -132,8 +132,10 @@ public class GitExpertiseJob implements Runnable {
 
         double quality = Expertise.CLASSIFIER_OUTPUT[(int) GitClassifier.classify(classificationData)];
         Logger.info(repo.getFileName() + " contains " + repo.getPresentTags() +
-                " with following stats: Expertise: " + quality + ";complexity-> " + repo.getCyclomaticComplexity() + "; hasReadMe-> "+readMe.exists() +"; BuildStatus-> " + repo.getBuildStatus() + "; hasTests-> " + repo.isHasTests() + "; Coverage: " + repo.getCoverage() +"; Sloc: " + repo.getSourceLinesOfCode());
-
+                " with following stats: Expertise: " + quality + ";complexity-> " + repo.getCyclomaticComplexity() + "; " +
+                "hasReadMe-> "+readMe.exists() +"; BuildStatus-> " + repo.getBuildStatus() + "; " +
+                "hasTests-> " + repo.isHasTests() + "; Coverage: " + repo.getCoverage() +"; " +
+                "Sloc: " + repo.getTestFilesSourceLinesOfCode()+"/"+repo.getSourceLinesOfCode());
 
         repo.setQuality(quality);
     }
