@@ -8,7 +8,7 @@
 
     <rule ref="category/java/design.xml/CyclomaticComplexity">
     <properties>
-        <property name="methodReportLevel" value="2" />
+        <property name="methodReportLevel" value="1" />
     </properties>
     </rule>
     <rule ref="category/java/design.xml/NcssCount">
