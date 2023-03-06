@@ -3,17 +3,19 @@ package com.wriesnig.expertise.git.metrics;
 import com.wriesnig.api.git.Repo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedConstruction;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.*;
 
 public class PythonMetricsTest {
     private String repoPath = "src/main/resources/test/metrics/pythonRepo";
@@ -30,6 +32,26 @@ public class PythonMetricsTest {
         pythonMetrics = new PythonMetrics(repo);
         spyPythonMetrics = spy(pythonMetrics);
         repoFile = new File(repo.getFileName()).getAbsoluteFile();
+    }
+
+    @Test
+    public void radonProcessButDoesNotPass() throws IOException, InterruptedException {
+        String command = "cc";
+        doCallRealMethod().when(spyPythonMetrics).callRadonProcess(any(),any());
+        doCallRealMethod().when(spyPythonMetrics).setProcessProperties(anyString(),anyString(),anyString());
+        Process radonProcess = mock(Process.class);
+        doReturn(false).when(radonProcess).waitFor(anyLong(), any());
+        doReturn(InputStream.nullInputStream()).when(radonProcess).getErrorStream();
+        try(MockedConstruction<ProcessBuilder> mockedProcessBuilder = mockConstruction(ProcessBuilder.class,
+                (mock,context)->{
+                    doReturn(radonProcess).when(mock).start();
+                })){
+            assertThrows(InterruptedException.class, ()-> spyPythonMetrics.callRadonProcess(command,pythonMetrics.root));
+            ProcessBuilder processBuilder = mockedProcessBuilder.constructed().get(0);
+            assertEquals(1, mockedProcessBuilder.constructed().size());
+            verify(processBuilder, times(1)).start();
+        }
+        verify(spyPythonMetrics, times(1)).setProcessProperties(command,pythonMetrics.root.getAbsolutePath(), pythonMetrics.output.getAbsolutePath());
     }
 
     @Test

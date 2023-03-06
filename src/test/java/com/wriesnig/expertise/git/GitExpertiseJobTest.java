@@ -1,5 +1,6 @@
 package com.wriesnig.expertise.git;
 
+import com.wriesnig.api.git.FinishRepo;
 import com.wriesnig.api.git.GitUser;
 import com.wriesnig.api.git.Repo;
 import com.wriesnig.api.stack.StackUser;
@@ -18,6 +19,7 @@ import org.mockito.MockedStatic;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,6 +34,27 @@ public class GitExpertiseJobTest {
         when(user.getGitLogin()).thenReturn("user");
         when(user.getExpertise()).thenReturn(new Expertise());
         gitExpertiseJob = new GitExpertiseJob(user);
+    }
+
+    @Test
+    public void testDetermineReposExpertise() throws InterruptedException {
+        BlockingQueue<Repo> downloadedRepos = new LinkedBlockingQueue<>();
+        Repo repo = new Repo("repo1", "",false,0);
+        downloadedRepos.put(repo);
+        downloadedRepos.put(new FinishRepo());
+
+        try(MockedConstruction<GitExpertiseJob.RepoExpertiseJob> mockedRepoExpertiseJob = mockConstruction(GitExpertiseJob.RepoExpertiseJob.class);
+            MockedConstruction<ThreadPoolExecutor> mockedExecutorService = mockConstruction(ThreadPoolExecutor.class)){
+            gitExpertiseJob.determineReposExpertise(downloadedRepos, "");
+            assertEquals(1, mockedRepoExpertiseJob.constructed().size());
+            assertEquals(1, mockedExecutorService.constructed().size());
+            GitExpertiseJob.RepoExpertiseJob expertiseJob = mockedRepoExpertiseJob.constructed().get(0);
+            ExecutorService executorService = mockedExecutorService.constructed().get(0);
+            verify(executorService, times(1)).awaitTermination(anyLong(), any());
+            verify(executorService, times(1)).execute(expertiseJob);
+            verify(executorService, times(1)).shutdown();
+        }
+
     }
 
     @Test
@@ -112,24 +135,7 @@ public class GitExpertiseJobTest {
         assertEquals(4, expertise.get(tagJava));
     }
 
-    @Test
-    public void determineExpertise(){
-        Logger.deactivatePrinting();
-        Repo repo = new Repo("repo", "java", false, 0);
-        repo.setFileName("src/main/resources/test/projects/java/standard");
-        String tag = "hibernate";
-        Tags.tagsToCharacterize = new String[]{tag};
 
-        try(MockedStatic<GitClassifier> mockedClassifier = mockStatic(GitClassifier.class);
-            MockedConstruction<StatusBadgesAnalyser> mockedAnalyser = mockConstruction(StatusBadgesAnalyser.class);
-            MockedConstruction<JavaMetrics> mockedMetricsSetter = mockConstruction(JavaMetrics.class)){
-            double classifierOutput = 3.0;
-            mockedClassifier.when(()->GitClassifier.classify(any())).thenReturn(classifierOutput);
-            gitExpertiseJob.determineExpertise(repo);
-            assertEquals(Expertise.CLASSIFIER_OUTPUT[(int) classifierOutput],repo.getQuality());
-
-        }
-    }
 
 
     @Test
@@ -157,6 +163,24 @@ public class GitExpertiseJobTest {
 
         assertEquals(1, repos.size());
         assertEquals(repo1, repos.get(0));
+    }
+
+    @Test
+    public void determineExpertise(){
+        Logger.deactivatePrinting();
+        Repo repo = new Repo("repo", "java", false, 0);
+        repo.setFileName("src/main/resources/test/projects/java/standard");
+        String tag = "hibernate";
+        Tags.tagsToCharacterize = new String[]{tag};
+
+        try(MockedStatic<GitClassifier> mockedClassifier = mockStatic(GitClassifier.class);
+            MockedConstruction<StatusBadgesAnalyser> mockedAnalyser = mockConstruction(StatusBadgesAnalyser.class);
+            MockedConstruction<JavaMetrics> mockedMetricsSetter = mockConstruction(JavaMetrics.class)){
+            double classifierOutput = 3.0;
+            mockedClassifier.when(()->GitClassifier.classify(any())).thenReturn(classifierOutput);
+            gitExpertiseJob.determineExpertise(repo);
+            assertEquals(Expertise.CLASSIFIER_OUTPUT[(int) classifierOutput],repo.getQuality());
+        }
     }
 
     @AfterEach
