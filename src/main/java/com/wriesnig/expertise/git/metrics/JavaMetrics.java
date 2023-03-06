@@ -67,6 +67,7 @@ public class JavaMetrics extends MetricsSetter {
                             testFilesSourceLinesOfCode += parsedVal;
                         break;
                     case "CyclomaticComplexity":
+                        if(parsedVal<2)continue;
                         cyclomaticComplexitySum += parsedVal;
                         cyclomaticComplexityCounter++;
                         break;
@@ -74,7 +75,7 @@ public class JavaMetrics extends MetricsSetter {
 
             }
         }
-        double avgCyclomaticComplexity = cyclomaticComplexityCounter == 0 ? -1 : (double) cyclomaticComplexitySum / cyclomaticComplexityCounter;
+        double avgCyclomaticComplexity = cyclomaticComplexityCounter == 0 ? 1 : (double) cyclomaticComplexitySum / cyclomaticComplexityCounter;
         repo.setCyclomaticComplexity((int) (avgCyclomaticComplexity * 100) / 100.0);
         repo.setSourceLinesOfCode(sourceLinesOfCode);
         repo.setTestFilesSourceLinesOfCode(testFilesSourceLinesOfCode);

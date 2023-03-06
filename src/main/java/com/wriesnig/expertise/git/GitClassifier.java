@@ -1,91 +1,90 @@
 package com.wriesnig.expertise.git;
 
 class GitClassifier {
-
-    public static double classify(Object[] i){
+    public static double classify(Object[] i) {
 
         double p = Double.NaN;
-        p = GitClassifier.N6e61a2ff35(i);
+        p = GitClassifier.N3a542b7735(i);
         return p;
     }
-    static double N6e61a2ff35(Object []i) {
+    static double N3a542b7735(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
-            p = 2;
+            p = 1;
         } else if (((Double) i[2]).doubleValue() <= 522.0) {
-            p = GitClassifier.N24dd121d36(i);
+            p = GitClassifier.N5618148d36(i);
         } else if (((Double) i[2]).doubleValue() > 522.0) {
-            p = GitClassifier.Nc5249c052(i);
+            p = GitClassifier.N34e388e052(i);
         }
         return p;
     }
-    static double N24dd121d36(Object []i) {
+    static double N5618148d36(Object []i) {
         double p = Double.NaN;
         if (i[1] == null) {
             p = 2;
         } else if (i[1].equals("false")) {
-            p = GitClassifier.N5b48957837(i);
+            p = GitClassifier.N34119e0437(i);
         } else if (i[1].equals("true")) {
-            p = GitClassifier.N97ca3a146(i);
+            p = GitClassifier.N5274750346(i);
         }
         return p;
     }
-    static double N5b48957837(Object []i) {
+    static double N34119e0437(Object []i) {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 1;
         } else if (i[4].equals("false")) {
             p = 1;
         } else if (i[4].equals("true")) {
-            p = GitClassifier.N6497bfab38(i);
+            p = GitClassifier.N143f1cb438(i);
         }
         return p;
     }
-    static double N6497bfab38(Object []i) {
+    static double N143f1cb438(Object []i) {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 1;
         } else if (i[3].equals("false")) {
-            p = GitClassifier.N7828f9c39(i);
+            p = GitClassifier.Nf2b92d739(i);
         } else if (i[3].equals("true")) {
-            p = GitClassifier.N1ea1805f43(i);
+            p = GitClassifier.N1e80f32a43(i);
         }
         return p;
     }
-    static double N7828f9c39(Object []i) {
+    static double Nf2b92d739(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 1;
-        } else if (((Double) i[2]).doubleValue() <= 261.0) {
+        } else if (((Double) i[2]).doubleValue() <= 223.0) {
             p = 1;
-        } else if (((Double) i[2]).doubleValue() > 261.0) {
-            p = GitClassifier.N4b03288b40(i);
+        } else if (((Double) i[2]).doubleValue() > 223.0) {
+            p = GitClassifier.N198143c340(i);
         }
         return p;
     }
-    static double N4b03288b40(Object []i) {
+    static double N198143c340(Object []i) {
         double p = Double.NaN;
         if (i[0] == null) {
             p = 2;
         } else if (((Double) i[0]).doubleValue() <= 2.12) {
             p = 2;
         } else if (((Double) i[0]).doubleValue() > 2.12) {
-            p = GitClassifier.N54ff97c641(i);
+            p = GitClassifier.N21580f4941(i);
         }
         return p;
     }
-    static double N54ff97c641(Object []i) {
+    static double N21580f4941(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 1;
         } else if (((Double) i[2]).doubleValue() <= 425.0) {
             p = 1;
         } else if (((Double) i[2]).doubleValue() > 425.0) {
-            p = GitClassifier.Ndcc101542(i);
+            p = GitClassifier.N4dee7d6a42(i);
         }
         return p;
     }
-    static double Ndcc101542(Object []i) {
+    static double N4dee7d6a42(Object []i) {
         double p = Double.NaN;
         if (i[0] == null) {
             p = 2;
@@ -96,29 +95,29 @@ class GitClassifier {
         }
         return p;
     }
-    static double N1ea1805f43(Object []i) {
+    static double N1e80f32a43(Object []i) {
         double p = Double.NaN;
         if (i[0] == null) {
             p = 2;
-        } else if (((Double) i[0]).doubleValue() <= 5.88) {
-            p = GitClassifier.N4cb4a47044(i);
-        } else if (((Double) i[0]).doubleValue() > 5.88) {
+        } else if (((Double) i[0]).doubleValue() <= 6.76) {
+            p = GitClassifier.Nd8c346244(i);
+        } else if (((Double) i[0]).doubleValue() > 6.76) {
             p = 1;
         }
         return p;
     }
-    static double N4cb4a47044(Object []i) {
+    static double Nd8c346244(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
-            p = 2;
+            p = 1;
         } else if (((Double) i[2]).doubleValue() <= 66.0) {
-            p = GitClassifier.N645d5b8745(i);
+            p = GitClassifier.N6ccf40dd45(i);
         } else if (((Double) i[2]).doubleValue() > 66.0) {
             p = 2;
         }
         return p;
     }
-    static double N645d5b8745(Object []i) {
+    static double N6ccf40dd45(Object []i) {
         double p = Double.NaN;
         if (i[0] == null) {
             p = 2;
@@ -129,29 +128,29 @@ class GitClassifier {
         }
         return p;
     }
-    static double N97ca3a146(Object []i) {
+    static double N5274750346(Object []i) {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 0;
         } else if (i[3].equals("false")) {
             p = 0;
         } else if (i[3].equals("true")) {
-            p = GitClassifier.N1b4d79a947(i);
+            p = GitClassifier.N4b74c5c447(i);
         }
         return p;
     }
-    static double N1b4d79a947(Object []i) {
+    static double N4b74c5c447(Object []i) {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 1;
         } else if (i[4].equals("false")) {
-            p = GitClassifier.N72b3d99448(i);
+            p = GitClassifier.N27b7c7ec48(i);
         } else if (i[4].equals("true")) {
-            p = GitClassifier.N7cbc252649(i);
+            p = GitClassifier.N31e8b26f49(i);
         }
         return p;
     }
-    static double N72b3d99448(Object []i) {
+    static double N27b7c7ec48(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 1;
@@ -162,18 +161,18 @@ class GitClassifier {
         }
         return p;
     }
-    static double N7cbc252649(Object []i) {
+    static double N31e8b26f49(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 3;
         } else if (((Double) i[2]).doubleValue() <= 415.0) {
-            p = GitClassifier.N1031e0bb50(i);
+            p = GitClassifier.N40c5053c50(i);
         } else if (((Double) i[2]).doubleValue() > 415.0) {
-            p = GitClassifier.N6041432551(i);
+            p = GitClassifier.N2d72a20551(i);
         }
         return p;
     }
-    static double N1031e0bb50(Object []i) {
+    static double N40c5053c50(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 1;
@@ -184,7 +183,7 @@ class GitClassifier {
         }
         return p;
     }
-    static double N6041432551(Object []i) {
+    static double N2d72a20551(Object []i) {
         double p = Double.NaN;
         if (i[0] == null) {
             p = 4;
@@ -195,40 +194,40 @@ class GitClassifier {
         }
         return p;
     }
-    static double Nc5249c052(Object []i) {
+    static double N34e388e052(Object []i) {
         double p = Double.NaN;
         if (i[4] == null) {
             p = 2;
         } else if (i[4].equals("false")) {
-            p = GitClassifier.N115ac87953(i);
+            p = GitClassifier.N40ec3fd953(i);
         } else if (i[4].equals("true")) {
-            p = GitClassifier.N7ac1bd5056(i);
+            p = GitClassifier.N38beede156(i);
         }
         return p;
     }
-    static double N115ac87953(Object []i) {
+    static double N40ec3fd953(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 2;
         } else if (((Double) i[2]).doubleValue() <= 37815.0) {
-            p = GitClassifier.Ne71d6d154(i);
+            p = GitClassifier.N28e83e1d54(i);
         } else if (((Double) i[2]).doubleValue() > 37815.0) {
             p = 3;
         }
         return p;
     }
-    static double Ne71d6d154(Object []i) {
+    static double N28e83e1d54(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 1;
-        } else if (((Double) i[2]).doubleValue() <= 1009.0) {
-            p = GitClassifier.N6443f45155(i);
-        } else if (((Double) i[2]).doubleValue() > 1009.0) {
+        } else if (((Double) i[2]).doubleValue() <= 998.0) {
+            p = GitClassifier.N1032c38f55(i);
+        } else if (((Double) i[2]).doubleValue() > 998.0) {
             p = 2;
         }
         return p;
     }
-    static double N6443f45155(Object []i) {
+    static double N1032c38f55(Object []i) {
         double p = Double.NaN;
         if (i[0] == null) {
             p = 1;
@@ -239,29 +238,29 @@ class GitClassifier {
         }
         return p;
     }
-    static double N7ac1bd5056(Object []i) {
+    static double N38beede156(Object []i) {
         double p = Double.NaN;
         if (i[3] == null) {
             p = 2;
         } else if (i[3].equals("false")) {
-            p = GitClassifier.N3d9fab7157(i);
+            p = GitClassifier.N198d0fd857(i);
         } else if (i[3].equals("true")) {
-            p = GitClassifier.N4642afcb59(i);
+            p = GitClassifier.N76d4491959(i);
         }
         return p;
     }
-    static double N3d9fab7157(Object []i) {
+    static double N198d0fd857(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 2;
         } else if (((Double) i[2]).doubleValue() <= 12657.0) {
             p = 2;
         } else if (((Double) i[2]).doubleValue() > 12657.0) {
-            p = GitClassifier.N3d58354d58(i);
+            p = GitClassifier.N707cc22258(i);
         }
         return p;
     }
-    static double N3d58354d58(Object []i) {
+    static double N707cc22258(Object []i) {
         double p = Double.NaN;
         if (i[0] == null) {
             p = 4;
@@ -272,40 +271,40 @@ class GitClassifier {
         }
         return p;
     }
-    static double N4642afcb59(Object []i) {
+    static double N76d4491959(Object []i) {
         double p = Double.NaN;
         if (i[1] == null) {
             p = 3;
         } else if (i[1].equals("false")) {
-            p = GitClassifier.N311ea16e60(i);
+            p = GitClassifier.N39ca73c760(i);
         } else if (i[1].equals("true")) {
-            p = GitClassifier.N3993d53065(i);
+            p = GitClassifier.N6ac0656c65(i);
         }
         return p;
     }
-    static double N311ea16e60(Object []i) {
+    static double N39ca73c760(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 3;
         } else if (((Double) i[2]).doubleValue() <= 4383.0) {
-            p = GitClassifier.N711a501f61(i);
+            p = GitClassifier.N484858e961(i);
         } else if (((Double) i[2]).doubleValue() > 4383.0) {
-            p = GitClassifier.N5efb2bb263(i);
+            p = GitClassifier.Na7bf84e63(i);
         }
         return p;
     }
-    static double N711a501f61(Object []i) {
+    static double N484858e961(Object []i) {
         double p = Double.NaN;
         if (i[0] == null) {
             p = 3;
         } else if (((Double) i[0]).doubleValue() <= 4.94) {
             p = 3;
         } else if (((Double) i[0]).doubleValue() > 4.94) {
-            p = GitClassifier.Nd14f12c62(i);
+            p = GitClassifier.N5e33fe1062(i);
         }
         return p;
     }
-    static double Nd14f12c62(Object []i) {
+    static double N5e33fe1062(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 2;
@@ -316,18 +315,18 @@ class GitClassifier {
         }
         return p;
     }
-    static double N5efb2bb263(Object []i) {
+    static double Na7bf84e63(Object []i) {
         double p = Double.NaN;
         if (i[0] == null) {
             p = 4;
         } else if (((Double) i[0]).doubleValue() <= 5.18) {
             p = 4;
         } else if (((Double) i[0]).doubleValue() > 5.18) {
-            p = GitClassifier.N1aaae4d264(i);
+            p = GitClassifier.N60c5e68d64(i);
         }
         return p;
     }
-    static double N1aaae4d264(Object []i) {
+    static double N60c5e68d64(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 3;
@@ -338,40 +337,40 @@ class GitClassifier {
         }
         return p;
     }
-    static double N3993d53065(Object []i) {
+    static double N6ac0656c65(Object []i) {
         double p = Double.NaN;
         if (i[0] == null) {
             p = 4;
         } else if (((Double) i[0]).doubleValue() <= 6.11) {
-            p = GitClassifier.N1324cebf66(i);
+            p = GitClassifier.N2b42d55a66(i);
         } else if (((Double) i[0]).doubleValue() > 6.11) {
-            p = GitClassifier.N7ed95fa969(i);
+            p = GitClassifier.N5892697969(i);
         }
         return p;
     }
-    static double N1324cebf66(Object []i) {
+    static double N2b42d55a66(Object []i) {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 4;
         } else if (((Double) i[5]).doubleValue() <= 24.0) {
             p = 4;
         } else if (((Double) i[5]).doubleValue() > 24.0) {
-            p = GitClassifier.N1405c1d267(i);
+            p = GitClassifier.N7e2ee1f467(i);
         }
         return p;
     }
-    static double N1405c1d267(Object []i) {
+    static double N7e2ee1f467(Object []i) {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 3;
         } else if (((Double) i[5]).doubleValue() <= 75.0) {
-            p = GitClassifier.N59c43bf468(i);
+            p = GitClassifier.N3110813268(i);
         } else if (((Double) i[5]).doubleValue() > 75.0) {
             p = 4;
         }
         return p;
     }
-    static double N59c43bf468(Object []i) {
+    static double N3110813268(Object []i) {
         double p = Double.NaN;
         if (i[2] == null) {
             p = 3;
@@ -382,7 +381,7 @@ class GitClassifier {
         }
         return p;
     }
-    static double N7ed95fa969(Object []i) {
+    static double N5892697969(Object []i) {
         double p = Double.NaN;
         if (i[5] == null) {
             p = 3;

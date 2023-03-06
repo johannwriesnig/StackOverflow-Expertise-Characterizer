@@ -44,7 +44,7 @@ public class GitExpertiseJob implements Runnable {
         downloadReposInNewThread(repos, userReposPath, downloadedRepos);
         determineReposExpertise(downloadedRepos, userReposPath);
         deleteDirectory(new File(userReposPath));
-        repos.removeIf(repo-> repo.getCyclomaticComplexity()==-1 || repo.getSourceLinesOfCode()==0);
+        repos.removeIf(repo-> repo.getSourceLinesOfCode()==0);
         HashMap<String, ArrayList<Double>> expertisePerTag = getExpertisePerTag(repos);
         storeExpertise(expertisePerTag, user);
     }

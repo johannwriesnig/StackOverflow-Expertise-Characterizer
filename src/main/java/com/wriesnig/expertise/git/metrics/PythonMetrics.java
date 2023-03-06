@@ -102,7 +102,7 @@ public class PythonMetrics extends MetricsSetter {
             }
         }
 
-        double returnVal = counter == 0 ? -1 : (double) cyclomaticComplexitySum / counter;
+        double returnVal = counter == 0 ? 1 : (double) cyclomaticComplexitySum / counter;
         repo.setCyclomaticComplexity((int) (returnVal * 100) / 100.0);
     }
 
