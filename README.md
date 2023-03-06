@@ -17,7 +17,7 @@ StackExchange-Api-Key: For increased rate limits, a personal key for the Stack-E
 
 First we create the Stackover-Data-Dumps database. Go to db/dumpsDb, where you can find the init.cmd script that will setup the database by using the psql command and the createDB.sql file. For this to work, make sure the psql command is working and you have Posts.csv, Users.csv and Votes.csv placed under db/dumpsDb/csv/.
 <br>
-Then navigate to db/dumpsDb/. The init.cmd will create a database that is used to store the users expertise. Before running the script you have to set the tags in the config.properties file. The script will adapt the createDB.sql file to contain the tags in the users table. ***Tags are delimited by commas e.g. 'tags=java,python,spring'.***
+Then navigate to db/expertiseDb/. The init.cmd will create a database that is used to store the users expertise. Before running the script you have to set the tags in the config.properties file. The script will adapt the createDB.sql file to contain the tags in the users table. ***Tags are delimited by commas e.g. 'tags=java,python,spring'.***
 
 #### Install Radon
 
