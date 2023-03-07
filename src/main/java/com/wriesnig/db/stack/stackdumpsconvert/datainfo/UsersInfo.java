@@ -7,11 +7,7 @@ import java.util.Arrays;
 public class UsersInfo implements DataInfo{
     private final ArrayList<Pair<String, AttributeType>> dataAttributes = new ArrayList<>(Arrays.asList(
             new Pair<>("Id", AttributeType.INTEGER),
-            new Pair<>("Reputation", AttributeType.INTEGER),
             new Pair<>("DisplayName", AttributeType.STRING),
-            new Pair<>("WebsiteUrl", AttributeType.STRING),
-            new Pair<>("Location", AttributeType.STRING),
-            new Pair<>("ProfileImage", AttributeType.STRING),
             new Pair<>("AccountId", AttributeType.INTEGER)
     ));
 

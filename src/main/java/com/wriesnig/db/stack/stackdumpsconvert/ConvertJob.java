@@ -97,7 +97,7 @@ public class ConvertJob {
         if (counter++ != 1000000) return;
         double stop = System.nanoTime() - start;
         stop /= 1000000000.0;
-        Logger.info("Needed " + String.format("%.2f", stop) + "sec to insert " + (mill_counter++) + "mill entries into " + dataInfo.getDataName() + ".");
+        Logger.info("It took " + String.format("%.2f", stop) + " seconds to write " + (mill_counter++) + " million entries to " + dataInfo.getDataName() + ".");
         counter = 0;
     }
 }

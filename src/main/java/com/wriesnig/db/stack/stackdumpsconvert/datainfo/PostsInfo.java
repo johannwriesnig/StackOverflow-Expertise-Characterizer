@@ -10,11 +10,7 @@ public class PostsInfo implements DataInfo{
             new Pair<>("PostTypeId", AttributeType.INTEGER),
             new Pair<>("ParentId",AttributeType.INTEGER),
             new Pair<>("AcceptedAnswerId", AttributeType.INTEGER),
-            new Pair<>("Score", AttributeType.INTEGER),
-            new Pair<>("ViewCount", AttributeType.INTEGER),
-            new Pair<>("Body", AttributeType.STRING),
             new Pair<>("OwnerUserId", AttributeType.INTEGER),
-            new Pair<>("Title", AttributeType.STRING),
             new Pair<>("Tags", AttributeType.STRING)
     ));
     @Override

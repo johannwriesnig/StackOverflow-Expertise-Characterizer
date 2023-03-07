@@ -39,7 +39,7 @@ public class UserTest {
 
     @Test
     public void isUserEstablished(){
-        assertEquals(1, user.getIsEstablishedOnStack());
+        assertTrue( user.getIsEstablishedOnStack());
     }
 
     @Test

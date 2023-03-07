@@ -14,11 +14,7 @@ CREATE DATABASE "StackOverflow"
 
 CREATE UNLOGGED TABLE Users(
 	Id Integer,
-	Reputation Integer,
 	DisplayName varchar(80),
-	WebsiteUrl varchar(400),
-	Location varchar(200),
-	ProfileImageUrl varchar(400),
 	AccountId Integer
 );
 
@@ -34,11 +30,7 @@ CREATE UNLOGGED TABLE Posts(
 	PostTypeId Integer,
 	ParentId Integer,
 	AcceptedAnswerId Integer,
-	Score Integer,
-	ViewCount Integer,
-	Body Text,
 	OwnerUserId Integer,
-	Title varchar(200),
 	Tags varchar(200)
 );
 
