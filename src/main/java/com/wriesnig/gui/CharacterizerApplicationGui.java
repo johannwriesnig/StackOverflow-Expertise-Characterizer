@@ -10,6 +10,8 @@ import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -20,13 +22,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CharacterizerApplicationGui extends JFrame implements Observer {
+    private final int HEIGHT = 550;
+    private final int WIDTH = 900;
     private final JPanel pane;
     private final JPanel welcomeScreen;
     private JPanel waitScreen;
     private JScrollPane usersExpertisesScreen;
-
     private JButton appStartBtn;
     private JButton backToStartBtn;
+    private JPanel infoPanel;
+    private JLabel stackInfo;
+    private JLabel stackInfoValue;
+    private JLabel gitInfo;
+    private JLabel gitInfoValue;
     private JTextField idsInput;
     private final Color backGroundColor = Color.decode("#fcfcfc");
 
@@ -35,13 +43,13 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         ImageIcon image = new ImageIcon("src/main/resources/src/gui/StackIcon.png");
         this.setIconImage(image.getImage());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setMinimumSize(new Dimension(900, 550));
+        this.setMinimumSize(new Dimension(WIDTH, HEIGHT));
         this.setLocationRelativeTo(null);
         this.setResizable(false);
 
         pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
-        pane.setBackground(backGroundColor);
+        pane.setBackground(Color.cyan);
         welcomeScreen = getWelcomeScreen();
         waitScreen = getWaitScreen();
         pane.add(welcomeScreen);
@@ -169,12 +177,18 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         return waitScreen;
     }
 
+    public void setInfoPanel(double stackExpertise, double gitExpertise){
+        gitInfoValue.setText(String.valueOf(gitExpertise));
+        stackInfoValue.setText(String.valueOf(stackExpertise));
+    }
+
 
     @Override
     public void notifyUpdate(ArrayList<User> users) {
         JPanel usersPanel = new JPanel();
         usersPanel.setLayout(new BoxLayout(usersPanel, BoxLayout.Y_AXIS));
         usersPanel.setBackground(backGroundColor);
+
 
         for(User user: users){
             JPanel userPanel = getUserPanel(user);
@@ -197,9 +211,57 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         btnPanel.add(backToStartBtn, constraints);
         btnPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) btnPanel.getPreferredSize().getHeight()));
 
+
+        infoPanel= new JPanel();
+        infoPanel.setBackground(Color.decode("#e6d4d3"));
+        infoPanel.setVisible(false);
+        infoPanel.setLayout(new GridBagLayout());
+        constraints = new GridBagConstraints();
+        stackInfo = new JLabel("Stack-Expertise:");
+        stackInfo.setFont(new Font(stackInfo.getFont().getName(), Font.PLAIN , 13));
+        stackInfo.setSize(stackInfo.getPreferredSize());
+        stackInfo.setMaximumSize(stackInfo.getPreferredSize());
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.insets = new Insets(2,2,0,0);
+        infoPanel.add(stackInfo, constraints);
+        stackInfoValue = new JLabel("1");
+        stackInfoValue.setMaximumSize(stackInfoValue.getPreferredSize());
+        stackInfoValue.setFont(new Font(stackInfoValue.getFont().getName(), Font.PLAIN , 13));
+        constraints.gridx = 1;
+        infoPanel.add(stackInfoValue, constraints);
+        gitInfo = new JLabel("Git-Expertise:");
+        gitInfo.setFont(new Font(gitInfo.getFont().getName(), Font.PLAIN , 13));
+        gitInfo.setHorizontalAlignment(SwingConstants.RIGHT);
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        infoPanel.add(gitInfo, constraints);
+        gitInfoValue = new JLabel("1");
+        gitInfoValue.setMaximumSize(gitInfoValue.getPreferredSize());
+        gitInfoValue.setFont(new Font(gitInfoValue.getFont().getName(), Font.PLAIN , 13));
+        gitInfoValue.setBackground(Color.yellow);
+        constraints.gridx = 1;
+        infoPanel.add(gitInfoValue, constraints);
+        infoPanel.setSize(new Dimension(135,41));
+
+
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                usersExpertisesScreen.setSize(e.getComponent().getSize());
+
+            }
+        });
+
+        layeredPane.setBackground(Color.green);
+        layeredPane.add(usersExpertisesScreen,0,0);
+        layeredPane.add(infoPanel, 1,0);
+
         pane.removeAll();
-        pane.add(usersExpertisesScreen);
+        pane.add(layeredPane);
         pane.add(btnPanel);
+
         revalidate();
         repaint();
     }
@@ -307,6 +369,28 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
             constraints.insets = new Insets(8,0,0,20);
             JLabel tagLbl = new JLabel(tag);
             tagLbl.setFont(new Font(tagLbl.getFont().getName(), Font.PLAIN , 15));
+            tagLbl.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    Point b = MouseInfo.getPointerInfo().getLocation();
+                    SwingUtilities.convertPointFromScreen(b, pane);
+                    int xOffSet = 10;
+                    int yOffSet = 5;
+                    int position = (int) (b.getX() + xOffSet + infoPanel.getSize().getWidth());
+                    if(position<WIDTH)
+                        infoPanel.setLocation((int) (b.getX() + xOffSet), (int) (b.getY() + yOffSet));
+                    else
+                        infoPanel.setLocation((int) (b.getX() - xOffSet - infoPanel.getSize().getWidth()), (int) (b.getY() + yOffSet));
+                    setInfoPanel(user.getExpertise().getStackExpertise().get(tag),user.getExpertise().getGitExpertise().get(tag));
+                    infoPanel.setVisible(true);
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    infoPanel.setVisible(false);
+                }
+            });
             constraints.gridy = 0;
             constraints.gridx++;
             userPanel.add(tagLbl, constraints);
