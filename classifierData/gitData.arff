@@ -1,11 +1,11 @@
 @relation git_repo_quality
 
-@attribute avg_complexity numeric
+@attribute avg_complexity real
 @attribute has_tests {false,true}
-@attribute sloc numeric
+@attribute sloc real
 @attribute has_readme {false,true}
 @attribute is_building {false,true}
-@attribute coverage numeric
+@attribute coverage real
 @attribute expertise {1,2,3,4,5}
 
 @data

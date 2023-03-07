@@ -36,7 +36,7 @@ public class StackExpertiseJob implements Runnable {
 
     public HashMap<String, ArrayList<Double>> getScoresPerTagFromPosts(ResultSet postResults) throws SQLException {
         HashMap<String, ArrayList<Double>> scoresPerTag = getEmptyScoresPerTag();
-        String userIsEstablished = String.valueOf(user.getIsEstablishedOnStack());
+        boolean userIsEstablished = user.getIsEstablishedOnStack();
 
         while (postResults.next()) {
             String tagsOfCurrentPost = postResults.getString("tags");
@@ -44,21 +44,19 @@ public class StackExpertiseJob implements Runnable {
 
             double upVotes = postResults.getInt("upVotes");
             double downVotes = postResults.getInt("downVotes");
-            String isAccepted = postResults.getString("isAccepted");
+            boolean isAccepted = postResults.getString("isAccepted").equals("1");
 
             if(upVotes==0&&downVotes==0)continue;
 
-            String isMainTag;
+            boolean isMainTag;
             for (String tag : Tags.tagsToCharacterize) {
                 if (tagsOfCurrentPost.contains("<" + tag + ">")){
 
-                    if (user.getMainTags().contains(tag))
-                        isMainTag = "1";
-                    else isMainTag = "0";
-                    boolean isActiveOnTag = (isMainTag.equals("1")) && userIsEstablished.equals("1");
+                    isMainTag = user.getMainTags().contains(tag);
+                    boolean isActiveOnTag = isMainTag && userIsEstablished;
                     double score = upVotes / (upVotes + downVotes);
                     score = (double)((int)(score*100))/100.0; //double with only 2 decimals
-                    Object[] postToClassify = new Object[]{upVotes, downVotes, score, isAccepted, isActiveOnTag?"1":"0"};
+                    Object[] postToClassify = new Object[]{upVotes, downVotes, score, String.valueOf(isAccepted), String.valueOf(isActiveOnTag)};
                     double expertise = Expertise.CLASSIFIER_OUTPUT[(int) StackClassifier.classify(postToClassify)];
                     scoresPerTag.get(tag).add(expertise);
                 }

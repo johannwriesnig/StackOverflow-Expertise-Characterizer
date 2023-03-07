@@ -38,8 +38,8 @@ public class User {
         this.expertise = expertise;
     }
 
-    public int getIsEstablishedOnStack() {
-        return stackUser.getReputation() >= 3000 ? 1 : 0;
+    public boolean getIsEstablishedOnStack() {
+        return stackUser.getReputation() >= 3000;
     }
 
     public ArrayList<String> getMainTags() {
