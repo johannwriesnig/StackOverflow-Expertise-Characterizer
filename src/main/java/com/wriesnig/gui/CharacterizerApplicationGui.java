@@ -5,6 +5,7 @@ import com.wriesnig.api.git.DefaultGitUser;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
 import com.wriesnig.utils.Logger;
+
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
@@ -22,21 +23,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CharacterizerApplicationGui extends JFrame implements Observer {
-    private final int HEIGHT = 550;
-    private final int WIDTH = 900;
+    private static final int HEIGHT = 550;
+    private static final int WIDTH = 900;
+
     private final JPanel pane;
-    private final JPanel welcomeScreen;
+    private JPanel welcomeScreen;
     private JPanel waitScreen;
-    private JScrollPane usersExpertisesScreen;
+    private JScrollPane usersScrollPane;
+
+    private final Color backGroundColor = Color.decode("#fcfcfc");
+    private final Color borderColor = Color.decode("#DADCE0");
+    private final Color linkColor = Color.decode("#4287f5");
+    private final Color noLinkColor = Color.decode("#d41313");
+
     private JButton appStartBtn;
     private JButton backToStartBtn;
-    private JPanel infoPanel;
+    private JPanel hoverExpertisePanel;
     private JLabel stackInfo;
     private JLabel stackInfoValue;
     private JLabel gitInfo;
     private JLabel gitInfoValue;
     private JTextField idsInput;
-    private final Color backGroundColor = Color.decode("#fcfcfc");
 
     public CharacterizerApplicationGui(){
         super("Characterizer");
@@ -50,19 +57,20 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         pane.setBackground(Color.cyan);
-        welcomeScreen = getWelcomeScreen();
-        waitScreen = getWaitScreen();
+
+        initWelcomeScreen();
+        initWaitScreen();
+
         pane.add(welcomeScreen);
 
         this.getContentPane().add(pane);
         this.setVisible(true);
     }
 
-    public JPanel getWelcomeScreen(){
-        JPanel welcomeScreen = new JPanel();
+    public void initWelcomeScreen(){
+        welcomeScreen = new JPanel();
         welcomeScreen.setLayout(new GridBagLayout());
         welcomeScreen.setBackground(backGroundColor);
-
         GridBagConstraints constraints = new GridBagConstraints();
 
         JLabel headLbl = new JLabel("Welcome");
@@ -85,39 +93,7 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         idsInput.setPreferredSize(new Dimension(250,22));
         idsInput.setMaximumSize(idsInput.getPreferredSize());
         idsInput.setMinimumSize(idsInput.getPreferredSize());
-        idsInput.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                updateStartBtn();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                updateStartBtn();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                updateStartBtn();
-            }
-
-            public void updateStartBtn(){
-                boolean isInputCorrect = idsInput.getText().matches("\\d+(,\\d+)*");
-                if(!isInputCorrect){
-                    appStartBtn.setEnabled(false);
-                    return;
-                }
-                String[] ids = idsInput.getText().split(",");
-                String lastId = ids[ids.length-1];
-                boolean isInteger=true;
-                try{
-                    Integer.parseInt(lastId);
-                } catch(NumberFormatException e){
-                    isInteger=false;
-                }
-                appStartBtn.setEnabled(isInteger);
-            }
-        });
+        idsInput.getDocument().addDocumentListener(getUserInputDocumentListener());
         welcomeScreen.add(idsInput, constraints);
 
         appStartBtn = new JButton("Start");
@@ -135,26 +111,63 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         constraints.insets = new Insets(0,0,10,10);
         constraints.anchor=GridBagConstraints.LAST_LINE_END;
         welcomeScreen.add(footerLbl, constraints);
+    }
 
-        return welcomeScreen;
+    //listens to users input
+    public DocumentListener getUserInputDocumentListener(){
+        return new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateStartBtn();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateStartBtn();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateStartBtn();
+            }
+
+            public void updateStartBtn(){
+                //disables start button if input does not match numbers delimited by commas
+                boolean isInputCorrect = idsInput.getText().matches("\\d+(,\\d+)*");
+                if(!isInputCorrect){
+                    appStartBtn.setEnabled(false);
+                    return;
+                }
+                String[] ids = idsInput.getText().split(",");
+                String lastId = ids[ids.length-1];
+                boolean isInteger=true;
+                //disables button if value to big for integer
+                try{
+                    Integer.parseInt(lastId);
+                } catch(NumberFormatException e){
+                    isInteger=false;
+                }
+                appStartBtn.setEnabled(isInteger);
+            }
+        };
     }
 
     public void startButtonPressed(){
+        changeViewAfterStartButtonPressed();
+        revalidate();
+        repaint();
+        startApp();
+    }
+
+    public void changeViewAfterStartButtonPressed(){
         appStartBtn.setEnabled(false);
         pane.removeAll();
         waitScreen.setVisible(true);
         pane.add(waitScreen);
-        revalidate();
-        repaint();
-
-        startApp();
     }
 
     public void startApp(){
-        String[] inputIdsSplit = idsInput.getText().split(",");
-        ArrayList<Integer> ids = new ArrayList<>();
-        for(String id: inputIdsSplit)
-            ids.add(Integer.parseInt(id));
+        ArrayList<Integer> ids = getIdsFromUserInput();
 
         Thread thread = new Thread(() -> {
             CharacterizerApplication characterizerApplication = new CharacterizerApplication(ids);
@@ -164,20 +177,26 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         thread.start();
     }
 
+    public ArrayList<Integer> getIdsFromUserInput(){
+        String[] inputIdsSplit = idsInput.getText().split(",");
+        ArrayList<Integer> ids = new ArrayList<>();
+        for(String id: inputIdsSplit)
+            ids.add(Integer.parseInt(id));
+        return ids;
+    }
 
-    public JPanel getWaitScreen(){
-        JPanel waitScreen = new JPanel();
+
+    public void initWaitScreen(){
+        waitScreen = new JPanel();
         waitScreen.setBackground(backGroundColor);
 
         ImageIcon spinner = new ImageIcon(new ImageIcon("src/main/resources/src/gui/Spinner.gif").getImage().getScaledInstance(40,40, Image.SCALE_DEFAULT));
         JLabel infoLbl = new JLabel("this could take some time...", spinner,JLabel.CENTER);
         infoLbl.setFont(new Font(infoLbl.getFont().getName(), Font.PLAIN , 17));
         waitScreen.add(infoLbl);
-
-        return waitScreen;
     }
 
-    public void setInfoPanel(double stackExpertise, double gitExpertise){
+    public void setExpertiseHoverInfo(double stackExpertise, double gitExpertise){
         gitInfoValue.setText(String.valueOf(gitExpertise));
         stackInfoValue.setText(String.valueOf(stackExpertise));
     }
@@ -185,20 +204,39 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
 
     @Override
     public void notifyUpdate(ArrayList<User> users) {
+        JPanel usersPanel = getUsersPanel(users);
+        usersScrollPane = getUsersScrollPane(usersPanel);
+        JPanel backBtnPanel = getBackBtnPanel();
+        hoverExpertisePanel = getHoverExpertisePanel();
+        JLayeredPane layeredPane = getLayeredPane(usersScrollPane, hoverExpertisePanel);
+        pane.removeAll();
+        pane.add(layeredPane);
+        pane.add(backBtnPanel);
+        revalidate();
+        repaint();
+    }
+
+    public JPanel getUsersPanel(ArrayList<User> users){
         JPanel usersPanel = new JPanel();
         usersPanel.setLayout(new BoxLayout(usersPanel, BoxLayout.Y_AXIS));
         usersPanel.setBackground(backGroundColor);
 
+        for(User user: users)
+            usersPanel.add(getUserPanel(user));
 
-        for(User user: users){
-            JPanel userPanel = getUserPanel(user);
-            usersPanel.add(userPanel);
-        }
-        usersExpertisesScreen = new JScrollPane(usersPanel,  ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        usersExpertisesScreen.getVerticalScrollBar().setUnitIncrement(10);
-        usersExpertisesScreen.setBorder(BorderFactory.createEmptyBorder());
-        usersExpertisesScreen.setVisible(true);
+        return usersPanel;
+    }
 
+    //Creates ScrollPane from the usersPanel
+    public JScrollPane getUsersScrollPane(JPanel panel){
+        JScrollPane scrollPane = new JScrollPane(panel,  ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setVisible(true);
+        return scrollPane;
+    }
+
+    public JPanel getBackBtnPanel(){
         JPanel btnPanel = new JPanel();
         btnPanel.setLayout(new GridBagLayout());
         btnPanel.setBackground(backGroundColor);
@@ -210,13 +248,17 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         constraints.insets = new Insets(10,0,10,0);
         btnPanel.add(backToStartBtn, constraints);
         btnPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) btnPanel.getPreferredSize().getHeight()));
+        return btnPanel;
+    }
 
+    public JPanel getHoverExpertisePanel(){
+        JPanel panel = new JPanel();
+        panel.setBackground(Color.decode("#e6d4d3"));
+        panel.setVisible(false);
+        panel.setLayout(new GridBagLayout());
 
-        infoPanel= new JPanel();
-        infoPanel.setBackground(Color.decode("#e6d4d3"));
-        infoPanel.setVisible(false);
-        infoPanel.setLayout(new GridBagLayout());
-        constraints = new GridBagConstraints();
+        GridBagConstraints constraints = new GridBagConstraints();
+
         stackInfo = new JLabel("Stack-Expertise:");
         stackInfo.setFont(new Font(stackInfo.getFont().getName(), Font.PLAIN , 13));
         stackInfo.setSize(stackInfo.getPreferredSize());
@@ -224,117 +266,67 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.insets = new Insets(2,2,0,0);
-        infoPanel.add(stackInfo, constraints);
+        panel.add(stackInfo, constraints);
+
         stackInfoValue = new JLabel("1");
         stackInfoValue.setMaximumSize(stackInfoValue.getPreferredSize());
         stackInfoValue.setFont(new Font(stackInfoValue.getFont().getName(), Font.PLAIN , 13));
         constraints.gridx = 1;
-        infoPanel.add(stackInfoValue, constraints);
+        panel.add(stackInfoValue, constraints);
+
         gitInfo = new JLabel("Git-Expertise:");
         gitInfo.setFont(new Font(gitInfo.getFont().getName(), Font.PLAIN , 13));
         gitInfo.setHorizontalAlignment(SwingConstants.RIGHT);
         constraints.gridx = 0;
         constraints.gridy = 1;
-        infoPanel.add(gitInfo, constraints);
+        panel.add(gitInfo, constraints);
+
         gitInfoValue = new JLabel("1");
         gitInfoValue.setMaximumSize(gitInfoValue.getPreferredSize());
         gitInfoValue.setFont(new Font(gitInfoValue.getFont().getName(), Font.PLAIN , 13));
         gitInfoValue.setBackground(Color.yellow);
         constraints.gridx = 1;
-        infoPanel.add(gitInfoValue, constraints);
-        infoPanel.setSize(new Dimension(135,41));
+        panel.add(gitInfoValue, constraints);
 
+        panel.setSize(new Dimension(135,41));
+        return panel;
+    }
 
+    public JLayeredPane getLayeredPane(JScrollPane bottomComponent,JPanel topComponent){
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                usersExpertisesScreen.setSize(e.getComponent().getSize());
-
+                usersScrollPane.setSize(e.getComponent().getSize());
             }
         });
 
-        layeredPane.setBackground(Color.green);
-        layeredPane.add(usersExpertisesScreen,0,0);
-        layeredPane.add(infoPanel, 1,0);
-
-        pane.removeAll();
-        pane.add(layeredPane);
-        pane.add(btnPanel);
-
-        revalidate();
-        repaint();
+        layeredPane.add(bottomComponent,0,0);
+        layeredPane.add(topComponent, 1,0);
+        return layeredPane;
     }
 
     public void backBtnPressed(){
-        pane.removeAll();
-        pane.add(welcomeScreen);
-        appStartBtn.setEnabled(true);
+        changeViewAfterBackButtonPressed();
         revalidate();
         repaint();
     }
 
-    public JPanel getUserPanel(User user){
-        Color borderColor = Color.decode("#DADCE0");
-        Color linkColor = Color.decode("#4287f5");
-        Color noLinkColor = Color.decode("#d41313");
+    public void changeViewAfterBackButtonPressed(){
+        pane.removeAll();
+        pane.add(welcomeScreen);
+        appStartBtn.setEnabled(true);
+    }
 
+    public JPanel getUserPanel(User user){
         JPanel userPanel = new JPanel(new GridBagLayout());
         userPanel.setBackground(backGroundColor);
         userPanel.setBorder(BorderFactory.createMatteBorder(0,0,1,0,borderColor));
-        BufferedImage image = user.getProfileImage();
-        ImageIcon profileImageIcon = image!=null?new ImageIcon(image):new ImageIcon("src/main/resources/src/gui/BrokenImageUrl.png");
-        String displayName = user.getStackDisplayName();
-        String stackLink = user.getStackLink();
-        String gitLink = user.getGitLink();
 
-
-        JLabel imageLbl = new JLabel(new ImageIcon(profileImageIcon.getImage().getScaledInstance(50,50, Image.SCALE_DEFAULT)));
-        JLabel nameLbl = new JLabel(displayName + "("+user.getStackId()+")");
-        nameLbl.setFont(new Font(nameLbl.getFont().getName(), Font.PLAIN , 15));
-
-        ImageIcon stackImage = new ImageIcon(new ImageIcon("src/main/resources/src/gui/StackIcon.png").getImage().getScaledInstance(25,25, Image.SCALE_DEFAULT));
-        JLabel stackLinkLbl = new JLabel("StackOverflow ", stackImage, JLabel.CENTER);
-        stackLinkLbl.setForeground(linkColor);
-        stackLinkLbl.setFont(new Font(stackLinkLbl.getFont().getName(), Font.PLAIN , 13));
-        stackLinkLbl.setIconTextGap(0);
-        stackLinkLbl.setVerticalTextPosition(JLabel.CENTER);
-        stackLinkLbl.setBorder(new MatteBorder(0,0,0,1,borderColor));
-        stackLinkLbl.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        stackLinkLbl.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                try {
-                    Desktop.getDesktop().browse(new URI(stackLink));
-
-                } catch (IOException | URISyntaxException exception) {
-                    Logger.error("Failed to open stackoverflow link in browser. ", exception);
-                }
-            }
-        });
-
-        JLabel gitLinkLbl = new JLabel("Github", new ImageIcon(new ImageIcon("src/main/resources/src/gui/GitIcon.png").getImage().getScaledInstance(25,25, Image.SCALE_DEFAULT)), JLabel.CENTER);
-        gitLinkLbl.setFont(new Font(gitLinkLbl.getFont().getName(), Font.PLAIN , 13));
-        gitLinkLbl.setIconTextGap(0);
-        gitLinkLbl.setVerticalTextPosition(JLabel.CENTER);
-
-        if(user.getGitUser() instanceof DefaultGitUser){
-            gitLinkLbl.setForeground(noLinkColor);
-        } else{
-            gitLinkLbl.setForeground(linkColor);
-            gitLinkLbl.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            gitLinkLbl.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    try {
-                        Desktop.getDesktop().browse(new URI(gitLink));
-
-                    } catch (IOException | URISyntaxException exception) {
-                        Logger.error("Failed to open github link in browser. ", exception);
-                    }
-                }
-            });
-        }
+        JLabel imageLbl = getImageLabel(user);
+        JLabel nameLbl = getNameLabel(user);
+        JLabel stackLinkLbl = getStackLinkLabel(user);
+        JLabel gitLinkLbl = getGitLinkLabel(user);
 
 
         GridBagConstraints constraints = new GridBagConstraints();
@@ -362,47 +354,8 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         constraints.gridy=1;
         constraints.insets = new Insets(0,0,8,40);
         userPanel.add(gitLinkLbl, constraints);
-        constraints.anchor = GridBagConstraints.CENTER;
 
-        HashMap<String, Double> expertise = user.getExpertise().getOverAllExpertise();
-        for(String tag: Tags.tagsToCharacterize){
-            constraints.insets = new Insets(8,0,0,20);
-            JLabel tagLbl = new JLabel(tag);
-            tagLbl.setFont(new Font(tagLbl.getFont().getName(), Font.PLAIN , 15));
-            tagLbl.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    Point b = MouseInfo.getPointerInfo().getLocation();
-                    SwingUtilities.convertPointFromScreen(b, pane);
-                    int xOffSet = 10;
-                    int yOffSet = 5;
-                    int position = (int) (b.getX() + xOffSet + infoPanel.getSize().getWidth());
-                    if(position<WIDTH)
-                        infoPanel.setLocation((int) (b.getX() + xOffSet), (int) (b.getY() + yOffSet));
-                    else
-                        infoPanel.setLocation((int) (b.getX() - xOffSet - infoPanel.getSize().getWidth()), (int) (b.getY() + yOffSet));
-                    setInfoPanel(user.getExpertise().getStackExpertise().get(tag),user.getExpertise().getGitExpertise().get(tag));
-                    infoPanel.setVisible(true);
-
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    infoPanel.setVisible(false);
-                }
-            });
-            constraints.gridy = 0;
-            constraints.gridx++;
-            userPanel.add(tagLbl, constraints);
-
-
-            constraints.insets = new Insets(0,0,8,20);
-            constraints.gridy = 1;
-            double tagExpertise = expertise.get(tag);
-            JLabel valueLbl = new JLabel(String.valueOf(tagExpertise));
-            tagLbl.setFont(new Font(valueLbl.getFont().getName(), Font.PLAIN , 15));
-            userPanel.add(valueLbl, constraints);
-        }
+        addTagsToPanel(user, constraints, userPanel);
 
         JLabel filler = new JLabel("");
         constraints.gridx++;
@@ -410,7 +363,117 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         userPanel.add(filler,constraints);
 
         userPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) userPanel.getPreferredSize().getHeight()));
-
         return userPanel;
+    }
+
+    public JLabel getImageLabel(User user){
+        BufferedImage image = user.getProfileImage();
+        ImageIcon profileImageIcon = image!=null?new ImageIcon(image):new ImageIcon("src/main/resources/src/gui/BrokenImageUrl.png");
+        return new JLabel(new ImageIcon(profileImageIcon.getImage().getScaledInstance(50,50, Image.SCALE_DEFAULT)));
+    }
+
+    public JLabel getNameLabel(User user){
+        String displayName = user.getStackDisplayName();
+        JLabel nameLbl = new JLabel(displayName + "("+user.getStackId()+")");
+        nameLbl.setFont(new Font(nameLbl.getFont().getName(), Font.PLAIN , 15));
+        return nameLbl;
+    }
+
+    public JLabel getStackLinkLabel(User user){
+        ImageIcon stackImage = new ImageIcon(new ImageIcon("src/main/resources/src/gui/StackIcon.png").getImage().getScaledInstance(25,25, Image.SCALE_DEFAULT));
+        JLabel stackLinkLbl = new JLabel("StackOverflow ", stackImage, JLabel.CENTER);
+        String stackLink = user.getStackLink();
+
+        stackLinkLbl.setForeground(linkColor);
+        stackLinkLbl.setFont(new Font(stackLinkLbl.getFont().getName(), Font.PLAIN , 13));
+        stackLinkLbl.setIconTextGap(0);
+        stackLinkLbl.setVerticalTextPosition(JLabel.CENTER);
+        stackLinkLbl.setBorder(new MatteBorder(0,0,0,1,borderColor));
+        stackLinkLbl.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        stackLinkLbl.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    Desktop.getDesktop().browse(new URI(stackLink));
+
+                } catch (IOException | URISyntaxException exception) {
+                    Logger.error("Failed to open stackoverflow link in browser. ", exception);
+                }
+            }
+        });
+        return stackLinkLbl;
+    }
+
+    public JLabel getGitLinkLabel(User user){
+        JLabel gitLinkLbl = new JLabel("Github", new ImageIcon(new ImageIcon("src/main/resources/src/gui/GitIcon.png").getImage().getScaledInstance(25,25, Image.SCALE_DEFAULT)), JLabel.CENTER);
+        gitLinkLbl.setFont(new Font(gitLinkLbl.getFont().getName(), Font.PLAIN , 13));
+        gitLinkLbl.setIconTextGap(0);
+        gitLinkLbl.setVerticalTextPosition(JLabel.CENTER);
+
+        String gitLink = user.getGitLink();
+        if(user.getGitUser() instanceof DefaultGitUser){
+            gitLinkLbl.setForeground(noLinkColor);
+        } else{
+            gitLinkLbl.setForeground(linkColor);
+            gitLinkLbl.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            gitLinkLbl.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    try {
+                        Desktop.getDesktop().browse(new URI(gitLink));
+
+                    } catch (IOException | URISyntaxException exception) {
+                        Logger.error("Failed to open github link in browser. ", exception);
+                    }
+                }
+            });
+        }
+        return gitLinkLbl;
+    }
+
+    public void addTagsToPanel(User user, GridBagConstraints constraints, JPanel userPanel){
+        constraints.anchor = GridBagConstraints.CENTER;
+        HashMap<String, Double> expertise = user.getExpertise().getOverAllExpertise();
+        for(String tag: Tags.tagsToCharacterize){
+            constraints.insets = new Insets(8,0,0,20);
+            JLabel tagLbl = new JLabel(tag);
+            tagLbl.setFont(new Font(tagLbl.getFont().getName(), Font.PLAIN , 15));
+            tagLbl.addMouseListener(getMouseAdapterForHoverInfo(user, tag));
+            constraints.gridy = 0;
+            constraints.gridx++;
+            userPanel.add(tagLbl, constraints);
+
+            constraints.insets = new Insets(0,0,8,20);
+            constraints.gridy = 1;
+            double tagExpertise = expertise.get(tag);
+            JLabel tagValueLbl = new JLabel(String.valueOf(tagExpertise));
+            tagLbl.setFont(new Font(tagValueLbl.getFont().getName(), Font.PLAIN , 15));
+            userPanel.add(tagValueLbl, constraints);
+        }
+    }
+
+    public MouseAdapter getMouseAdapterForHoverInfo(User user, String tag){
+        return new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                Point b = MouseInfo.getPointerInfo().getLocation();
+                SwingUtilities.convertPointFromScreen(b, pane);
+                int xOffSet = 10;
+                int yOffSet = 5;
+                int position = (int) (b.getX() + xOffSet + hoverExpertisePanel.getSize().getWidth());
+                if(position<WIDTH)
+                    hoverExpertisePanel.setLocation((int) (b.getX() + xOffSet), (int) (b.getY() + yOffSet));
+                else
+                    hoverExpertisePanel.setLocation((int) (b.getX() - xOffSet - hoverExpertisePanel.getSize().getWidth()), (int) (b.getY() + yOffSet));
+                setExpertiseHoverInfo(user.getExpertise().getStackExpertise().get(tag),user.getExpertise().getGitExpertise().get(tag));
+                hoverExpertisePanel.setVisible(true);
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                hoverExpertisePanel.setVisible(false);
+            }
+        };
     }
 }
