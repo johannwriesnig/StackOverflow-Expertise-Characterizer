@@ -1,6 +1,4 @@
 target/
 log.txt
 repos
-db/dumpsDb/csv
-db/dumpsDb/xml/*
 tools
