@@ -109,6 +109,7 @@ public class JavaMetrics extends MetricsSetter {
             Logger.error("Reading metrics report for " + repo.getFileName() + " failed.", e);
         }
 
+        if(reportContent.isEmpty())reportContent="{}";
         return new JSONObject(reportContent);
     }
 

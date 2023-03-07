@@ -41,6 +41,7 @@ public class PythonMetrics extends MetricsSetter {
             report = FileUtils.readLines(output, Charsets.UTF_8).stream()
                     .map(String::valueOf)
                     .collect(Collectors.joining());
+            if(report.isEmpty())report="{}";
         } catch (IOException e) {
             Logger.error("Radon report for " + command + " command could not be created for " + input.getPath());
         } catch (InterruptedException e) {
