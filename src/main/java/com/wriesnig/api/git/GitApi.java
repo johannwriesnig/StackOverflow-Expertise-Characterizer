@@ -73,7 +73,8 @@ public class GitApi {
             URL getUrl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("Authorization", "Bearer " + token);
+            if(!token.isEmpty())
+                connection.setRequestProperty("Authorization", "Bearer " + token);
             if(connection.getResponseCode() == CODE_RESOURCE_NOT_FOUND)
                 return connection.getErrorStream();
             else if (connection.getResponseCode() == CODE_BAD_CREDENTIALS) {
