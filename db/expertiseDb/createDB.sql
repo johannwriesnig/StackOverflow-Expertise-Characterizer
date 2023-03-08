@@ -13,16 +13,15 @@ CREATE DATABASE "Expertise"
 \connect Expertise; 
  
 CREATE TABLE Users( 
-id Integer PRIMARY KEY, 
-stackId varchar(80), 
-gitId varchar(80), 
-profileImageUrl varchar(400) 
-,java Numeric 
-,python Numeric 
-,hibernate Numeric 
-,spring Numeric 
-,bottle Numeric 
-,flask Numeric 
-,django Numeric 
-,gwt Numeric 
-); 
+id SERIAL PRIMARY KEY, 
+stackId Integer, 
+stackDisplayName varchar(80), 
+gitLogin varchar(80), 
+profileImageUrl varchar(400), 
+java Numeric, 
+python Numeric, 
+spring Numeric, 
+hibernate Numeric, 
+django Numeric, 
+flask Numeric, 
+time TimeStamp); 

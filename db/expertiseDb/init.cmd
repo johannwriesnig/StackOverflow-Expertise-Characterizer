@@ -15,21 +15,22 @@ echo: >> %file%
 echo \connect Expertise; >> %file%
 echo: >> %file%
 echo CREATE TABLE Users( >> %file%
-echo	id Integer PRIMARY KEY, >> %file%
-echo	stackId varchar(80), >> %file%
-echo	gitId varchar(80), >> %file%
-echo	profileImageUrl varchar(400) >> %file%
+echo	id SERIAL PRIMARY KEY, >> %file%
+echo	stackId Integer, >> %file%
+echo	stackDisplayName varchar(80), >> %file%
+echo	gitLogin varchar(80), >> %file%
+echo	profileImageUrl varchar(400), >> %file%
 for /F "tokens=1,2 delims==" %%i in (../../config.properties) do (
 	set line=%%i
 	set tags=%%j
 	if [!line!] == [tags] (
 		for /F "tokens=* delims=," %%k in ("!tags!") do (
 			for %%l in (%%k) do (
-				echo ,%%l Numeric >> %file%
+				echo %%l Numeric, >> %file%
 			)
 		)
 	)
 
 )
-echo ); >> %file%
+echo time TimeStamp); >> %file%
 psql -U postgres -f createDB.sql
