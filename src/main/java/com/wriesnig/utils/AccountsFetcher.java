@@ -14,46 +14,57 @@ import java.util.HashMap;
 public class AccountsFetcher {
 
     public ArrayList<User> fetchMatchingAccounts(ArrayList<Integer> stackIds) {
-        ArrayList<StackUser> stackUsers = StackApi.getUsers(stackIds);
-        for (StackUser user : stackUsers)
-            user.setMainTags(StackApi.getMainTags(user.getId()));
-        HashMap<StackUser, ArrayList<GitUser>> potentially_matching_accounts = getStackUsersWithPotentialGitUsers(stackUsers);
-
-        return matchAccounts(potentially_matching_accounts);
+        ArrayList<StackUser> stackUsers = getStackUsersFromStackApi(stackIds);
+        HashMap<StackUser, ArrayList<GitUser>> stackAccountsWithPotentialGitAccounts = getPotentialGitAccountsForStackUsers(stackUsers);
+        return matchAccounts(stackAccountsWithPotentialGitAccounts);
     }
 
-    public HashMap<StackUser, ArrayList<GitUser>> getStackUsersWithPotentialGitUsers(ArrayList<StackUser> stackUsers) {
+    public ArrayList<StackUser> getStackUsersFromStackApi(ArrayList<Integer> ids){
+        ArrayList<StackUser> stackUsers = StackApi.getUsers(ids);
+        for (StackUser user : stackUsers)
+            user.setMainTags(StackApi.getMainTags(user.getId()));
+        return stackUsers;
+    }
+
+    public HashMap<StackUser, ArrayList<GitUser>> getPotentialGitAccountsForStackUsers(ArrayList<StackUser> stackUsers) {
         HashMap<StackUser, ArrayList<GitUser>> potentiallyMatchingAccounts = new HashMap<>();
 
         for (StackUser stackUser : stackUsers) {
-            ArrayList<GitUser> potential_matches = fetchPotentialGitUsers(stackUser);
-            potentiallyMatchingAccounts.put(stackUser, potential_matches);
+            ArrayList<GitUser> potentialGitAccountsForStackUser = getPotentialGitAccountsForSingleStackUser(stackUser);
+            potentiallyMatchingAccounts.put(stackUser, potentialGitAccountsForStackUser);
         }
 
         return potentiallyMatchingAccounts;
     }
 
-    public ArrayList<GitUser> fetchPotentialGitUsers(StackUser stackUser) {
-        ArrayList<GitUser> potentialMatches = new ArrayList<>();
+    public ArrayList<GitUser> getPotentialGitAccountsForSingleStackUser(StackUser stackUser) {
+        ArrayList<GitUser> potentialGitAccounts = new ArrayList<>();
+        GitUser gitUser = GitApi.getUserByLogin(stackUser.getDisplayName());
+        potentialGitAccounts.add(gitUser);
+        potentialGitAccounts.addAll(getPotentialGitAccountsByFullName(stackUser));
+        if(isGitUserLink(stackUser.getWebsiteUrl()))
+            potentialGitAccounts.add(getGitUserFromWebsiteLink(stackUser));
+
+        potentialGitAccounts.removeIf(user-> user instanceof DefaultGitUser);
+        return potentialGitAccounts;
+    }
+
+    private ArrayList<GitUser> getPotentialGitAccountsByFullName(StackUser stackUser){
+        ArrayList<GitUser> potentialGitAccounts = new ArrayList<>();
         GitUser gitUser;
-
-        gitUser = GitApi.getUserByLogin(stackUser.getDisplayName());
-        if (gitUser != null) potentialMatches.add(gitUser);
-
         ArrayList<String> fullNames = GitApi.getUsersByFullName(stackUser.getDisplayName());
         for (String login : fullNames) {
             gitUser = GitApi.getUserByLogin(login);
-            if (!gitUser.getName().equals(stackUser.getDisplayName())) continue;
-            potentialMatches.add(gitUser);
+            if (!gitUser.getName().equals(stackUser.getDisplayName()))
+                continue;
+            potentialGitAccounts.add(gitUser);
         }
+        return potentialGitAccounts;
+    }
 
-        if (isGitUserLink(stackUser.getWebsiteUrl())) {
-            String login = getLoginFromGitUserLink(stackUser.getWebsiteUrl());
-            gitUser = GitApi.getUserByLogin(login);
-            potentialMatches.add(gitUser);
-        }
-
-        return potentialMatches;
+    private GitUser getGitUserFromWebsiteLink(StackUser stackUser){
+        String login = getLoginFromGitUserLink(stackUser.getWebsiteUrl());
+        return GitApi.getUserByLogin(login);
     }
 
     public String getLoginFromGitUserLink(String url) {
@@ -70,36 +81,48 @@ public class AccountsFetcher {
         return isLink;
     }
 
-    public ArrayList<User> matchAccounts(HashMap<StackUser, ArrayList<GitUser>> potentiallyMatchingAccounts) {
-        ArrayList<Pair<StackUser, GitUser>> linkedAccounts = new ArrayList<>();
-        for (StackUser stackUser : potentiallyMatchingAccounts.keySet()) {
-            Pair<GitUser, Double> highest_match = new Pair<>(null, -1.0);
-            for (GitUser gitUser : potentiallyMatchingAccounts.get(stackUser)) {
-                AccountsMatchScorer accountsMatchScorer = new AccountsMatchScorer(stackUser, gitUser);
-                double score = accountsMatchScorer.getMatchingScore();
-                if (score > highest_match.getValue()) highest_match = new Pair<>(gitUser, score);
-            }
-            //only add git account to stack user if the score is higher than 0.6
-            if (highest_match.getValue()-(AccountsMatchScorer.MATCHING_NAMES_SCORE+AccountsMatchScorer.MATCHING_LINKED_WEBSITES_SCORE) >= -0.001) {
-                linkedAccounts.add(new Pair<>(stackUser, highest_match.getKey()));
-                Logger.info("Matched " + stackUser.getDisplayName() + "/" + highest_match.getKey().getLogin() + " with score " + highest_match.getValue()+".");
-            } else {
-                linkedAccounts.add(new Pair<>(stackUser, new DefaultGitUser()));
-                Logger.info("No github account could be found for " + stackUser.getDisplayName() + ".");
-            }
+    public ArrayList<User> matchAccounts(HashMap<StackUser, ArrayList<GitUser>> stackUsersWithPotentialGitAccounts) {
+        ArrayList<Pair<StackUser, GitUser>> pairs = new ArrayList<>();
+        for (StackUser stackUser : stackUsersWithPotentialGitAccounts.keySet()) {
+            pairs.add(getMatchingStackAndGit(stackUser, stackUsersWithPotentialGitAccounts.get(stackUser)));
         }
 
+        return getUsersFromPairs(pairs);
+    }
+
+    public Pair<StackUser,GitUser> getMatchingStackAndGit(StackUser stackUser, ArrayList<GitUser> potentialGitAccounts){
+        Pair<GitUser, Double> highest_match = getHighestMatch(stackUser, potentialGitAccounts);
+        //only match git account with stack user if the score is higher than 0.6
+        if (highest_match.getValue()-(AccountsMatchScorer.MATCHING_NAMES_SCORE+AccountsMatchScorer.MATCHING_LINKED_WEBSITES_SCORE) >= -0.001) {
+            Logger.info("Matched " + stackUser.getDisplayName() + "/" + highest_match.getKey().getLogin() + " with score " + highest_match.getValue()+".");
+            return new Pair<>(stackUser, highest_match.getKey());
+        } else {
+            Logger.info("No github account could be found for " + stackUser.getDisplayName() + ".");
+            return new Pair<>(stackUser, new DefaultGitUser());
+        }
+
+    }
+
+    private Pair<GitUser, Double> getHighestMatch(StackUser stackUser, ArrayList<GitUser> potentialGitAccounts){
+        Pair<GitUser, Double> highest_match = new Pair<>(null, -1.0);
+        for (GitUser gitUser : potentialGitAccounts) {
+            AccountsMatchScorer accountsMatchScorer = new AccountsMatchScorer(stackUser, gitUser);
+            double score = accountsMatchScorer.getMatchingScore();
+            if (score > highest_match.getValue()) highest_match = new Pair<>(gitUser, score);
+        }
+        return highest_match;
+    }
+
+    //Creating users from the matching accounts
+    private ArrayList<User> getUsersFromPairs(ArrayList<Pair<StackUser, GitUser>> pairs){
         AccountsMatchScorer accountsMatchScorer = new AccountsMatchScorer(null, null);
         ArrayList<User> users = new ArrayList<>();
-        //Creating users from the matching accounts
-        for (Pair<StackUser, GitUser> matching_accounts : linkedAccounts) {
+        for (Pair<StackUser, GitUser> matching_accounts : pairs) {
             StackUser stackUser = matching_accounts.getKey();
             GitUser gitUser = matching_accounts.getValue();
             stackUser.setProfileImage(accountsMatchScorer.getImageFromUrl(stackUser.getProfileImageUrl()));
             users.add(new User(stackUser, gitUser));
         }
-
         return users;
     }
-
 }

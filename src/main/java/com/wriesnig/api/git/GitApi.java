@@ -31,7 +31,7 @@ public class GitApi {
     }
 
     public static GitUser getUserByLogin(String login) {
-        if (login.contains(" ")) return null;
+        if (login.contains(" ")) return new DefaultGitUser();
         String path = "users/" + login;
         InputStream apiStream = getStreamFromAPICall(path);
         JSONObject userAsJson = new JSONObject(getStringFromStream(apiStream));

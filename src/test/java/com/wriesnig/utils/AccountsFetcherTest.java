@@ -66,7 +66,7 @@ public class AccountsFetcherTest {
             stackApiMockedStatic.verify(() -> StackApi.getUsers(ids), times(1));
             for (StackUser user : stackApiReturnList)
                 stackApiMockedStatic.verify(() -> StackApi.getMainTags(user.getId()), times(1));
-            verify(accountsFetcher, times(1)).getStackUsersWithPotentialGitUsers(stackApiReturnList);
+            verify(accountsFetcher, times(1)).getPotentialGitAccountsForStackUsers(stackApiReturnList);
             verify(accountsFetcher, times(1)).matchAccounts(any());
         }
     }
@@ -76,7 +76,7 @@ public class AccountsFetcherTest {
         try (MockedStatic<GitApi> gitApiMock = Mockito.mockStatic(GitApi.class)) {
             getMockedGitApi(gitApiMock);
             ArrayList<StackUser> stackApiReturnList = new ArrayList<>(potentialMatches.keySet());
-            HashMap<StackUser, ArrayList<GitUser>> potentiallyMatchingAccounts = accountsFetcher.getStackUsersWithPotentialGitUsers(stackApiReturnList);
+            HashMap<StackUser, ArrayList<GitUser>> potentiallyMatchingAccounts = accountsFetcher.getPotentialGitAccountsForStackUsers(stackApiReturnList);
 
             for (StackUser stackUser : potentialMatches.keySet()) {
                 gitApiMock.verify(() -> GitApi.getUsersByFullName(stackUser.getDisplayName()), times(1));

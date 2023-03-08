@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class GitApiResponseParser {
 
     public GitUser parseUserByLoginResponse(JSONObject user) {
-        if (user.has("message")) return null;
+        if (user.has("message")) return new DefaultGitUser();
 
         String login = user.getString("login");
         String profileImageUrl = user.getString("avatar_url");
