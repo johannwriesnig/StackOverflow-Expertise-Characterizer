@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) {
         if(args.length!=1){
             Logger.error("Wrong arguments.");
-            return;
+            throw new RuntimeException();
         }
 
         if(args[0].equals("c")){
