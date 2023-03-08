@@ -40,7 +40,7 @@ public class MainTest {
     }
 
     @Test
-    public void shouldRunAllMethodsWhenCorrectArguments() {
+    public void shouldCallAllMethodsWhenCorrectArguments() {
         String fileName = "config.properties";
         String[] arguments = new String[]{fileName};
         try (MockedStatic<Main> mainMockedStatic = mockStatic(Main.class);) {

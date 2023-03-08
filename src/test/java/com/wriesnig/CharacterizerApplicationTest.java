@@ -12,6 +12,7 @@ import com.wriesnig.gui.CharacterizerApplicationGui;
 import com.wriesnig.utils.AccountsFetcher;
 import com.wriesnig.utils.Logger;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
@@ -29,122 +30,140 @@ public class CharacterizerApplicationTest {
     private CharacterizerApplication characterizerApplication;
     private ArrayList<User> users;
 
+
+    @BeforeAll
+    public static void setUpBeforeAll() {
+        Logger.deactivatePrinting();
+    }
+
+
     @BeforeEach
     public void setUp() {
-        Logger.deactivatePrinting();
         users = new ArrayList<>();
-        users.add(new User(new StackUser(1,1,"", "","","",1),
-                new GitUser("gitUser1", "", "", "","")));
-        users.add(new User(new StackUser(2,1,"", "","","",2),
+        users.add(new User(new StackUser(1, 1, "", "", "", "", 1),
+                new GitUser("gitUser1", "", "", "", "")));
+        users.add(new User(new StackUser(2, 1, "", "", "", "", 2),
                 new DefaultGitUser()));
+        characterizerApplication = new CharacterizerApplication(null);
     }
 
     @Test
-    public void runIsCallingHelper(){
-        try (MockedStatic<StackDatabase> mockedDb = mockStatic(StackDatabase.class);
-             MockedConstruction<AccountsFetcher> mockedAccountsFetcher = mockConstruction(AccountsFetcher.class);
-             MockedConstruction<CharacterizerApplication> mockedApp = mockConstruction(CharacterizerApplication.class,
-                     (mock,context)->{
-                        doCallRealMethod().when(mock).run();
-                     })) {
-            characterizerApplication = new CharacterizerApplication(null);
+    public void shouldCallAllMethods() {
+        try (MockedConstruction<AccountsFetcher> accountsFetcherMockedConstruction = getMockedAccountsFetcherThatReturnsUsers()){
+
+            characterizerApplication = mock(CharacterizerApplication.class, withSettings().useConstructor((ArrayList)null));
+            doCallRealMethod().when(characterizerApplication).run();
             characterizerApplication.run();
-            assertEquals(1, mockedAccountsFetcher.constructed().size());
-            AccountsFetcher createdFetcher = mockedAccountsFetcher.constructed().get(0);
-            verify(createdFetcher, times(1)).fetchMatchingAccounts(any());
-            verify(characterizerApplication, times(1)).runExpertiseJobs(any());
-            verify(characterizerApplication, times(1)).storeUsersExpertise(any());
-            verify(characterizerApplication, times(1)).notifyObservers(any());
+
+            AccountsFetcher accountsFetcher = accountsFetcherMockedConstruction.constructed().get(0);
+            verify(accountsFetcher, times(1)).fetchMatchingAccounts(any());
+            verify(characterizerApplication, times(1)).runExpertiseJobs(users);
+            verify(characterizerApplication, times(1)).storeUsersExpertise(users);
+            verify(characterizerApplication, times(1)).notifyObservers(users);
+            verify(characterizerApplication, times(1)).initDBs();
+            verify(characterizerApplication, times(1)).closeDBs();
+            verify(characterizerApplication, times(1)).initDBs();
+        }
+    }
+
+    private MockedConstruction<AccountsFetcher> getMockedAccountsFetcherThatReturnsUsers(){
+        return mockConstruction(AccountsFetcher.class,
+                (mock,context)->{
+                    doReturn(users).when(mock).fetchMatchingAccounts(any());
+                });
+    }
+
+    @Test
+    public void shouldInitDbConnections(){
+        try(MockedStatic<StackDatabase> stackDbMockedStatic = mockStatic(StackDatabase.class);
+            MockedStatic<ExpertiseDatabase> expertiseDbMockedStatic = mockStatic(ExpertiseDatabase.class)){
+            characterizerApplication.initDBs();
+            stackDbMockedStatic.verify(StackDatabase::initDB, times(1));
+            expertiseDbMockedStatic.verify(ExpertiseDatabase::initDB, times(1));
         }
     }
 
     @Test
-    public void runStackExpertiseJobForAllUsers(){
-        try (MockedConstruction<StackExpertiseJob> stackExpertiseJob = getMockedStackExpertiseJob()) {
-
-            characterizerApplication = new CharacterizerApplication(null);
-            characterizerApplication.runStackExpertiseJobs(users);
-            assertEquals(users.size(),stackExpertiseJob.constructed().size());
+    public void shouldCloseDbConnections(){
+        try(MockedStatic<StackDatabase> stackDbMockedStatic = mockStatic(StackDatabase.class);
+            MockedStatic<ExpertiseDatabase> expertiseDbMockedStatic = mockStatic(ExpertiseDatabase.class)){
+            characterizerApplication.closeDBs();
+            stackDbMockedStatic.verify(StackDatabase::closeConnection, times(1));
+            expertiseDbMockedStatic.verify(ExpertiseDatabase::closeConnection, times(1));
         }
     }
 
     @Test
-    public void runGitExpertiseJobForAllUsersExceptDefaultOne(){
-        try (MockedConstruction<GitExpertiseJob> gitExpertiseJob = getMockedGitExpertiseJob()) {
-
-            characterizerApplication = new CharacterizerApplication(null);
-            characterizerApplication.runGitExpertiseJobs(users);
-            assertEquals(1,gitExpertiseJob.constructed().size());
-        }
-    }
-
-    @Test
-    public void runGitAndStackJobsThreaded() throws InterruptedException {
-        try (MockedConstruction<Thread> mockedThreads = mockConstruction(Thread.class)) {
-
-            characterizerApplication = new CharacterizerApplication(null);
-            characterizerApplication.runExpertiseJobs(users);
-
-            assertEquals(2, mockedThreads.constructed().size());
-            for(Thread thread: mockedThreads.constructed()){
-                verify(thread,times(1)).start();
-                verify(thread,times(1)).join();
-            }
-        }
-    }
-
-    @Test
-    public void insertAllUsers(){
+    public void shouldInsertUsersInExpertiseDb(){
         try (MockedStatic<ExpertiseDatabase> mockedExpertiseDb = mockStatic(ExpertiseDatabase.class)) {
-
-            characterizerApplication = new CharacterizerApplication(null);
             characterizerApplication.storeUsersExpertise(users);
-            for(User user: users)
+            for (User user : users)
                 mockedExpertiseDb.verify(() -> ExpertiseDatabase.insertUser(user), times(1));
         }
     }
 
     @Test
-    public void notifyingGui(){
-        try (MockedConstruction<CharacterizerApplicationGui> mockedGui = mockConstruction(CharacterizerApplicationGui.class)) {
-            CharacterizerApplicationGui gui = new CharacterizerApplicationGui();
+    public void shouldRunStackExpertiseJobs() {
+        try (MockedConstruction<StackExpertiseJob> stackJobMockedConstruction = mockConstruction(StackExpertiseJob.class)) {
+            characterizerApplication.runStackExpertiseJobs(users);
+            assertEquals(users.size(), stackJobMockedConstruction.constructed().size());
+            for(StackExpertiseJob job: stackJobMockedConstruction.constructed())
+                verify(job, times(1)).run();
+        }
+    }
 
-            characterizerApplication = new CharacterizerApplication(null);
+    @Test
+    public void shouldCallExpertiseJobMethods(){
+        characterizerApplication = mock(CharacterizerApplication.class, withSettings().useConstructor((ArrayList)null));
+        doCallRealMethod().when(characterizerApplication).runExpertiseJobs(users);
+        characterizerApplication.runExpertiseJobs(users);
+        verify(characterizerApplication, times(1)).runGitExpertiseJobs(users);
+        verify(characterizerApplication, times(1)).runStackExpertiseJobs(users);
+    }
+
+    @Test
+    public void shouldThrowRunTimeExceptionWhenThreadInterrupted() throws InterruptedException {
+        try (MockedConstruction<Thread> mockedThreads = getMockedThreadsThatThrowInterruptedException()) {
+            assertThrows(RuntimeException.class, ()-> characterizerApplication.runExpertiseJobs(users));
+            Thread stackThread = mockedThreads.constructed().get(0);
+            verify(stackThread, times(1)).start();
+            verify(stackThread, times(1)).join();
+            Thread gitThread = mockedThreads.constructed().get(1);
+            verify(gitThread, times(1)).start();
+            verify(gitThread, times(0)).join();
+        }
+    }
+
+    private MockedConstruction<Thread> getMockedThreadsThatThrowInterruptedException(){
+        return mockConstruction(Thread.class,
+                (mock,context)->{
+                    doThrow(InterruptedException.class).when(mock).join();
+                });
+    }
+
+    @Test
+    public void shouldRunGitExpertiseJobsForUsersExceptDefaultOnes() {
+        try (MockedConstruction<GitExpertiseJob> gitExpertiseJob = mockConstruction(GitExpertiseJob.class)) {
+            characterizerApplication.runGitExpertiseJobs(users);
+            assertEquals(1, gitExpertiseJob.constructed().size());
+            verify(gitExpertiseJob.constructed().get(0), times(1)).run();
+        }
+    }
+
+    @Test
+    public void shouldNotifyObservers() {
+            CharacterizerApplicationGui gui = mock(CharacterizerApplicationGui.class);
+
             characterizerApplication.addObserver(gui);
             characterizerApplication.notifyObservers(users);
-
             verify(gui, times(1)).notifyUpdate(users);
-        }
     }
 
-    @Test
-    public void threadInterruptWhileJoinedThrowsRuntimeException() throws InterruptedException {
-        try (MockedConstruction<Thread> mockedThreads = mockConstruction(Thread.class,
-                     (mock, context)->{
-                        doThrow(InterruptedException.class).when(mock).join();
-                     })) {
-
-            characterizerApplication = new CharacterizerApplication(null);
-            assertThrows(RuntimeException.class, ()->characterizerApplication.runExpertiseJobs(users));
-            assertEquals(2, mockedThreads.constructed().size());
-            Thread firstThread = mockedThreads.constructed().get(0);
-            Thread secondThread = mockedThreads.constructed().get(1);
-            verify(firstThread, times(1)).start();
-            verify(firstThread, times(1)).join();
-            verify(secondThread, times(1)).start();
-            verify(secondThread, times(0)).join();
-        }
-    }
 
     @Test
-    public void threadInterruptWhileExecutorServiceAwait() throws InterruptedException {
-        try (MockedConstruction<ThreadPoolExecutor> mockedExecutorService = mockConstruction(ThreadPoolExecutor.class,
-                (mock, context)->{
-                    doThrow(InterruptedException.class).when(mock).awaitTermination(anyLong(), any());
-        })) {
-
-            characterizerApplication = new CharacterizerApplication(null);
-            assertThrows(RuntimeException.class, ()->characterizerApplication.runGitExpertiseJobs(users));
+    public void shouldThrowRuntimeExceptionWhenExecutorInterrupts() throws InterruptedException {
+        try (MockedConstruction<ThreadPoolExecutor> mockedExecutorService = getMockedExecutorServiceThatInterrupts()) {
+            assertThrows(RuntimeException.class, () -> characterizerApplication.runGitExpertiseJobs(users));
             assertEquals(1, mockedExecutorService.constructed().size());
             ExecutorService executorService = mockedExecutorService.constructed().get(0);
             verify(executorService, times(1)).execute(any());
@@ -155,21 +174,7 @@ public class CharacterizerApplicationTest {
 
 
 
-    public MockedConstruction<StackExpertiseJob> getMockedStackExpertiseJob() {
-        return mockConstruction(StackExpertiseJob.class,
-                (mock, context) -> {
-                    doNothing().when(mock).run();
-                });
-    }
-
-    public MockedConstruction<GitExpertiseJob> getMockedGitExpertiseJob() {
-        return mockConstruction(GitExpertiseJob.class,
-                (mock, context) -> {
-                    doNothing().when(mock).run();
-                });
-    }
-
-    public MockedConstruction<ThreadPoolExecutor> getMockedExecutorService() {
+    public MockedConstruction<ThreadPoolExecutor> getMockedExecutorServiceThatInterrupts() {
         return mockConstruction(ThreadPoolExecutor.class,
                 (mock, context) -> {
                     doThrow(InterruptedException.class).when(mock).awaitTermination(anyLong(), any());
