@@ -54,35 +54,27 @@ public class AccountsFetcherTest {
     }
 
     @Test
-    public void fetchMethodCallsHelper() {
-        try (MockedConstruction<AccountsFetcher> mockedFetcher = mockConstruction(AccountsFetcher.class,
-                (mock, context) -> {
-                    doCallRealMethod().when(mock).fetchMatchingAccounts(any());
-                });
-             MockedStatic<StackApi> stackApi = Mockito.mockStatic(StackApi.class)) {
+    public void shouldCallHelperMethods() {
+        accountsFetcher = mock(AccountsFetcher.class);
+        doCallRealMethod().when(accountsFetcher).fetchMatchingAccounts(any());
+        try(MockedStatic<StackApi> stackApiMockedStatic = Mockito.mockStatic(StackApi.class)){
             ArrayList<StackUser> stackApiReturnList = new ArrayList<>(potentialMatches.keySet());
-            stackApi.when(() -> StackApi.getUsers(any()))
+            stackApiMockedStatic.when(() -> StackApi.getUsers(any()))
                     .thenReturn(stackApiReturnList);
-
             ArrayList<Integer> ids = new ArrayList<>(potentialMatches.keySet().stream().map(StackUser::getId).toList());
-            accountsFetcher = new AccountsFetcher();
             accountsFetcher.fetchMatchingAccounts(ids);
-
-            stackApi.verify(() -> StackApi.getUsers(ids), times(1));
+            stackApiMockedStatic.verify(() -> StackApi.getUsers(ids), times(1));
             for (StackUser user : stackApiReturnList)
-                stackApi.verify(() -> StackApi.getMainTags(user.getId()), times(1));
-
-            assertEquals(1, mockedFetcher.constructed().size());
-            accountsFetcher = mockedFetcher.constructed().get(0);
+                stackApiMockedStatic.verify(() -> StackApi.getMainTags(user.getId()), times(1));
             verify(accountsFetcher, times(1)).getStackUsersWithPotentialGitUsers(stackApiReturnList);
             verify(accountsFetcher, times(1)).matchAccounts(any());
         }
     }
 
     @Test
-    public void gettingStackUserWithPotentialGitUser() {
+    public void shouldReturnStackUserWithPotentialGitUser() {
         try (MockedStatic<GitApi> gitApiMock = Mockito.mockStatic(GitApi.class)) {
-            setUpGitApiMock(gitApiMock);
+            getMockedGitApi(gitApiMock);
             ArrayList<StackUser> stackApiReturnList = new ArrayList<>(potentialMatches.keySet());
             HashMap<StackUser, ArrayList<GitUser>> potentiallyMatchingAccounts = accountsFetcher.getStackUsersWithPotentialGitUsers(stackApiReturnList);
 
@@ -101,7 +93,7 @@ public class AccountsFetcherTest {
         }
     }
 
-    private void setUpGitApiMock(MockedStatic<GitApi> gitApiMock) {
+    private void getMockedGitApi(MockedStatic<GitApi> gitApiMock) {
         for (ArrayList<GitUser> gitUserArrayList : potentialMatches.values()) {
             for (GitUser gitUser : gitUserArrayList) {
                 gitApiMock.when(() -> GitApi.getUserByLogin(gitUser.getLogin()))
@@ -159,7 +151,7 @@ public class AccountsFetcherTest {
     }
 
     @Test
-    public void matchingAccountsReturnsDefaultGitUser() {
+    public void shouldCreateDefaultGitUser() {
         HashMap<StackUser, ArrayList<GitUser>> hashMap = new HashMap<>();
         StackUser stackUser = new StackUser(0, 1, "Jon", "", "", "", 0);
         GitUser gitUser1 = new GitUser("", "", "", "", "");
@@ -188,14 +180,14 @@ public class AccountsFetcherTest {
 
 
     @Test
-    public void isGitUserLink() {
+    public void testGitUserLinks() {
         assertTrue(accountsFetcher.isGitUserLink("https://github.com/user123"));
         assertTrue(accountsFetcher.isGitUserLink("https://github.com/123user"));
         assertTrue(accountsFetcher.isGitUserLink("https://github.com/1us-er1"));
     }
 
     @Test
-    public void isNotGitUserLink() {
+    public void testNoGitUserLink() {
         assertFalse(accountsFetcher.isGitUserLink("https://randomWebsite.com/user123"));
         assertFalse(accountsFetcher.isGitUserLink("https://github.de/123user"));
         assertFalse(accountsFetcher.isGitUserLink("https://github.com/-user123"));
@@ -204,7 +196,7 @@ public class AccountsFetcherTest {
     }
 
     @Test
-    public void extractLoginFromGithubUserLink() {
+    public void shouldExtractLoginFromGithubUserLink() {
         String link = "https://github.com/user123";
         String extractedUser = accountsFetcher.getLoginFromGitUserLink(link);
         assertEquals("user123", extractedUser);
