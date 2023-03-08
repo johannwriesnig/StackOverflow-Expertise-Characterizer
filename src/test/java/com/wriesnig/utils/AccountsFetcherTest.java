@@ -25,7 +25,9 @@ public class AccountsFetcherTest {
     private final String _4Potentials1Match = "user";
     private final String _2Potentials1Match = "user1";
     private final String gitUserInLink = "https://github.com/user6";
-
+    private StackUser stackUser1;
+    private StackUser stackUser2;
+    private ArrayList<Integer> ids;
 
     private HashMap<StackUser, ArrayList<GitUser>> potentialMatches = new HashMap<>() {{
         put(new StackUser(0, 1, _4Potentials1Match, gitUserInLink, "", "", 0),
@@ -51,23 +53,58 @@ public class AccountsFetcherTest {
     @BeforeEach
     public void setUp() {
         accountsFetcher = new AccountsFetcher();
+        stackUser1 = new StackUser(1, 1, "user1", "", "","",1);
+        stackUser2 = new StackUser(2, 1, "user2", "", "","",2);
+        ids = new ArrayList<>();
+        ids.add(stackUser1.getId());
+        ids.add(stackUser2.getId());
     }
 
     @Test
     public void shouldCallHelperMethods() {
         accountsFetcher = mock(AccountsFetcher.class);
         doCallRealMethod().when(accountsFetcher).fetchMatchingAccounts(any());
-        try(MockedStatic<StackApi> stackApiMockedStatic = Mockito.mockStatic(StackApi.class)){
-            ArrayList<StackUser> stackApiReturnList = new ArrayList<>(potentialMatches.keySet());
-            stackApiMockedStatic.when(() -> StackApi.getUsers(any()))
-                    .thenReturn(stackApiReturnList);
-            ArrayList<Integer> ids = new ArrayList<>(potentialMatches.keySet().stream().map(StackUser::getId).toList());
-            accountsFetcher.fetchMatchingAccounts(ids);
-            stackApiMockedStatic.verify(() -> StackApi.getUsers(ids), times(1));
-            for (StackUser user : stackApiReturnList)
-                stackApiMockedStatic.verify(() -> StackApi.getMainTags(user.getId()), times(1));
-            verify(accountsFetcher, times(1)).getPotentialGitAccountsForStackUsers(stackApiReturnList);
-            verify(accountsFetcher, times(1)).matchAccounts(any());
+        accountsFetcher.fetchMatchingAccounts(ids);
+        verify(accountsFetcher, times(1)).getStackUsersFromStackApi(ids);
+        verify(accountsFetcher, times(1)).getPotentialGitAccountsForStackUsers(any());
+        verify(accountsFetcher, times(1)).matchAccounts(any());
+    }
+
+    @Test
+    public void shouldReturnGitUsersForStackAccount(){
+        StackUser stackUser = new StackUser(1, 1,"Jon Doe", "","","",1);
+        GitUser gitUser = new GitUser("user1", "","Jon Doe","","");
+        ArrayList<String> fullNames = new ArrayList<>();
+        fullNames.add(gitUser.getName());
+        try(MockedStatic<GitApi> gitApiMockedStatic = mockStatic(GitApi.class)){
+            gitApiMockedStatic.when(()->GitApi.getUsersByFullName(stackUser.getDisplayName())).thenReturn(fullNames);
+            gitApiMockedStatic.when(()->GitApi.getUserByLogin(gitUser.getName())).thenReturn(gitUser);
+            ArrayList<GitUser> gitUsers = accountsFetcher.getPotentialGitAccountsByFullName(stackUser);
+            assertEquals(1, gitUsers.size());
+            assertEquals(gitUser, gitUsers.get(0));
+            gitApiMockedStatic.verify(()->GitApi.getUserByLogin(gitUser.getName()), times(1));
+            gitApiMockedStatic.verify(()->GitApi.getUsersByFullName(stackUser.getDisplayName()), times(1));
+        }
+    }
+
+    @Test
+    public void shouldReturnStackUsersWithSetMainTags(){
+        ArrayList<StackUser> stackUsers = new ArrayList<>();
+        String tag = "tag";
+        ArrayList<String> tags = new ArrayList<>();
+        tags.add(tag);
+        stackUsers.add(stackUser1);
+        stackUsers.add(stackUser2);
+        try(MockedStatic<StackApi> stackApiMockedStatic = mockStatic(StackApi.class)){
+            stackApiMockedStatic.when(()->StackApi.getUsers(ids)).thenReturn(stackUsers);
+            stackApiMockedStatic.when(()->StackApi.getMainTags(anyInt())).thenReturn(tags);
+            ArrayList<StackUser> users = accountsFetcher.getStackUsersFromStackApi(ids);
+            assertEquals(stackUser1, users.get(0));
+            assertEquals(stackUser2, users.get(1));
+            for(StackUser stackUser: users)
+                assertTrue(stackUser.getMainTags().contains(tag));
+            stackApiMockedStatic.verify(()->StackApi.getUsers(ids), times(1));
+            stackApiMockedStatic.verify(()->StackApi.getMainTags(anyInt()), times(2));
         }
     }
 

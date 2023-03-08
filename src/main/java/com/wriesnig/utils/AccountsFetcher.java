@@ -39,8 +39,7 @@ public class AccountsFetcher {
 
     public ArrayList<GitUser> getPotentialGitAccountsForSingleStackUser(StackUser stackUser) {
         ArrayList<GitUser> potentialGitAccounts = new ArrayList<>();
-        GitUser gitUser = GitApi.getUserByLogin(stackUser.getDisplayName());
-        potentialGitAccounts.add(gitUser);
+        potentialGitAccounts.add(GitApi.getUserByLogin(stackUser.getDisplayName()));
         potentialGitAccounts.addAll(getPotentialGitAccountsByFullName(stackUser));
         if(isGitUserLink(stackUser.getWebsiteUrl()))
             potentialGitAccounts.add(getGitUserFromWebsiteLink(stackUser));
@@ -49,15 +48,14 @@ public class AccountsFetcher {
         return potentialGitAccounts;
     }
 
-    private ArrayList<GitUser> getPotentialGitAccountsByFullName(StackUser stackUser){
+    public ArrayList<GitUser> getPotentialGitAccountsByFullName(StackUser stackUser){
         ArrayList<GitUser> potentialGitAccounts = new ArrayList<>();
         GitUser gitUser;
         ArrayList<String> fullNames = GitApi.getUsersByFullName(stackUser.getDisplayName());
         for (String login : fullNames) {
             gitUser = GitApi.getUserByLogin(login);
-            if (!gitUser.getName().equals(stackUser.getDisplayName()))
-                continue;
-            potentialGitAccounts.add(gitUser);
+            if (gitUser.getName().equals(stackUser.getDisplayName()))
+                potentialGitAccounts.add(gitUser);
         }
         return potentialGitAccounts;
     }

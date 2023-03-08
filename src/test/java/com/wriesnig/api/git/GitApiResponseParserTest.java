@@ -75,7 +75,7 @@ public class GitApiResponseParserTest {
         JSONObject json = new JSONObject(content);
         GitUser gitUser = gitApiResponseParser.parseUserByLoginResponse(json);
 
-        assertNull(gitUser);
+        assertTrue(gitUser instanceof DefaultGitUser);
     }
 
     @Test
