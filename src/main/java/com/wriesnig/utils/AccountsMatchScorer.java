@@ -141,11 +141,11 @@ public class AccountsMatchScorer {
     }
 
     private boolean isStackWebsiteLinkingGitAccount(){
-        return !stackUser.getLink().isEmpty() && stackUser.getLink().equals(gitUser.getWebsiteUrl());
+        return !stackUser.getWebsiteUrl().isEmpty() && stackUser.getWebsiteUrl().equals(gitUser.getHtmlUrl());
     }
 
     private boolean isGitAccountLinkingStackAccount(){
-        return !stackUser.getWebsiteUrl().isEmpty() && stackUser.getWebsiteUrl().equals(gitUser.getHtmlUrl());
+        return !gitUser.getWebsiteUrl().isEmpty() && gitUser.getWebsiteUrl().equals(stackUser.getLink());
     }
 
 }
