@@ -20,10 +20,15 @@ public class StackApi {
     public static String key = "";
     public static int backOffParameterInSecs;
 
+    private static StackApi stackApi;
 
+    public static StackApi getInstance(){
+        if(stackApi==null)
+            stackApi=new StackApi();
+        return stackApi;
+    }
 
-
-    public static ArrayList<StackUser> getUsers(ArrayList<Integer> ids) {
+    public ArrayList<StackUser> getUsers(ArrayList<Integer> ids) {
         StackApiResponseParser responseParser = new StackApiResponseParser();
         ArrayList<StackUser> users = new ArrayList<>();
         int maxIdsPerRequest = 100;
@@ -41,12 +46,13 @@ public class StackApi {
                     .collect(Collectors.joining(";"));
             String path = "users/" + idsList + "?site=stackoverflow&pagesize="+maxIdsPerRequest;
             JSONObject usersAsJson = getResponse(path);
+            backOffParameterInSecs = usersAsJson.has("backoff")?usersAsJson.getInt("backoff"):0;
             users.addAll(responseParser.parseUsersResponse(usersAsJson));
         }
         return users;
     }
 
-    public static ArrayList<String> getMainTags(int id) {
+    public ArrayList<String> getMainTags(int id) {
         String path = "users/" + id + "/top-answer-tags?pagesize=3&site=stackoverflow";
         JSONObject tags = getResponse(path);
         backOffParameterInSecs = tags.has("backoff")?tags.getInt("backoff"):0;
@@ -54,13 +60,13 @@ public class StackApi {
         return responseParser.parseTagsResponse(tags);
     }
 
-    public static JSONObject getResponse(String path){
+    public JSONObject getResponse(String path){
         GZIPInputStream apiStream = getStreamFromAPICall(path);
         String content = getStringFromStream(apiStream);
         return new JSONObject(content);
     }
 
-    public static GZIPInputStream getStreamFromAPICall(String path) {
+    public GZIPInputStream getStreamFromAPICall(String path) {
         String url = API_URL + path + "&key="+key;
         try {
             URL getUrl = new URL(url);
@@ -82,11 +88,11 @@ public class StackApi {
     }
 
     //Since having issues to mock url for tests, this method is mocked instead
-    public static HttpURLConnection getConnectionFromUrl(URL url) throws IOException {
+    public HttpURLConnection getConnectionFromUrl(URL url) throws IOException {
         return (HttpURLConnection) url.openConnection();
     }
 
-    public static void waitBackOffTime(){
+    public void waitBackOffTime(){
         try{
             Thread.sleep(backOffParameterInSecs* 1000L);
         } catch (InterruptedException e) {
@@ -96,7 +102,7 @@ public class StackApi {
     }
 
 
-    public static String getStringFromStream(GZIPInputStream inputStream) {
+    public String getStringFromStream(GZIPInputStream inputStream) {
         if(inputStream==null)return "{}";
         StringBuilder stringBuilder = new StringBuilder();
         try {

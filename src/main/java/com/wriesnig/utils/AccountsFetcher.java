@@ -12,6 +12,13 @@ import java.util.HashMap;
 
 
 public class AccountsFetcher {
+    private GitApi gitApi;
+    private StackApi stackApi;
+
+    public AccountsFetcher(){
+        gitApi = GitApi.getInstance();
+        stackApi = StackApi.getInstance();
+    }
 
     public ArrayList<User> fetchMatchingAccounts(ArrayList<Integer> stackIds) {
         ArrayList<StackUser> stackUsers = getStackUsersFromStackApi(stackIds);
@@ -20,9 +27,9 @@ public class AccountsFetcher {
     }
 
     public ArrayList<StackUser> getStackUsersFromStackApi(ArrayList<Integer> ids){
-        ArrayList<StackUser> stackUsers = StackApi.getUsers(ids);
+        ArrayList<StackUser> stackUsers = stackApi.getUsers(ids);
         for (StackUser user : stackUsers)
-            user.setMainTags(StackApi.getMainTags(user.getId()));
+            user.setMainTags(stackApi.getMainTags(user.getId()));
         return stackUsers;
     }
 
@@ -39,7 +46,7 @@ public class AccountsFetcher {
 
     public ArrayList<GitUser> getPotentialGitAccountsForSingleStackUser(StackUser stackUser) {
         ArrayList<GitUser> potentialGitAccounts = new ArrayList<>();
-        potentialGitAccounts.add(GitApi.getUserByLogin(stackUser.getDisplayName()));
+        potentialGitAccounts.add(gitApi.getUserByLogin(stackUser.getDisplayName()));
         potentialGitAccounts.addAll(getPotentialGitAccountsByFullName(stackUser));
         if(isGitUserLink(stackUser.getWebsiteUrl()))
             potentialGitAccounts.add(getGitUserFromWebsiteLink(stackUser));
@@ -51,9 +58,9 @@ public class AccountsFetcher {
     public ArrayList<GitUser> getPotentialGitAccountsByFullName(StackUser stackUser){
         ArrayList<GitUser> potentialGitAccounts = new ArrayList<>();
         GitUser gitUser;
-        ArrayList<String> fullNames = GitApi.getUsersByFullName(stackUser.getDisplayName());
+        ArrayList<String> fullNames = gitApi.getUsersByFullName(stackUser.getDisplayName());
         for (String login : fullNames) {
-            gitUser = GitApi.getUserByLogin(login);
+            gitUser = gitApi.getUserByLogin(login);
             if (gitUser.getName().equals(stackUser.getDisplayName()))
                 potentialGitAccounts.add(gitUser);
         }
@@ -62,7 +69,7 @@ public class AccountsFetcher {
 
     private GitUser getGitUserFromWebsiteLink(StackUser stackUser){
         String login = getLoginFromGitUserLink(stackUser.getWebsiteUrl());
-        return GitApi.getUserByLogin(login);
+        return gitApi.getUserByLogin(login);
     }
 
     public String getLoginFromGitUserLink(String url) {

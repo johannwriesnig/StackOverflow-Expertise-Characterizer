@@ -28,6 +28,8 @@ public class AccountsFetcherTest {
     private StackUser stackUser1;
     private StackUser stackUser2;
     private ArrayList<Integer> ids;
+    private GitApi gitApi;
+    private StackApi stackApi;
 
     private HashMap<StackUser, ArrayList<GitUser>> potentialMatches = new HashMap<>() {{
         put(new StackUser(0, 1, _4Potentials1Match, gitUserInLink, "", "", 0),
@@ -52,12 +54,14 @@ public class AccountsFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        accountsFetcher = new AccountsFetcher();
         stackUser1 = new StackUser(1, 1, "user1", "", "","",1);
         stackUser2 = new StackUser(2, 1, "user2", "", "","",2);
         ids = new ArrayList<>();
         ids.add(stackUser1.getId());
         ids.add(stackUser2.getId());
+        gitApi = mock(GitApi.class);
+        stackApi = mock(StackApi.class);
+        accountsFetcher = new AccountsFetcher();
     }
 
     @Test
@@ -70,6 +74,7 @@ public class AccountsFetcherTest {
         verify(accountsFetcher, times(1)).matchAccounts(any());
     }
 
+
     @Test
     public void shouldReturnGitUsersForStackAccount(){
         StackUser stackUser = new StackUser(1, 1,"Jon Doe", "","","",1);
@@ -77,15 +82,18 @@ public class AccountsFetcherTest {
         ArrayList<String> fullNames = new ArrayList<>();
         fullNames.add(gitUser.getName());
         try(MockedStatic<GitApi> gitApiMockedStatic = mockStatic(GitApi.class)){
-            gitApiMockedStatic.when(()->GitApi.getUsersByFullName(stackUser.getDisplayName())).thenReturn(fullNames);
-            gitApiMockedStatic.when(()->GitApi.getUserByLogin(gitUser.getName())).thenReturn(gitUser);
+            gitApiMockedStatic.when(GitApi::getInstance).thenReturn(gitApi);
+            doReturn(gitUser).when(gitApi).getUserByLogin(gitUser.getName());
+            doReturn(fullNames).when(gitApi).getUsersByFullName(stackUser.getDisplayName());
+            accountsFetcher = new AccountsFetcher();
             ArrayList<GitUser> gitUsers = accountsFetcher.getPotentialGitAccountsByFullName(stackUser);
             assertEquals(1, gitUsers.size());
             assertEquals(gitUser, gitUsers.get(0));
-            gitApiMockedStatic.verify(()->GitApi.getUserByLogin(gitUser.getName()), times(1));
-            gitApiMockedStatic.verify(()->GitApi.getUsersByFullName(stackUser.getDisplayName()), times(1));
+            verify(gitApi, times(1)).getUserByLogin(gitUser.getName());
+            verify(gitApi, times(1)).getUsersByFullName(stackUser.getDisplayName());
         }
     }
+
 
     @Test
     public void shouldReturnStackUsersWithSetMainTags(){
@@ -96,31 +104,37 @@ public class AccountsFetcherTest {
         stackUsers.add(stackUser1);
         stackUsers.add(stackUser2);
         try(MockedStatic<StackApi> stackApiMockedStatic = mockStatic(StackApi.class)){
-            stackApiMockedStatic.when(()->StackApi.getUsers(ids)).thenReturn(stackUsers);
-            stackApiMockedStatic.when(()->StackApi.getMainTags(anyInt())).thenReturn(tags);
+            stackApiMockedStatic.when(StackApi::getInstance).thenReturn(stackApi);
+            doReturn(stackUsers).when(stackApi).getUsers(ids);
+            doReturn(tags).when(stackApi).getMainTags(anyInt());
+            accountsFetcher = new AccountsFetcher();
             ArrayList<StackUser> users = accountsFetcher.getStackUsersFromStackApi(ids);
             assertEquals(stackUser1, users.get(0));
             assertEquals(stackUser2, users.get(1));
             for(StackUser stackUser: users)
                 assertTrue(stackUser.getMainTags().contains(tag));
-            stackApiMockedStatic.verify(()->StackApi.getUsers(ids), times(1));
-            stackApiMockedStatic.verify(()->StackApi.getMainTags(anyInt()), times(2));
+            verify(stackApi, times(1)).getUsers(ids);
+            verify(stackApi, times(2)).getMainTags(anyInt());
         }
     }
 
+
+
     @Test
     public void shouldReturnStackUserWithPotentialGitUser() {
-        try (MockedStatic<GitApi> gitApiMock = Mockito.mockStatic(GitApi.class)) {
-            getMockedGitApi(gitApiMock);
+        try (MockedStatic<GitApi> gitApiMockedStatic = Mockito.mockStatic(GitApi.class)) {
+            gitApiMockedStatic.when(GitApi::getInstance).thenReturn(gitApi);
+            initGitApiMock();
+            accountsFetcher = new AccountsFetcher();
             ArrayList<StackUser> stackApiReturnList = new ArrayList<>(potentialMatches.keySet());
             HashMap<StackUser, ArrayList<GitUser>> potentiallyMatchingAccounts = accountsFetcher.getPotentialGitAccountsForStackUsers(stackApiReturnList);
 
             for (StackUser stackUser : potentialMatches.keySet()) {
-                gitApiMock.verify(() -> GitApi.getUsersByFullName(stackUser.getDisplayName()), times(1));
+                verify(gitApi, times(1)).getUsersByFullName(stackUser.getDisplayName());
                 if (stackUser.getDisplayName().equals(_2Potentials1Match) || stackUser.getDisplayName().equals(_4Potentials1Match))
-                    gitApiMock.verify(() -> GitApi.getUserByLogin(stackUser.getDisplayName()), times(2));
+                    verify(gitApi, times(2)).getUserByLogin(stackUser.getDisplayName());
             }
-            gitApiMock.verify(() -> GitApi.getUserByLogin(accountsFetcher.getLoginFromGitUserLink(gitUserInLink)), times(1));
+            verify(gitApi, times(1)).getUserByLogin(accountsFetcher.getLoginFromGitUserLink(gitUserInLink));
 
             for (StackUser stackUser : potentialMatches.keySet()) {
                 assertTrue(potentiallyMatchingAccounts.containsKey(stackUser));
@@ -130,11 +144,10 @@ public class AccountsFetcherTest {
         }
     }
 
-    private void getMockedGitApi(MockedStatic<GitApi> gitApiMock) {
+    private void initGitApiMock() {
         for (ArrayList<GitUser> gitUserArrayList : potentialMatches.values()) {
             for (GitUser gitUser : gitUserArrayList) {
-                gitApiMock.when(() -> GitApi.getUserByLogin(gitUser.getLogin()))
-                        .thenReturn(gitUser);
+                doReturn(gitUser).when(gitApi).getUserByLogin(gitUser.getLogin());
             }
         }
 
@@ -144,9 +157,10 @@ public class AccountsFetcherTest {
             ArrayList<String> fullNames = new ArrayList<>();
             for (GitUser gitUser : potentialMatches.get(user))
                 fullNames.add(gitUser.getLogin());
-            gitApiMock.when(() -> GitApi.getUsersByFullName(displayName)).thenReturn(fullNames);
+            doReturn(fullNames).when(gitApi).getUsersByFullName(displayName);
             if (potentialMatches.get(user).isEmpty())
-                gitApiMock.when(() -> GitApi.getUserByLogin(displayName)).thenReturn(null);
+                doReturn(null).when(gitApi).getUserByLogin(displayName);
+
         }
 
     }
@@ -238,6 +252,7 @@ public class AccountsFetcherTest {
         String extractedUser = accountsFetcher.getLoginFromGitUserLink(link);
         assertEquals("user123", extractedUser);
     }
+
 
 
     @AfterEach

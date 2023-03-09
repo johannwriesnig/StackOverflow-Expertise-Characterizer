@@ -19,53 +19,51 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class StackApiTest {
     private final String users_response = "src/main/resources/test/apiResponses/stack/usersResponse.txt";
 
     private HttpURLConnection connection;
+    private StackApi stackApi;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException {
         connection = mock(HttpURLConnection.class);
+        stackApi = mock(StackApi.class, withSettings().defaultAnswer(CALLS_REAL_METHODS));
+        doReturn(connection).when(stackApi).getConnectionFromUrl(any());
     }
+
 
     @Test
     public void shouldReturnUsers() throws IOException {
-        try (MockedStatic<StackApi> stackApiMockedStatic = mockStatic(StackApi.class)) {
-            stackApiMockedStatic.when(() -> StackApi.getUsers(any())).thenCallRealMethod();
-            stackApiMockedStatic.when(() -> StackApi.getResponse(any())).thenReturn(new JSONObject(Files.readString(Path.of(users_response))));
-            ArrayList<Integer> ids = new ArrayList<>();
-            ids.add(1);
-            ArrayList<StackUser> stackUsers = StackApi.getUsers(ids);
-            assertEquals("Jon Skeet", stackUsers.get(0).getDisplayName());
-            assertEquals("johannwriesnig", stackUsers.get(1).getDisplayName());
-            stackApiMockedStatic.verify(() -> StackApi.getResponse(any()), times(1));
-        }
+        doReturn(new JSONObject(Files.readString(Path.of(users_response)))).when(stackApi).getResponse(any());
+        ArrayList<Integer> ids = new ArrayList<>();
+        ids.add(1);
+        ArrayList<StackUser> stackUsers = stackApi.getUsers(ids);
+        assertEquals("Jon Skeet", stackUsers.get(0).getDisplayName());
+        assertEquals("johannwriesnig", stackUsers.get(1).getDisplayName());
+        verify(stackApi, times(1)).getResponse(any());
+
     }
 
     @Test
     public void shouldMake2RequestSinceIdsListIsGreater100() throws IOException {
-        try (MockedStatic<StackApi> stackApiMockedStatic = mockStatic(StackApi.class)) {
-            stackApiMockedStatic.when(() -> StackApi.getUsers(any())).thenCallRealMethod();
-            stackApiMockedStatic.when(() -> StackApi.getResponse(any())).thenReturn(new JSONObject(Files.readString(Path.of(users_response))));
-            ArrayList<Integer> ids = new ArrayList<>();
-            for (int i = 0; i <= 150; i++)
-                ids.add(i);
-            StackApi.getUsers(ids);
-            stackApiMockedStatic.verify(() -> StackApi.getResponse(anyString()), times(2));
-        }
+        doReturn(new JSONObject(Files.readString(Path.of(users_response)))).when(stackApi).getResponse(any());
+        ArrayList<Integer> ids = new ArrayList<>();
+        for (int i = 0; i <= 150; i++)
+            ids.add(i);
+        stackApi.getUsers(ids);
+        verify(stackApi, times(2)).getResponse(anyString());
+
     }
 
     @Test
     public void shouldReturnMainTags() throws IOException {
         String tagsResponse = Files.readString(Paths.get("src/main/resources/test/apiResponses/stack/tagsResponse.txt"));
-        try (MockedStatic<StackApi> stackApiMockedStatic = mockStatic(StackApi.class)) {
-            stackApiMockedStatic.when(() -> StackApi.getMainTags(anyInt())).thenCallRealMethod();
-            stackApiMockedStatic.when(() -> StackApi.getResponse(any())).thenReturn(new JSONObject(tagsResponse));
-            assertEquals("wcf", StackApi.getMainTags(0).get(1));
-        }
+        doReturn(new JSONObject(tagsResponse)).when(stackApi).getResponse(any());
+        assertEquals("wcf", stackApi.getMainTags(0).get(1));
     }
 
     @Test
@@ -73,31 +71,29 @@ public class StackApiTest {
         String tagsResponse = Files.readString(Paths.get("src/main/resources/test/apiResponses/stack/tagsResponse.txt"));
         doReturn(StackApi.CODE_OK).when(connection).getResponseCode();
         doReturn(getInputStreamInGzipFormat(tagsResponse)).when(connection).getInputStream();
-        try (MockedStatic<StackApi> stackApiMockedStatic = mockStatic(StackApi.class)) {
-            setupMockedStackApi(stackApiMockedStatic);
-            JSONObject response = StackApi.getResponse("");
-            assertTrue(response.has("items"));
-        }
+        JSONObject response = stackApi.getResponse("");
+        assertTrue(response.has("items"));
+
     }
 
 
     @Test
     public void shouldReturnEmptyString() throws IOException {
         String expected = "";
-        assertEquals(expected, StackApi.getStringFromStream(getGzipInputStreamFromString(expected)));
+        assertEquals(expected, stackApi.getStringFromStream(getGzipInputStreamFromString(expected)));
     }
 
     @Test
     public void shouldConvertGZIPInputStreamToString() throws IOException {
         String testSentence = "This represents the content of a gzip stream!";
 
-        String streamContent = StackApi.getStringFromStream(getGzipInputStreamFromString(testSentence));
+        String streamContent = stackApi.getStringFromStream(getGzipInputStreamFromString(testSentence));
         assertEquals(testSentence, streamContent);
     }
 
     @Test
     public void shouldReturnEmptyJsonWhenGivenNullStream() {
-        assertEquals("{}", StackApi.getStringFromStream(null));
+        assertEquals("{}", stackApi.getStringFromStream(null));
     }
 
     @Test
@@ -105,40 +101,19 @@ public class StackApiTest {
         String throttleViolation = Files.readString(Paths.get("src/main/resources/test/apiResponses/stack/502Response.txt"));
         doReturn(StackApi.CODE_BAD_REQUEST).when(connection).getResponseCode();
         doReturn(getInputStreamInGzipFormat(throttleViolation)).when(connection).getErrorStream();
-        try (MockedStatic<StackApi> stackApiMockedStatic = mockStatic(StackApi.class);
-             MockedStatic<Logger> loggerMockedStatic = mockStatic(Logger.class)) {
-
-            setupMockedStackApi(stackApiMockedStatic);
-            assertThrows(RuntimeException.class, () -> StackApi.getStreamFromAPICall(""));
-            loggerMockedStatic.verify(()->Logger.error(anyString()), times(1));
+        try (MockedStatic<Logger> loggerMockedStatic = mockStatic(Logger.class)) {
+            assertThrows(RuntimeException.class, () -> stackApi.getStreamFromAPICall(""));
+            loggerMockedStatic.verify(() -> Logger.error(anyString()), times(1));
         }
     }
 
     @Test
     public void shouldReturnGZIPStream() throws IOException {
-        try (MockedStatic<StackApi> stackApiMockedStatic = mockStatic(StackApi.class)) {
-            setupMockedStackApi(stackApiMockedStatic);
-            doReturn(StackApi.CODE_OK).when(connection).getResponseCode();
-            doReturn(getInputStreamInGzipFormat(users_response)).when(connection).getInputStream();
-            assertNotNull(StackApi.getStreamFromAPICall(""));
-        }
+        doReturn(StackApi.CODE_OK).when(connection).getResponseCode();
+        doReturn(getInputStreamInGzipFormat(users_response)).when(connection).getInputStream();
+        assertNotNull(stackApi.getStreamFromAPICall(""));
     }
 
-
-    public InputStream getInputStreamInGZIPFormat(String fileName) throws IOException {
-        String fileContent = Files.readString(Path.of(fileName));
-        return getInputStreamInGzipFormat(fileContent);
-    }
-
-    public void setupMockedStackApi(MockedStatic<StackApi> stackApiMockedStatic) {
-        stackApiMockedStatic.when(() -> StackApi.getUsers(any())).thenCallRealMethod();
-        stackApiMockedStatic.when(() -> StackApi.getMainTags(anyInt())).thenCallRealMethod();
-        stackApiMockedStatic.when(() -> StackApi.getStreamFromAPICall(any())).thenCallRealMethod();
-        stackApiMockedStatic.when(() -> StackApi.getStringFromStream(any())).thenCallRealMethod();
-        stackApiMockedStatic.when(() -> StackApi.setKey(any())).thenCallRealMethod();
-        stackApiMockedStatic.when(() -> StackApi.getResponse(anyString())).thenCallRealMethod();
-        stackApiMockedStatic.when(() -> StackApi.getConnectionFromUrl(any())).thenReturn(connection);
-    }
 
 
     public GZIPInputStream getGzipInputStreamFromString(String s) throws IOException {
@@ -167,7 +142,7 @@ public class StackApiTest {
                      (mock, context) -> {
                          doThrow(IOException.class).when(mock).read();
                      })) {
-            StackApi.getStringFromStream(getGzipInputStreamFromString("test"));
+            stackApi.getStringFromStream(getGzipInputStreamFromString("test"));
             assertEquals(1, mockedReader.constructed().size());
             mockedLogger.verify(() -> Logger.error(any(), any()), times(1));
         }
@@ -178,13 +153,12 @@ public class StackApiTest {
         doReturn(StackApi.CODE_OK).when(connection).getResponseCode();
         InputStream inputStreamInNoZIPFormat = new ByteArrayInputStream(Files.readString(Path.of(users_response)).getBytes(StandardCharsets.UTF_8));
         doReturn(inputStreamInNoZIPFormat).when(connection).getInputStream();
-        try (MockedStatic<Logger> mockedLogger = mockStatic(Logger.class);
-             MockedStatic<StackApi> stackApiMockedStatic = mockStatic(StackApi.class)) {
-            setupMockedStackApi(stackApiMockedStatic);
-            StackApi.getStreamFromAPICall(" broken url ");
+        try (MockedStatic<Logger> mockedLogger = mockStatic(Logger.class)) {
+            stackApi.getStreamFromAPICall(" broken url ");
             mockedLogger.verify(() -> Logger.error(any(), any()), times(1));
         }
     }
+
 
     @AfterEach
     public void tearDown() {

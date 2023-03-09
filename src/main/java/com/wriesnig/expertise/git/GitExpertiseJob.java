@@ -29,16 +29,18 @@ public class GitExpertiseJob implements Runnable {
     private static final String REPOS_WORKSPACE = "src/main/resources/src/workspace/repos";
 
     private final User user;
+    private final GitApi gitApi;
 
     public GitExpertiseJob(User user) {
         this.user = user;
+        gitApi = GitApi.getInstance();
     }
 
     @Override
     public void run() {
         String userReposPath = REPOS_WORKSPACE + "/" + user.getGitLogin() + "/";
 
-        ArrayList<Repo> repos = GitApi.getReposByLogin(user.getGitLogin());
+        ArrayList<Repo> repos = gitApi.getReposByLogin(user.getGitLogin());
         cleanseRepos(repos);
         BlockingQueue<Repo> downloadedRepos = new LinkedBlockingQueue<>();
         downloadReposInNewThread(repos, userReposPath, downloadedRepos);
@@ -67,7 +69,7 @@ public class GitExpertiseJob implements Runnable {
 
     public void downloadReposInNewThread(ArrayList<Repo> repos, String userReposPath, BlockingQueue<Repo> downloadedRepos){
         Thread reposDownloadJob = new Thread(() -> {
-            GitApi.downloadRepos(repos, userReposPath, downloadedRepos);
+            gitApi.downloadRepos(repos, userReposPath, downloadedRepos);
         });
         reposDownloadJob.start();
     }

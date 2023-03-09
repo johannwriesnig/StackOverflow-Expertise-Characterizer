@@ -20,36 +20,37 @@ public class GitApi {
     public static final int CODE_BAD_CREDENTIALS=401;
     private static String token;
     private static int reposMaxSizeInKB;
-    private final static GitApiResponseParser responseParser = new GitApiResponseParser();
+    private static GitApi gitApi;
 
+    public static GitApi getInstance(){
+        if(gitApi==null)
+            gitApi=new GitApi();
+        return gitApi;
+    }
 
     private GitApi() {
     }
 
-    public static void setToken(String token) {
-        GitApi.token = token;
-    }
-
-    public static GitUser getUserByLogin(String login) {
+    public GitUser getUserByLogin(String login) {
         if (login.contains(" ")) return new DefaultGitUser();
         String path = "users/" + login;
         InputStream apiStream = getStreamFromAPICall(path);
         JSONObject userAsJson = new JSONObject(getStringFromStream(apiStream));
 
-        return responseParser.parseUserByLoginResponse(userAsJson);
+        return new GitApiResponseParser().parseUserByLoginResponse(userAsJson);
     }
 
-    public static ArrayList<String> getUsersByFullName(String fullName) {
+    public ArrayList<String> getUsersByFullName(String fullName) {
         fullName = fullName.replace(" ", "+");
         String path = "search/users?q=fullname:" + fullName;
         InputStream apiStream = getStreamFromAPICall(path);
         JSONObject usersAsJson = new JSONObject(getStringFromStream(apiStream));
 
-        return responseParser.parseUsersByFullName(usersAsJson);
+        return new GitApiResponseParser().parseUsersByFullName(usersAsJson);
     }
 
     //Git-Api would return 100 repos max for one request, so we iterate over pages to get all
-    public static ArrayList<Repo> getReposByLogin(String login) {
+    public ArrayList<Repo> getReposByLogin(String login) {
         int reposPerPage=100;
         int pageCounter=1;
 
@@ -60,14 +61,14 @@ public class GitApi {
             String path = "users/" + login + "/repos?type=all&per_page="+reposPerPage+"&page="+ pageCounter++;
             InputStream apiStream = getStreamFromAPICall(path);
             JSONArray reposJson = new JSONArray(getStringFromStream(apiStream));
-            reposLimitedByPageSize = responseParser.parseReposByLogin(reposJson);
+            reposLimitedByPageSize = new GitApiResponseParser().parseReposByLogin(reposJson);
             repos.addAll(reposLimitedByPageSize);
         } while(reposLimitedByPageSize.size()==reposPerPage);
 
         return repos;
     }
 
-    public static InputStream getStreamFromAPICall(String path) {
+    public InputStream getStreamFromAPICall(String path) {
         String urlString = API_URL + path;
         try {
             URL url = new URL(urlString);
@@ -90,12 +91,12 @@ public class GitApi {
     }
 
     //Since having issues to mock url for tests, this method is mocked instead
-    public static HttpURLConnection getConnectionFromUrl(URL url) throws IOException {
+    public HttpURLConnection getConnectionFromUrl(URL url) throws IOException {
         return (HttpURLConnection) url.openConnection();
     }
 
 
-    public static String getStringFromStream(InputStream inputStream) {
+    public String getStringFromStream(InputStream inputStream) {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         StringBuilder stringBuilder = new StringBuilder();
         int currentChar;
@@ -109,7 +110,7 @@ public class GitApi {
         return stringBuilder.toString();
     }
 
-    public static void downloadRepos(ArrayList<Repo> repos, String path, BlockingQueue<Repo> downloadedRepos) {
+    public void downloadRepos(ArrayList<Repo> repos, String path, BlockingQueue<Repo> downloadedRepos) {
         try {
             tryDownloadRepos(repos, path, downloadedRepos);
         } catch (IOException e) {
@@ -119,7 +120,7 @@ public class GitApi {
         }
     }
 
-    public static void tryDownloadRepos(ArrayList<Repo> repos, String path, BlockingQueue<Repo> downloadedRepos) throws IOException, InterruptedException {
+    public void tryDownloadRepos(ArrayList<Repo> repos, String path, BlockingQueue<Repo> downloadedRepos) throws IOException, InterruptedException {
         for (Repo repo : repos) {
             if(repo.getSizeInKB()>reposMaxSizeInKB)continue;
             ZipInputStream zipIn = getZipStreamFromRepo(repo.getName());
@@ -140,7 +141,7 @@ public class GitApi {
         downloadedRepos.put(new FinishRepo());
     }
 
-    public static void processZipEntry(String path, ZipEntry entry, ZipInputStream zipIn) throws IOException {
+    public void processZipEntry(String path, ZipEntry entry, ZipInputStream zipIn) throws IOException {
         String filePath = path + entry.getName();
         if (!entry.isDirectory()) {
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
@@ -156,13 +157,17 @@ public class GitApi {
         }
     }
 
-    public static ZipInputStream getZipStreamFromRepo(String repo) {
+    public ZipInputStream getZipStreamFromRepo(String repo) {
         String apiPath = "repos/" + repo + "/zipball";
         InputStream in = getStreamFromAPICall(apiPath);
         return new ZipInputStream(in);
     }
 
     public static String getToken(){return token;}
+
+    public static void setToken(String token) {
+        GitApi.token = token;
+    }
 
     public static void setReposMaxSizeInMB(int reposMaxSizeInMB) {
         GitApi.reposMaxSizeInKB = reposMaxSizeInMB*1000;
