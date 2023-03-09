@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class StackApiResponseParser {
 
     public ArrayList<StackUser> parseUsersResponse(JSONObject response) {
+        if(!response.has("items")) return new ArrayList<>();
         JSONArray usersAsJson = response.getJSONArray("items");
 
         ArrayList<StackUser> users = new ArrayList<>();
@@ -27,6 +28,7 @@ public class StackApiResponseParser {
     }
 
     public ArrayList<String> parseTagsResponse(JSONObject response) {
+        if(!response.has("items")) return new ArrayList<>();
         JSONArray tags = response.getJSONArray("items");
         ArrayList<String> mainTags = new ArrayList<>();
 

@@ -3,9 +3,9 @@ package com.wriesnig.api.git;
 import com.wriesnig.utils.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -15,9 +15,9 @@ import java.util.zip.ZipInputStream;
 
 
 public class GitApi {
-    private final static String API_URL = "https://api.github.com/";
-    private static final int CODE_RESOURCE_NOT_FOUND = 404;
-    private static final int CODE_BAD_CREDENTIALS=401;
+    public final static String API_URL = "https://api.github.com/";
+    public static final int CODE_RESOURCE_NOT_FOUND = 404;
+    public static final int CODE_BAD_CREDENTIALS=401;
     private static String token;
     private static int reposMaxSizeInKB;
     private final static GitApiResponseParser responseParser = new GitApiResponseParser();
@@ -68,12 +68,12 @@ public class GitApi {
     }
 
     public static InputStream getStreamFromAPICall(String path) {
-        String url = API_URL + path;
+        String urlString = API_URL + path;
         try {
-            URL getUrl = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
+            URL url = new URL(urlString);
+            HttpURLConnection connection = getConnectionFromUrl(url);
             connection.setRequestMethod("GET");
-            if(!token.isEmpty())
+            if(token != null && !token.isEmpty())
                 connection.setRequestProperty("Authorization", "Bearer " + token);
             if(connection.getResponseCode() == CODE_RESOURCE_NOT_FOUND)
                 return connection.getErrorStream();
@@ -83,12 +83,15 @@ public class GitApi {
             }
 
             return connection.getInputStream();
-        } catch (MalformedURLException e) {
-            Logger.error("Url for requesting git-api is malformed -> " + url, e);
-        } catch (IOException e) {
+        }catch (IOException e) {
             Logger.error("Processing git-api input stream failed.", e);
         }
         return InputStream.nullInputStream();
+    }
+
+    //Since having issues to mock url for tests, this method is mocked instead
+    public static HttpURLConnection getConnectionFromUrl(URL url) throws IOException {
+        return (HttpURLConnection) url.openConnection();
     }
 
 

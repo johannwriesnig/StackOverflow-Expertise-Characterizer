@@ -7,6 +7,9 @@ import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -17,13 +20,59 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class GitApiTest {
+    private final String loginResponse = "src/main/resources/test/apiResponses/git/loginResponse1.txt";
+
+    @Test
+    public void shouldReturnInputStream() throws IOException {
+        HttpURLConnection connection = mock(HttpURLConnection.class);
+        InputStream inputStream = new ByteArrayInputStream(Files.readAllBytes(Path.of(loginResponse)));
+        doReturn(inputStream).when(connection).getInputStream();
+
+        try(MockedStatic<GitApi> gitApiMockedStatic = mockStatic(GitApi.class)){
+            gitApiMockedStatic.when((()->GitApi.getStreamFromAPICall(anyString()))).thenCallRealMethod();
+            gitApiMockedStatic.when((()->GitApi.getConnectionFromUrl(any()))).thenReturn(connection);
+            assertNotNull(GitApi.getStreamFromAPICall(""));
+        }
+    }
+
+    @Test
+    public void shouldThrowRuntimeException() throws IOException {
+        Logger.deactivatePrinting();
+        HttpURLConnection connection = mock(HttpURLConnection.class);
+        InputStream inputStream = new ByteArrayInputStream(Files.readAllBytes(Path.of(loginResponse)));
+        doReturn(inputStream).when(connection).getInputStream();
+        doReturn(GitApi.CODE_BAD_CREDENTIALS).when(connection).getResponseCode();
+        try(MockedStatic<GitApi> gitApiMockedStatic = mockStatic(GitApi.class)){
+            gitApiMockedStatic.when((()->GitApi.getStreamFromAPICall(anyString()))).thenCallRealMethod();
+            gitApiMockedStatic.when((()->GitApi.getConnectionFromUrl(any()))).thenReturn(connection);
+
+            assertThrows(RuntimeException.class, ()->GitApi.getStreamFromAPICall(""));
+        }
+    }
+
+    @Test
+    public void shouldSetTokenInHeaderWhenSet() throws IOException {
+        Logger.deactivatePrinting();
+        HttpURLConnection connection = mock(HttpURLConnection.class);
+        InputStream inputStream = new ByteArrayInputStream(Files.readAllBytes(Path.of(loginResponse)));
+        doReturn(inputStream).when(connection).getInputStream();
+        try(MockedStatic<GitApi> gitApiMockedStatic = mockStatic(GitApi.class)){
+            gitApiMockedStatic.when((()->GitApi.getStreamFromAPICall(anyString()))).thenCallRealMethod();
+            gitApiMockedStatic.when((()->GitApi.getConnectionFromUrl(any()))).thenReturn(connection);
+            gitApiMockedStatic.when((()->GitApi.setToken(anyString()))).thenCallRealMethod();
+
+            String token = "token";
+            GitApi.setToken(token);
+            GitApi.getStreamFromAPICall("");
+            verify(connection, times(1)).setRequestProperty("Authorization","Bearer " + token);
+        }
+    }
 
     @Test
     public void retrieveUserByLogin() throws IOException {
-        String fileName = "src/main/resources/test/apiResponses/git/loginResponse1.txt";
         try (MockedStatic<GitApi> mockedGitApi = mockStatic(GitApi.class)) {
 
-            mockedGitApi.when(() -> GitApi.getStreamFromAPICall(anyString())).thenReturn(new FileInputStream(fileName));
+            mockedGitApi.when(() -> GitApi.getStreamFromAPICall(anyString())).thenReturn(new FileInputStream(loginResponse));
             mockedGitApi.when(() -> GitApi.getUserByLogin(any())).thenCallRealMethod();
             mockedGitApi.when(() -> GitApi.getStringFromStream(any())).thenCallRealMethod();
             GitUser user = GitApi.getUserByLogin("octocat");
