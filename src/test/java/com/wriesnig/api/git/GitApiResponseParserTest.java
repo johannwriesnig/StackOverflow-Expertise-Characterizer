@@ -23,7 +23,7 @@ public class GitApiResponseParserTest {
     }
 
     @Test
-    public void parseUserLoginResponse() throws IOException {
+    public void shouldReturnUserByGitLogin() throws IOException {
         String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/git/loginResponse1.txt"));
         JSONObject json = new JSONObject(content);
         GitUser gitUser = gitApiResponseParser.parseUserByLoginResponse(json);
@@ -36,7 +36,7 @@ public class GitApiResponseParserTest {
     }
 
     @Test
-    public void parseFullNameResponse() throws IOException {
+    public void shouldReturnFullNames() throws IOException {
         String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/git/fullNameResponse.txt"));
         JSONObject json = new JSONObject(content);
         ArrayList<String> logins = gitApiResponseParser.parseUsersByFullName(json);
@@ -46,7 +46,7 @@ public class GitApiResponseParserTest {
     }
 
     @Test
-    public void parseFullNameResponseNoUserFound() throws IOException {
+    public void shouldReturnEmptyList() throws IOException {
         String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/git/fullNameResponseNoMatch.txt"));
         JSONObject json = new JSONObject(content);
         ArrayList<String> logins = gitApiResponseParser.parseUsersByFullName(json);
@@ -55,7 +55,7 @@ public class GitApiResponseParserTest {
     }
 
     @Test
-    public void parseReposResponse() throws IOException {
+    public void shouldReturnRepos() throws IOException {
         String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/git/reposResponse.txt"));
         JSONArray json = new JSONArray(content);
         ArrayList<Repo> repos = gitApiResponseParser.parseReposByLogin(json);
@@ -70,7 +70,7 @@ public class GitApiResponseParserTest {
     }
 
     @Test
-    public void parseLoginResponseWhenNoUserFound() throws IOException {
+    public void shouldReturnDefaultUserWhenNoUserFound() throws IOException {
         String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/git/loginResponseUserNotFound.txt"));
         JSONObject json = new JSONObject(content);
         GitUser gitUser = gitApiResponseParser.parseUserByLoginResponse(json);
@@ -79,7 +79,7 @@ public class GitApiResponseParserTest {
     }
 
     @Test
-    public void parseLoginResponseWithNullableFieldName() throws IOException {
+    public void shouldPassParseWithNullableFields() throws IOException {
         String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/git/loginResponse2.txt"));
         JSONObject json = new JSONObject(content);
         GitUser gitUser = gitApiResponseParser.parseUserByLoginResponse(json);

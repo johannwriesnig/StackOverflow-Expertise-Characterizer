@@ -1,6 +1,5 @@
 package com.wriesnig.api.stack;
 
-import com.wriesnig.api.git.GitUser;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +21,7 @@ public class StackApiResponseParserTest {
     }
 
     @Test
-    public void parseTagsResponse() throws IOException {
+    public void shouldParseAndReturnTagsFromApiResponse() throws IOException {
         String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/stack/tagsResponse.txt"));
         JSONObject json = new JSONObject(content);
         ArrayList<String> tags = responseParser.parseTagsResponse(json);
@@ -33,7 +32,7 @@ public class StackApiResponseParserTest {
     }
 
     @Test
-    public void parseUsersResponse() throws IOException {
+    public void shouldParseAndReturnUsersFromApiResponse() throws IOException {
         String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/stack/usersResponse.txt"));
         JSONObject json = new JSONObject(content);
         ArrayList<StackUser> users = responseParser.parseUsersResponse(json);
