@@ -9,8 +9,6 @@ import org.mockito.MockedStatic;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -19,8 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class GitApiTest {
-    private final String loginResponse = "src/main/resources/test/apiResponses/git/loginResponse1.txt";
-
     private GitApi gitApi;
     private HttpURLConnection connection;
 
@@ -34,16 +30,14 @@ public class GitApiTest {
 
     @Test
     public void shouldReturnInputStream() throws IOException {
-        InputStream inputStream = new ByteArrayInputStream(Files.readAllBytes(Path.of(loginResponse)));
-        doReturn(inputStream).when(connection).getInputStream();
+        doReturn(GitApiResponses.getLoginResponse()).when(connection).getInputStream();
         assertNotNull(gitApi.getStreamFromAPICall(""));
     }
 
     @Test
     public void shouldThrowRuntimeException() throws IOException {
         Logger.deactivatePrinting();
-        InputStream inputStream = new ByteArrayInputStream(Files.readAllBytes(Path.of(loginResponse)));
-        doReturn(inputStream).when(connection).getInputStream();
+        doReturn(GitApiResponses.getLoginResponse()).when(connection).getInputStream();
         doReturn(GitApi.CODE_BAD_CREDENTIALS).when(connection).getResponseCode();
 
         assertThrows(RuntimeException.class, () -> gitApi.getStreamFromAPICall(""));
@@ -52,8 +46,7 @@ public class GitApiTest {
     @Test
     public void shouldSetTokenInHeaderWhenSet() throws IOException {
         Logger.deactivatePrinting();
-        InputStream inputStream = new ByteArrayInputStream(Files.readAllBytes(Path.of(loginResponse)));
-        doReturn(inputStream).when(connection).getInputStream();
+        doReturn(GitApiResponses.getLoginResponse()).when(connection).getInputStream();
         String token = "token";
         GitApi.setToken(token);
         gitApi.getStreamFromAPICall("");
@@ -63,9 +56,7 @@ public class GitApiTest {
 
     @Test
     public void retrieveUserByLogin() throws IOException {
-
-        doReturn(new FileInputStream(loginResponse)).when(gitApi).getStreamFromAPICall(anyString());
-
+        doReturn(GitApiResponses.getLoginResponse()).when(gitApi).getStreamFromAPICall(anyString());
         GitUser user = gitApi.getUserByLogin("octocat");
         assertNotNull(user);
         assertEquals("octocat", user.getLogin());
@@ -76,8 +67,7 @@ public class GitApiTest {
 
     @Test
     public void retrieveUsersByFullName() throws IOException {
-        String fileName = "src/main/resources/test/apiResponses/git/fullNameResponse.txt";
-        doReturn(new FileInputStream(fileName)).when(gitApi).getStreamFromAPICall(anyString());
+        doReturn(GitApiResponses.getFullNamesResponse()).when(gitApi).getStreamFromAPICall(anyString());
 
         ArrayList<String> logins = gitApi.getUsersByFullName("Max Mustermann");
         assertEquals(2, logins.size());
@@ -88,8 +78,7 @@ public class GitApiTest {
 
     @Test
     public void retrieveRepos() throws IOException {
-        String fileName = "src/main/resources/test/apiResponses/git/reposResponse.txt";
-        doReturn(new FileInputStream(fileName)).when(gitApi).getStreamFromAPICall(anyString());
+        doReturn(GitApiResponses.getReposResponse()).when(gitApi).getStreamFromAPICall(anyString());
 
         ArrayList<Repo> repos = gitApi.getReposByLogin("johannwriesnig");
         assertEquals(3, repos.size());
@@ -159,7 +148,6 @@ public class GitApiTest {
         File repoDir = new File(path + downloadedRepo.getFileName());
         assertTrue(repoDir.isDirectory());
         FileUtils.deleteDirectory(repoDir);
-
     }
 
     @Test
