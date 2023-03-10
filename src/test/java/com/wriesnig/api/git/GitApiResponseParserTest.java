@@ -7,11 +7,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class GitApiResponseParserTest {
@@ -24,9 +23,8 @@ public class GitApiResponseParserTest {
 
     @Test
     public void shouldReturnUserByGitLogin() throws IOException {
-        String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/git/loginResponse1.txt"));
-        JSONObject json = new JSONObject(content);
-        GitUser gitUser = gitApiResponseParser.parseUserByLoginResponse(json);
+        JSONObject loginResponse = new JSONObject(GitApiResponses.RESPONSE_LOGIN);
+        GitUser gitUser = gitApiResponseParser.parseUserByLoginResponse(loginResponse);
 
         assertEquals("octocat", gitUser.getLogin());
         assertEquals("monalisa octocat", gitUser.getName());
@@ -36,10 +34,9 @@ public class GitApiResponseParserTest {
     }
 
     @Test
-    public void shouldReturnFullNames() throws IOException {
-        String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/git/fullNameResponse.txt"));
-        JSONObject json = new JSONObject(content);
-        ArrayList<String> logins = gitApiResponseParser.parseUsersByFullName(json);
+    public void shouldReturnFullNames(){
+        JSONObject fullNamesResponse = new JSONObject(GitApiResponses.RESPONSE_FULL_NAMES);
+        ArrayList<String> logins = gitApiResponseParser.parseUsersByFullName(fullNamesResponse);
 
         assertEquals("jonhoo",logins.get(0));
         assertEquals("jskeet",logins.get(1));
@@ -47,18 +44,16 @@ public class GitApiResponseParserTest {
 
     @Test
     public void shouldReturnEmptyList() throws IOException {
-        String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/git/fullNameResponseNoMatch.txt"));
-        JSONObject json = new JSONObject(content);
-        ArrayList<String> logins = gitApiResponseParser.parseUsersByFullName(json);
+        JSONObject fullNamesNoMatchResponse = new JSONObject(GitApiResponses.RESPONSE_FULL_NAMES_NO_MATCH);
+        ArrayList<String> logins = gitApiResponseParser.parseUsersByFullName(fullNamesNoMatchResponse);
 
         assertEquals(0, logins.size());
     }
 
     @Test
     public void shouldReturnRepos() throws IOException {
-        String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/git/reposResponse.txt"));
-        JSONArray json = new JSONArray(content);
-        ArrayList<Repo> repos = gitApiResponseParser.parseReposByLogin(json);
+        JSONArray reposResponse = new JSONArray(GitApiResponses.RESPONSE_REPOS);
+        ArrayList<Repo> repos = gitApiResponseParser.parseReposByLogin(reposResponse);
 
         Repo runner = repos.get(0);
         assertEquals("johannwriesnig/Runner", runner.getName());
@@ -71,18 +66,16 @@ public class GitApiResponseParserTest {
 
     @Test
     public void shouldReturnDefaultUserWhenNoUserFound() throws IOException {
-        String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/git/loginResponseUserNotFound.txt"));
-        JSONObject json = new JSONObject(content);
-        GitUser gitUser = gitApiResponseParser.parseUserByLoginResponse(json);
+        JSONObject loginUserNotFoundResponse = new JSONObject(GitApiResponses.RESPONSE_LOGIN_USER_NOT_FOUND);
+        GitUser gitUser = gitApiResponseParser.parseUserByLoginResponse(loginUserNotFoundResponse);
 
         assertTrue(gitUser instanceof DefaultGitUser);
     }
 
     @Test
     public void shouldPassParseWithNullableFields() throws IOException {
-        String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/git/loginResponse2.txt"));
-        JSONObject json = new JSONObject(content);
-        GitUser gitUser = gitApiResponseParser.parseUserByLoginResponse(json);
+        JSONObject loginResponseWithNullableFields = new JSONObject(GitApiResponses.RESPONSE_LOGIN_WITH_NULLABLE_FIELDS);
+        GitUser gitUser = gitApiResponseParser.parseUserByLoginResponse(loginResponseWithNullableFields);
 
         assertEquals("johannwriesnig",gitUser.getLogin());
         assertEquals("", gitUser.getName());

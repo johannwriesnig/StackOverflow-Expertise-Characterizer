@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class GitApiResponses {
-    private static final String RESPONSE_FULL_NAMES = """
+    public static final String RESPONSE_FULL_NAMES = """
             {
               "total_count": 2,
               "incomplete_results": false,
@@ -55,7 +55,7 @@ public class GitApiResponses {
               ]
             }""";
 
-    private static final String RESPONSE_LOGIN = """
+    public static final String RESPONSE_LOGIN = """
             {
                "login": "octocat",
                "id": 1,
@@ -103,7 +103,7 @@ public class GitApiResponses {
                }
              }""";
 
-    private static final String RESPONSE_REPOS = """
+    public static final String RESPONSE_REPOS = """
             [
                 {
                    "id": 469132559,
@@ -418,6 +418,61 @@ public class GitApiResponses {
                      "default_branch": "main"
                    }
               ]""";
+
+    public static final String RESPONSE_FULL_NAMES_NO_MATCH = """
+            {
+              "total_count": 0,
+              "incomplete_results": false,
+              "items": [
+                        
+              ]
+            }""";
+
+    public static final String RESPONSE_LOGIN_WITH_NULLABLE_FIELDS = """
+            {
+              "login": "johannwriesnig",
+              "id": 80066151,
+              "node_id": "MDQ6VXNlcjgwMDY2MTUx",
+              "avatar_url": "https://avatars.githubusercontent.com/u/80066151?v=4",
+              "gravatar_id": "",
+              "url": "https://api.github.com/users/johannwriesnig",
+              "html_url": "https://github.com/johannwriesnig",
+              "followers_url": "https://api.github.com/users/johannwriesnig/followers",
+              "following_url": "https://api.github.com/users/johannwriesnig/following{/other_user}",
+              "gists_url": "https://api.github.com/users/johannwriesnig/gists{/gist_id}",
+              "starred_url": "https://api.github.com/users/johannwriesnig/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/johannwriesnig/subscriptions",
+              "organizations_url": "https://api.github.com/users/johannwriesnig/orgs",
+              "repos_url": "https://api.github.com/users/johannwriesnig/repos",
+              "events_url": "https://api.github.com/users/johannwriesnig/events{/privacy}",
+              "received_events_url": "https://api.github.com/users/johannwriesnig/received_events",
+              "type": "User",
+              "site_admin": false,
+              "name": null,
+              "company": null,
+              "blog": "https://stackoverflow.com/users/21153013/johannwriesnig",
+              "location": null,
+              "email": null,
+              "hireable": null,
+              "bio": null,
+              "twitter_username": null,
+              "public_repos": 3,
+              "public_gists": 0,
+              "followers": 0,
+              "following": 0,
+              "created_at": "2021-03-04T19:11:06Z",
+              "updated_at": "2023-02-05T18:05:33Z"
+            }
+            """;
+
+    public static final String RESPONSE_LOGIN_USER_NOT_FOUND = """
+            {
+              "message": "Not Found",
+              "documentation_url": "https://docs.github.com/rest/reference/users#get-a-user"
+            }
+            """;
+
+
 
     public static InputStream getReposResponse(){
         return new ByteArrayInputStream(RESPONSE_REPOS.getBytes(StandardCharsets.UTF_8));

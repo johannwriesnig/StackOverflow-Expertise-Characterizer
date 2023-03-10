@@ -5,9 +5,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,10 +18,9 @@ public class StackApiResponseParserTest {
     }
 
     @Test
-    public void shouldParseAndReturnTagsFromApiResponse() throws IOException {
-        String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/stack/tagsResponse.txt"));
-        JSONObject json = new JSONObject(content);
-        ArrayList<String> tags = responseParser.parseTagsResponse(json);
+    public void shouldParseAndReturnTagsFromApiResponse() {
+        JSONObject tagsResponse = StackApiResponses.RESPONSE_TAGS;
+        ArrayList<String> tags = responseParser.parseTagsResponse(tagsResponse);
 
         assertEquals(".net", tags.get(0));
         assertEquals("wcf", tags.get(1));
@@ -32,10 +28,9 @@ public class StackApiResponseParserTest {
     }
 
     @Test
-    public void shouldParseAndReturnUsersFromApiResponse() throws IOException {
-        String content = Files.readString(Paths.get("src/main/resources/test/apiResponses/stack/usersResponse.txt"));
-        JSONObject json = new JSONObject(content);
-        ArrayList<StackUser> users = responseParser.parseUsersResponse(json);
+    public void shouldParseAndReturnUsersFromApiResponse() {
+        JSONObject usersResponse = StackApiResponses.RESPONSE_USERS;
+        ArrayList<StackUser> users = responseParser.parseUsersResponse(usersResponse);
 
         assertEquals(2, users.size());
 
