@@ -11,9 +11,6 @@ import org.mockito.MockedStatic;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -23,8 +20,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class StackApiTest {
-    private final String users_response = "src/main/resources/test/apiResponses/stack/usersResponse.txt";
-
     private HttpURLConnection connection;
     private StackApi stackApi;
 
@@ -37,8 +32,8 @@ public class StackApiTest {
 
 
     @Test
-    public void shouldReturnUsers() throws IOException {
-        doReturn(new JSONObject(Files.readString(Path.of(users_response)))).when(stackApi).getResponse(any());
+    public void shouldReturnUsers() {
+        doReturn(StackApiResponses.RESPONSE_USERS).when(stackApi).getResponse(any());
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(1);
         ArrayList<StackUser> stackUsers = stackApi.getUsers(ids);
@@ -49,8 +44,8 @@ public class StackApiTest {
     }
 
     @Test
-    public void shouldMake2RequestSinceIdsListIsGreater100() throws IOException {
-        doReturn(new JSONObject(Files.readString(Path.of(users_response)))).when(stackApi).getResponse(any());
+    public void shouldMake2RequestSinceIdsListIsGreater100() {
+        doReturn(StackApiResponses.RESPONSE_USERS).when(stackApi).getResponse(any());
         ArrayList<Integer> ids = new ArrayList<>();
         for (int i = 0; i <= 150; i++)
             ids.add(i);
@@ -60,17 +55,15 @@ public class StackApiTest {
     }
 
     @Test
-    public void shouldReturnMainTags() throws IOException {
-        String tagsResponse = Files.readString(Paths.get("src/main/resources/test/apiResponses/stack/tagsResponse.txt"));
-        doReturn(new JSONObject(tagsResponse)).when(stackApi).getResponse(any());
+    public void shouldReturnMainTags(){
+        doReturn(StackApiResponses.RESPONSE_TAGS).when(stackApi).getResponse(any());
         assertEquals("wcf", stackApi.getMainTags(0).get(1));
     }
 
     @Test
     public void shouldReturnResponseCorrect() throws IOException {
-        String tagsResponse = Files.readString(Paths.get("src/main/resources/test/apiResponses/stack/tagsResponse.txt"));
         doReturn(StackApi.CODE_OK).when(connection).getResponseCode();
-        doReturn(getInputStreamInGzipFormat(tagsResponse)).when(connection).getInputStream();
+        doReturn(getInputStreamInGzipFormat(String.valueOf(StackApiResponses.RESPONSE_TAGS))).when(connection).getInputStream();
         JSONObject response = stackApi.getResponse("");
         assertTrue(response.has("items"));
 
@@ -98,9 +91,8 @@ public class StackApiTest {
 
     @Test
     public void shouldThrowRuntimeExceptionWhenBadRequest() throws IOException {
-        String throttleViolation = Files.readString(Paths.get("src/main/resources/test/apiResponses/stack/502Response.txt"));
         doReturn(StackApi.CODE_BAD_REQUEST).when(connection).getResponseCode();
-        doReturn(getInputStreamInGzipFormat(throttleViolation)).when(connection).getErrorStream();
+        doReturn(getInputStreamInGzipFormat(String.valueOf(StackApiResponses.RESPONSE_502))).when(connection).getErrorStream();
         try (MockedStatic<Logger> loggerMockedStatic = mockStatic(Logger.class)) {
             assertThrows(RuntimeException.class, () -> stackApi.getStreamFromAPICall(""));
             loggerMockedStatic.verify(() -> Logger.error(anyString()), times(1));
@@ -110,7 +102,7 @@ public class StackApiTest {
     @Test
     public void shouldReturnGZIPStream() throws IOException {
         doReturn(StackApi.CODE_OK).when(connection).getResponseCode();
-        doReturn(getInputStreamInGzipFormat(users_response)).when(connection).getInputStream();
+        doReturn(getInputStreamInGzipFormat(String.valueOf(StackApiResponses.RESPONSE_USERS))).when(connection).getInputStream();
         assertNotNull(stackApi.getStreamFromAPICall(""));
     }
 
@@ -151,7 +143,7 @@ public class StackApiTest {
     @Test
     public void shouldLogWhenGZIPStreamCannotBeCreated() throws IOException {
         doReturn(StackApi.CODE_OK).when(connection).getResponseCode();
-        InputStream inputStreamInNoZIPFormat = new ByteArrayInputStream(Files.readString(Path.of(users_response)).getBytes(StandardCharsets.UTF_8));
+        InputStream inputStreamInNoZIPFormat = new ByteArrayInputStream(String.valueOf(StackApiResponses.RESPONSE_USERS).getBytes(StandardCharsets.UTF_8));
         doReturn(inputStreamInNoZIPFormat).when(connection).getInputStream();
         try (MockedStatic<Logger> mockedLogger = mockStatic(Logger.class)) {
             stackApi.getStreamFromAPICall(" broken url ");
