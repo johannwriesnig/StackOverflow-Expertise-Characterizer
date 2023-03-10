@@ -457,7 +457,7 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
             tagPanel.add(tagLbl, tagPanelConstraints);
 
             JLabel tagValueLbl = new JLabel(expertise.get(tag));
-            tagValueLbl.setFont(new Font(tagValueLbl.getFont().getName(), Font.BOLD , 13));
+            tagValueLbl.setFont(new Font(tagValueLbl.getFont().getName(), Font.PLAIN , 13));
             tagValueLbl.setHorizontalAlignment(SwingConstants.CENTER);
 
             tagPanelConstraints.gridy=1;
