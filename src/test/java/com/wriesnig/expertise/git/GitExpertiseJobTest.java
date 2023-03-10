@@ -183,6 +183,18 @@ public class GitExpertiseJobTest {
         }
     }
 
+    @Test
+    public void shouldReturnTrueForImportSections(){
+        assertTrue(gitExpertiseJob.isInImportSection("import module from ..."));
+        assertTrue(gitExpertiseJob.isInImportSection("from module import ..."));
+        assertTrue(gitExpertiseJob.isInImportSection("      import from ..."));
+        assertTrue(gitExpertiseJob.isInImportSection("package com.package;"));
+        assertTrue(gitExpertiseJob.isInImportSection("#This is a comment"));
+        assertTrue(gitExpertiseJob.isInImportSection("//This is a comment"));
+        assertTrue(gitExpertiseJob.isInImportSection("/*Multiline Comment"));
+        assertTrue(gitExpertiseJob.isInImportSection("*/"));
+    }
+
     @AfterEach
     public void tearDown() {
         gitExpertiseJob = null;

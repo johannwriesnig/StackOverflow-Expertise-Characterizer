@@ -72,10 +72,9 @@ public class Main {
 
     public static Properties getPropertiesFromConfigFile(String configFile) {
         Properties properties = new Properties();
-        try {
-            InputStream inputStream = new FileInputStream(configFile);
-            properties.load(inputStream);
-            inputStream.close();
+
+        try(FileInputStream fileInputStream = new FileInputStream(configFile)){
+            properties.load(fileInputStream);
         } catch (FileNotFoundException e) {
             Logger.error("Properties file not found.", e);
             throw new RuntimeException();
