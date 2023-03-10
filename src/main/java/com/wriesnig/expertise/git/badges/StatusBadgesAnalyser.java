@@ -15,16 +15,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StatusBadgesAnalyser {
-    private final File readMe;
     private final String link = "https://([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])";
     private ArrayList<Document> badgesHtml;
 
 
-    public StatusBadgesAnalyser(File readMe){
-        this.readMe = readMe;
-    }
+    public StatusBadgesAnalyser(){}
 
-    public void initBadges(){
+    public void initBadges(File readMe){
         String readMeContent="";
         try {
             if(readMe.exists())readMeContent = Files.readString(readMe.toPath());

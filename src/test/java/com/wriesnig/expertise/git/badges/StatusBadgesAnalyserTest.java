@@ -4,95 +4,83 @@ import com.wriesnig.utils.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedConstruction;
-import org.mockito.MockedStatic;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class StatusBadgesAnalyserTest {
-    private StatusBadgesAnalyser buildPassingAnalyser;
-    private StatusBadgesAnalyser buildPassingSpy;
+    private StatusBadgesAnalyser statusBadgesAnalyser;
 
-    private StatusBadgesAnalyser buildFailingAnalyser;
-    private StatusBadgesAnalyser buildFailingSpy;
 
-    private final String buildPassingAndCodeCove84ReadMePath = "src/main/resources/test/badges/buildPassingAndCodeCove86.md";
-    private final String buildFailingAndCodeCove76Path = "src/main/resources/test/badges/buildFailingAndCodeCove76.md";
+    @TempDir
+    Path tempDir;
 
 
     @BeforeEach
     public void setUp() throws IOException {
         Logger.deactivatePrinting();
-        buildPassingAnalyser = new StatusBadgesAnalyser(new File(buildPassingAndCodeCove84ReadMePath));
-        buildPassingSpy = spy(buildPassingAnalyser);
-        doReturn(new FileInputStream("src/main/resources/test/badges/buildPassing.html")).when(buildPassingSpy).getInputStreamFromBadge("https://website.com/buildPassing");
-        doReturn(new FileInputStream("src/main/resources/test/badges/codecoverage86.html")).when(buildPassingSpy).getInputStreamFromBadge("https://website.com/codecoverage86");
-        buildPassingSpy.initBadges();
-
-        buildFailingAnalyser = new StatusBadgesAnalyser(new File(buildFailingAndCodeCove76Path));
-        buildFailingSpy = spy(buildFailingAnalyser);
-        doReturn(new FileInputStream("src/main/resources/test/badges/buildFailing.html")).when(buildFailingSpy).getInputStreamFromBadge("https://website.com/buildFailing");
-        doReturn(new FileInputStream("src/main/resources/test/badges/codecov76.html")).when(buildFailingSpy).getInputStreamFromBadge("https://website.com/codecove76");
-        buildFailingSpy.initBadges();
+        statusBadgesAnalyser = mock(StatusBadgesAnalyser.class, withSettings().defaultAnswer(CALLS_REAL_METHODS));
     }
 
     @Test
-    public void buildPassingAnd84CodeCoverage() throws IOException {
-        assertEquals(BuildStatus.PASSING,buildPassingSpy.getBuildStatus());
-        assertEquals(86, buildPassingSpy.getCoverage());
+    public void shouldReturnBuildPassing() throws IOException {
+        final Path buildPassingReadMe = tempDir.resolve("readMe.md");
+        Files.writeString(buildPassingReadMe, StatusBadgesHTML.READ_ME_BUILD_PASSING_AND_CODE_COV_86_READ);
+        doReturn(StatusBadgesHTML.getBuildPassing()).when(statusBadgesAnalyser).getInputStreamFromBadge(StatusBadgesHTML.LINK_BUILD_PASSING);
+        statusBadgesAnalyser.initBadges(buildPassingReadMe.toFile());
+        assertEquals(BuildStatus.PASSING,statusBadgesAnalyser.getBuildStatus());
     }
 
     @Test
-    public void setBuildFailingAnd76CodeCov(){
-        assertEquals(BuildStatus.FAILING, buildFailingSpy.getBuildStatus());
-        assertEquals(76, buildFailingSpy.getCoverage());
-    }
-    @Test
-    public void notExistingReadMe(){
-        StatusBadgesAnalyser spy = spy(new StatusBadgesAnalyser(new File("Not existing")));
-        spy.initBadges();
-        assertEquals(BuildStatus.NOT_GIVEN, spy.getBuildStatus());
-        assertEquals(-1, spy.getCoverage());
+    public void shouldReturnBuildFailing() throws IOException {
+        final Path buildFailingReadMe = tempDir.resolve("readMe.md");
+        Files.writeString(buildFailingReadMe, StatusBadgesHTML.READ_ME_ME_BUILD_FAILING_AND_CODE_COV_76);
+        doReturn(StatusBadgesHTML.getBuildFailing()).when(statusBadgesAnalyser).getInputStreamFromBadge(StatusBadgesHTML.LINK_BUILD_FAILING);
+        statusBadgesAnalyser.initBadges(buildFailingReadMe.toFile());
+        assertEquals(BuildStatus.FAILING,statusBadgesAnalyser.getBuildStatus());
     }
 
     @Test
-    public void fileReadingFails(){
-        try(MockedStatic<Files> mockedFiles = mockStatic(Files.class);
-            MockedStatic<Logger> mockedLogger = mockStatic(Logger.class)){
-            mockedFiles.when(()-> Files.readString(any())).thenThrow(IOException.class);
-            StatusBadgesAnalyser statusBadgesAnalyser = new StatusBadgesAnalyser(new File(buildPassingAndCodeCove84ReadMePath));
-            statusBadgesAnalyser.initBadges();
-            mockedLogger.verify(()-> Logger.error(anyString(), any()),times(1));
-        }
+    public void shouldReturn76Coverage() throws IOException {
+        final Path _76CoverageReadMe = tempDir.resolve("readMe.md");
+        Files.writeString(_76CoverageReadMe, StatusBadgesHTML.READ_ME_ME_BUILD_FAILING_AND_CODE_COV_76);
+        doReturn(StatusBadgesHTML.getCodeCov76()).when(statusBadgesAnalyser).getInputStreamFromBadge(StatusBadgesHTML.LINK_CODE_COV_76);
+        statusBadgesAnalyser.initBadges(_76CoverageReadMe.toFile());
+        assertEquals(76,statusBadgesAnalyser.getCoverage());
     }
 
     @Test
-    public void badgeUrlInputStreamFails(){
-        try(MockedStatic<Logger> mockedLogger = mockStatic(Logger.class);
-            MockedConstruction<URL> mockedUrl = getMockedUrl()){
-            StatusBadgesAnalyser statusBadgesAnalyser = new StatusBadgesAnalyser(new File(buildPassingAndCodeCove84ReadMePath));
-            statusBadgesAnalyser.initBadges();
-            mockedLogger.verify(()-> Logger.error(any()),times(2));
-        }
+    public void shouldReturn86Coverage() throws IOException {
+        final Path _86CoverageReadMe = tempDir.resolve("readMe.md");
+        Files.writeString(_86CoverageReadMe, StatusBadgesHTML.READ_ME_BUILD_PASSING_AND_CODE_COV_86_READ);
+        doReturn(StatusBadgesHTML.getCodeCoverage86()).when(statusBadgesAnalyser).getInputStreamFromBadge(StatusBadgesHTML.LINK_CODE_COV_86);
+        statusBadgesAnalyser.initBadges(_86CoverageReadMe.toFile());
+        assertEquals(86,statusBadgesAnalyser.getCoverage());
     }
 
-    public MockedConstruction<URL> getMockedUrl() {
-        return mockConstruction(URL.class,
-                (mock, context) -> {
-                    doThrow(MalformedURLException.class).when(mock).openStream();
-                });
+    @Test
+    public void shouldReturnBuildNotGiven() throws IOException {
+        final Path emptyReadMe = tempDir.resolve("readMe.md");
+        Files.writeString(emptyReadMe, StatusBadgesHTML.READ_ME_NO_BUILD_AND_COVE_COV_NO_VALUE);
+        statusBadgesAnalyser.initBadges(emptyReadMe.toFile());
+        assertEquals(BuildStatus.NOT_GIVEN,statusBadgesAnalyser.getBuildStatus());
     }
 
+    @Test
+    public void shouldReturnMinus1Coverage() throws IOException {
+        final Path emptyReadMe = tempDir.resolve("readMe.md");
+        Files.writeString(emptyReadMe, StatusBadgesHTML.READ_ME_NO_BUILD_AND_COVE_COV_NO_VALUE);
+        statusBadgesAnalyser.initBadges(emptyReadMe.toFile());
+        assertEquals(-1,statusBadgesAnalyser.getCoverage());
+    }
 
     @AfterEach
-    public void tearDown(){
-        buildPassingSpy = null;
-        buildPassingAnalyser = null;
+    public void tearDown() {
+        statusBadgesAnalyser = null;
     }
 }

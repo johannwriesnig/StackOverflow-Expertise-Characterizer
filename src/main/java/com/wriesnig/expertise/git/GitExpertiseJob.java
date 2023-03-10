@@ -117,8 +117,8 @@ public class GitExpertiseJob implements Runnable {
                 setPythonMetrics(repo);
             }
         }
-        StatusBadgesAnalyser badgesAnalyser = new StatusBadgesAnalyser(readMe);
-        badgesAnalyser.initBadges();
+        StatusBadgesAnalyser badgesAnalyser = new StatusBadgesAnalyser();
+        badgesAnalyser.initBadges(readMe);
         repo.setBuildStatus(badgesAnalyser.getBuildStatus());
         repo.setCoverage(badgesAnalyser.getCoverage());
         String readMeContent="";
