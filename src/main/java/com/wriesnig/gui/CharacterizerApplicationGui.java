@@ -2,6 +2,7 @@ package com.wriesnig.gui;
 
 import com.wriesnig.CharacterizerApplication;
 import com.wriesnig.api.git.DefaultGitUser;
+import com.wriesnig.expertise.Expertise;
 import com.wriesnig.expertise.Tags;
 import com.wriesnig.expertise.User;
 import com.wriesnig.utils.Logger;
@@ -196,9 +197,9 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         waitScreen.add(infoLbl);
     }
 
-    public void setExpertiseHoverInfo(double stackExpertise, double gitExpertise){
-        gitInfoValue.setText(String.valueOf(gitExpertise));
-        stackInfoValue.setText(String.valueOf(stackExpertise));
+    public void setExpertiseHoverInfo(String stackExpertise, String gitExpertise){
+        gitInfoValue.setText(gitExpertise);
+        stackInfoValue.setText(stackExpertise);
     }
 
 
@@ -262,33 +263,38 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
         stackInfo = new JLabel("Stack-Expertise:");
         stackInfo.setFont(new Font(stackInfo.getFont().getName(), Font.PLAIN , 13));
         stackInfo.setSize(stackInfo.getPreferredSize());
-        stackInfo.setMaximumSize(stackInfo.getPreferredSize());
         constraints.gridx = 0;
         constraints.gridy = 0;
-        constraints.insets = new Insets(2,2,0,0);
+        constraints.insets = new Insets(3,3,0,0);
         panel.add(stackInfo, constraints);
 
-        stackInfoValue = new JLabel("1");
-        stackInfoValue.setMaximumSize(stackInfoValue.getPreferredSize());
+        stackInfoValue = new JLabel("Placeholder");
         stackInfoValue.setFont(new Font(stackInfoValue.getFont().getName(), Font.PLAIN , 13));
+        stackInfoValue.setHorizontalAlignment(SwingConstants.LEFT);
         constraints.gridx = 1;
+        constraints.anchor=GridBagConstraints.LINE_START;
+        constraints.insets = new Insets(3,3,0,3);
         panel.add(stackInfoValue, constraints);
 
         gitInfo = new JLabel("Git-Expertise:");
         gitInfo.setFont(new Font(gitInfo.getFont().getName(), Font.PLAIN , 13));
         gitInfo.setHorizontalAlignment(SwingConstants.RIGHT);
+        constraints.anchor=GridBagConstraints.LINE_END;
         constraints.gridx = 0;
         constraints.gridy = 1;
+        constraints.insets = new Insets(3,3,0,0);
         panel.add(gitInfo, constraints);
 
-        gitInfoValue = new JLabel("1");
-        gitInfoValue.setMaximumSize(gitInfoValue.getPreferredSize());
+        gitInfoValue = new JLabel("Placeholder");
         gitInfoValue.setFont(new Font(gitInfoValue.getFont().getName(), Font.PLAIN , 13));
         gitInfoValue.setBackground(Color.yellow);
+        gitInfoValue.setHorizontalTextPosition(SwingConstants.LEFT);
+        constraints.anchor=GridBagConstraints.LINE_START;
         constraints.gridx = 1;
+        constraints.insets = new Insets(3,3,0,3);
         panel.add(gitInfoValue, constraints);
 
-        panel.setSize(new Dimension(135,41));
+        panel.setSize(panel.getPreferredSize());
         return panel;
     }
 
@@ -352,7 +358,7 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
 
         constraints.gridx=2;
         constraints.gridy=1;
-        constraints.insets = new Insets(0,0,8,40);
+        constraints.insets = new Insets(0,0,8,0);
         userPanel.add(gitLinkLbl, constraints);
 
         addTagsToPanel(user, constraints, userPanel);
@@ -433,22 +439,30 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
 
     public void addTagsToPanel(User user, GridBagConstraints constraints, JPanel userPanel){
         constraints.anchor = GridBagConstraints.CENTER;
-        HashMap<String, Double> expertise = user.getExpertise().getOverAllExpertise();
+        constraints.gridheight=2;
+        constraints.insets = new Insets(0,15,0,0);
+        HashMap<String, String> expertise = Expertise.getExpertiseAsDescriptions(user.getExpertise().getCombinedExpertise());
         for(String tag: Tags.tagsToCharacterize){
-            constraints.insets = new Insets(8,0,0,20);
+            JPanel tagPanel = new JPanel();
+            tagPanel.setLayout(new GridBagLayout());
+            GridBagConstraints tagPanelConstraints = new GridBagConstraints();
+            tagPanel.setBackground(backGroundColor);
             JLabel tagLbl = new JLabel(tag);
             tagLbl.setFont(new Font(tagLbl.getFont().getName(), Font.PLAIN , 15));
             tagLbl.addMouseListener(getMouseAdapterForHoverInfo(user, tag));
             constraints.gridy = 0;
             constraints.gridx++;
-            userPanel.add(tagLbl, constraints);
+            tagLbl.setHorizontalAlignment(SwingConstants.CENTER);
+            tagPanelConstraints.fill=GridBagConstraints.HORIZONTAL;
+            tagPanel.add(tagLbl, tagPanelConstraints);
 
-            constraints.insets = new Insets(0,0,8,20);
-            constraints.gridy = 1;
-            double tagExpertise = expertise.get(tag);
-            JLabel tagValueLbl = new JLabel(String.valueOf(tagExpertise));
-            tagLbl.setFont(new Font(tagValueLbl.getFont().getName(), Font.PLAIN , 15));
-            userPanel.add(tagValueLbl, constraints);
+            JLabel tagValueLbl = new JLabel(expertise.get(tag));
+            tagValueLbl.setFont(new Font(tagValueLbl.getFont().getName(), Font.BOLD , 13));
+            tagValueLbl.setHorizontalAlignment(SwingConstants.CENTER);
+
+            tagPanelConstraints.gridy=1;
+            tagPanel.add(tagValueLbl, tagPanelConstraints);
+            userPanel.add(tagPanel, constraints);
         }
     }
 
@@ -465,9 +479,11 @@ public class CharacterizerApplicationGui extends JFrame implements Observer {
                     hoverExpertisePanel.setLocation((int) (b.getX() + xOffSet), (int) (b.getY() + yOffSet));
                 else
                     hoverExpertisePanel.setLocation((int) (b.getX() - xOffSet - hoverExpertisePanel.getSize().getWidth()), (int) (b.getY() + yOffSet));
-                setExpertiseHoverInfo(user.getExpertise().getStackExpertise().get(tag),user.getExpertise().getGitExpertise().get(tag));
+                HashMap<String,String> stackExpertise = Expertise.getExpertiseAsDescriptions(user.getExpertise().getStackExpertise());
+                HashMap<String,String> gitExpertise = Expertise.getExpertiseAsDescriptions(user.getExpertise().getGitExpertise());
+                setExpertiseHoverInfo(stackExpertise.get(tag),gitExpertise.get(tag));
+                hoverExpertisePanel.setSize(hoverExpertisePanel.getPreferredSize());
                 hoverExpertisePanel.setVisible(true);
-
             }
 
             @Override

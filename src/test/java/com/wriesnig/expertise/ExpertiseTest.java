@@ -17,7 +17,7 @@ public class ExpertiseTest {
         expertise.getStackExpertise().put("python", 3.1);
         expertise.getGitExpertise().put("python", 3.5);
 
-        HashMap<String, Double> overallExpertise = expertise.getOverAllExpertise();
+        HashMap<String, Double> overallExpertise = expertise.getCombinedExpertise();
         assertEquals(2, overallExpertise.size());
         assertEquals(4.06, overallExpertise.get("java"));
         assertEquals(3.23, overallExpertise.get("python"));

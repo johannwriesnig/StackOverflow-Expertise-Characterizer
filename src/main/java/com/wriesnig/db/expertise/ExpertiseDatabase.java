@@ -70,7 +70,7 @@ public class ExpertiseDatabase {
             insertUser.setString(index++, user.getGitLogin());
             insertUser.setString(index++, user.getProfileImageUrl());
 
-            HashMap<String, Double> expertise = user.getExpertise().getOverAllExpertise();
+            HashMap<String, Double> expertise = user.getExpertise().getCombinedExpertise();
             for(String tag: Tags.tagsToCharacterize)
                 insertUser.setDouble(index++, expertise.get(tag));
 
