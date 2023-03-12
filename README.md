@@ -2,11 +2,20 @@
 
 The Characterizer application is a Java program that computes a [StackOverflow](https://stackoverflow.com/)-Users expertise for some given topics.
 
-Given some StackOverflow ids, the application uses the [StackExchange-Api](https://api.stackexchange.com/) to retrieve the users' profile data. With this data, it then utilizes the [GitHub-Api](https://docs.github.com/en/rest?apiVersion=2022-11-28) to find the users' potential [GitHub](https://github.com/) accounts. After this first phase, it then makes use of the [StackOverflow-Data-Dumps](https://archive.org/details/stackexchange) to determine the users' expertise for some given tags. Additionally, it will fetch repositories of found Github accounts and analyze their quality, thus their expertise, if they can be associated with certain tags and are written in Java or Python. At the end, the users' expertises computed for StackOverflow and Github will be used together, to determine final tag expertise scores that range between 1 and 5. 
+Given some StackOverflow ids, the application uses the [StackExchange-Api](https://api.stackexchange.com/) to retrieve the users' profile data. With this data, it then utilizes the [GitHub-Api](https://docs.github.com/en/rest?apiVersion=2022-11-28) to find the users' potential [GitHub](https://github.com/) accounts. After this first phase, it then makes use of the [StackOverflow-Data-Dumps](https://archive.org/details/stackexchange) to determine the users' expertise for some given tags. Additionally, it will fetch repositories of found Github accounts and analyze their quality, thus their expertise, if they can be associated with certain tags and are written in Java or Python. Next, the users' expertises computed for StackOverflow and Github are used together, to determine final tag expertise scores that range between 1 and 5. Finally, the scores are mapped to textual descriptions and displayed in the GUI. 
+
+Expertise-Legend:
+
+| Score | Description |
+|-------|-------------|
+| 1-1.99| 'Beginner', limited knowledge or experience |
+| 2-2.99| 'Intermediate', some knowledge or experience |
+| 3-3.99| 'Proficient', good knowledge or experience |
+| 4-5| 'Expert', high level of knowledge or experience |
 
 ## Requirements
 
-StackOverflow-Data-Dumps: The data dumps are used to compute a users' expertise on StackOverflow. You need to download [Users.xml](https://ia600107.us.archive.org/view_archive.php?archive=/27/items/stackexchange/stackoverflow.com-Users.7z), [Posts.xml](https://ia600107.us.archive.org/view_archive.php?archive=/27/items/stackexchange/stackoverflow.com-Posts.7z) and [Votes.xml](https://ia600107.us.archive.org/view_archive.php?archive=/27/items/stackexchange/stackoverflow.com-Votes.7z). <br>
+StackOverflow-Data-Dumps: The data dumps are used to compute a users' expertise on StackOverflow. You need to download [Users.xml](https://archive.org/download/stackexchange/stackoverflow.com-Users.7z), [Posts.xml](https://archive.org/download/stackexchange/stackoverflow.com-Posts.7z) and [Votes.xml](https://archive.org/download/stackexchange/stackoverflow.com-Votes.7z). <br>
 PostgreSQL: The application uses a [PostgreSQL](https://www.python.org/downloads/) database, that stores the StackOverflow-Data-Dumps.<br>
 Python: In order to analyze Python project metrics, the application uses Radon which is run with [Python](https://www.python.org/downloads/). ***To enable Python projects analysis make sure python is added as path-variable, thus can be called as 'python' via cmd. Since Radon may not work with older Python versions check Radons [ReadMe-Requirements](https://github.com/rubik/radon/blob/master/README.rst).*** <br>
 GitHub-Api-Token: For increased rate limits, a personal access token for the GitHub-Api is used.                                                                 [Here](https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) is a nice and simple step-by-step guide to create one. <br>
@@ -48,5 +57,5 @@ tags: expertise is computed for set tags, e.g. 'java,python,spring'. <br>
 
 ## Usage
 
-Start the application by calling it with the config.properties as an argument. A GUI should come up where you can type in user ids delimited by commas. Press start and the program starts running. After some time, you will get some output on the screen where the data is also stored in the expertise-database. 
+Start the application by calling it with the config.properties as an argument. A GUI will come up where you can type in user ids delimited by commas. Press start and the program starts running. After some time, the users and their expertises are displayed and the collected data is also getting stored into the expertise-database. 
 
