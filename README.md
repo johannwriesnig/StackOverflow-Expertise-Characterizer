@@ -27,9 +27,9 @@ StackExchange-Api-Key: For increased rate limits, a personal key for the Stack-E
 
 #### Creating Databases
 
-At first, place Posts.xml, Users.xml and Votes.xml in db/dumpsDb/xml (Make sure you keep these names!). Then you can call the Characterizer-Application with the parameter c, that will convert the XML files into CSV and remove unneeded columns. The .csv files can then be found in db/dumpsDb/csv/ and you can delete the .xml files. After creating the csv files you then can execute the init.cmd script in db/dumpsDb that creates the database by using the psql command and the createDB.sql file. ***Make sure the psql command is working and Posts.csv, Users.csv and Votes.csv are placed in db/dumpsDb/csv/.***
+At first, place Posts.xml, Users.xml and Votes.xml (unzipped) in db/dumpsDb/xml. Then you can call the Characterizer-Application with additional parameter c. The program tries to find db/dumpbsDb/xml/(Posts.xml|Votes.xml|Users.xml) and converts existing ones into CSV and remove unneeded columns. You can find the .csv files in db/dumpsDb/csv/ and delete the .xml files, since they are not needed from now on. Having the .csv files in db/dumpsDb/csv and Postgresql installed you can use the init.cmd script in db/dumpsDb to create the dumps-database.
 <br>
-Next navigate to db/expertiseDb/. The init.cmd will create a database that is used to store the users' expertise. Before running the script you have to set the tags in the config.properties file. Based on these tags the application will later compute the users' expertises and the script will adapt the createDB.sql file to contain them in the Users table. ***Tags are delimited by commas e.g. 'tags=java,python,spring'.***
+Next, navigate to db/expertiseDb/. The init.cmd creates a database that is used to store the users' expertise. Before running the script set the tags in the config.properties file. Based on these tags the application will later compute the users' expertises and the script adapts the createDB.sql file to contain them in the Users table. ***Tags are delimited by commas e.g. 'tags=java,python,spring'.***
 
 #### Install Radon
 
