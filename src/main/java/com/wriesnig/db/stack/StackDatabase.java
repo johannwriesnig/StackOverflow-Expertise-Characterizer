@@ -17,6 +17,7 @@ public class StackDatabase {
     private StackDatabase(){}
 
     public static void initDB() {
+        Logger.info("Initializing Stack-Database connection/statements.");
         try {
             connection = DriverManager.getConnection(url, user, password);
             selectPosts = connection.prepareStatement("""

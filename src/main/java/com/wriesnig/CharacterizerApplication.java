@@ -25,8 +25,9 @@ public class CharacterizerApplication implements Observable {
     }
 
     public void run() {
-        Logger.info("Running characterizer application.");
+        Logger.info("Running Characterizer application.");
         initDBs();
+        Logger.info("Retrieving user data and trying to find github accounts.");
         AccountsFetcher accountsFetcher = new AccountsFetcher();
         ArrayList<User> users = accountsFetcher.fetchMatchingAccounts(ids);
         runExpertiseJobs(users);

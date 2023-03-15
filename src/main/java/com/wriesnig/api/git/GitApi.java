@@ -85,13 +85,14 @@ public class GitApi {
 
             return connection.getInputStream();
         }catch (IOException e) {
-            Logger.error("Processing git-api input stream failed.", e);
+            Logger.error("Processing git-api input stream failed for '" + urlString + "'.", e);
         }
         return InputStream.nullInputStream();
     }
 
     //Since having issues to mock url for tests, this method is mocked instead
     public HttpURLConnection getConnectionFromUrl(URL url) throws IOException {
+        Logger.info("Connecting to '" + url + "'.");
         return (HttpURLConnection) url.openConnection();
     }
 
@@ -166,10 +167,12 @@ public class GitApi {
     public static String getToken(){return token;}
 
     public static void setToken(String token) {
+        Logger.info("Setting Git-Api token to '" + token + "'.");
         GitApi.token = token;
     }
 
     public static void setReposMaxSizeInMB(int reposMaxSizeInMB) {
+        Logger.info("Setting maximal size of repos to '"+reposMaxSizeInMB+"'MB.");
         GitApi.reposMaxSizeInKB = reposMaxSizeInMB*1000;
     }
 }

@@ -24,6 +24,7 @@ public class ExpertiseDatabase {
     }
 
     public static void initDB() {
+        Logger.info("Initializing Expertise-Database connection/statements.");
         try {
             connection = DriverManager.getConnection(url, user, password);
             String insertStmt = getInsertUserStatement();

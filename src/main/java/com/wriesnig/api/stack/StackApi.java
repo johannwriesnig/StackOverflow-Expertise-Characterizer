@@ -67,12 +67,12 @@ public class StackApi {
     }
 
     public GZIPInputStream getStreamFromAPICall(String path) {
-        String url = API_URL + path + "&key="+key;
+        String urlString = API_URL + path + "&key="+key;
         try {
-            URL getUrl = new URL(url);
+            URL url = new URL(urlString);
             if(backOffParameterInSecs !=0)
                 waitBackOffTime();
-            HttpURLConnection connection = getConnectionFromUrl(getUrl);
+            HttpURLConnection connection = getConnectionFromUrl(url);
             connection.setRequestMethod("GET");
             int status = connection.getResponseCode();
             if(status==CODE_OK)return new GZIPInputStream(connection.getInputStream());
@@ -82,13 +82,14 @@ public class StackApi {
             Logger.error("Stack-Api error: " + errorName);
             throw new RuntimeException(errorMessage);
         } catch (IOException e) {
-            Logger.error("Processing stack-api input stream failed.", e);
+            Logger.error("Processing stack-api input stream failed for '" +urlString+ "'.", e);
         }
         return null;
     }
 
     //Since having issues to mock url for tests, this method is mocked instead
     public HttpURLConnection getConnectionFromUrl(URL url) throws IOException {
+        Logger.info("Connecting to '" + url + "'.");
         return (HttpURLConnection) url.openConnection();
     }
 
@@ -118,6 +119,7 @@ public class StackApi {
     }
 
     public static void setKey(String key){
+        Logger.info("Setting Stack-Api key to '" + key + "'.");
         StackApi.key = key;
     }
 
