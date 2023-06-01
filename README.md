@@ -58,4 +58,3 @@ tags: expertise is computed for set tags, e.g. 'java,python,spring'. <br>
 ## Usage
 
 Start the application by calling it with the config.properties as an argument. A GUI comes up where you can type in user ids delimited by commas. Press start and the program starts running. After some time, the users and their expertises are displayed and the collected data is also stored in the expertise-database. 
-
